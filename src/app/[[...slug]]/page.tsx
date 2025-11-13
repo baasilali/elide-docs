@@ -45,18 +45,14 @@ export default async function DocsPage(props: PageProps) {
   }
 
   return (
-    <div className="flex h-full w-full justify-center overflow-hidden">
-      <div className="flex h-full w-full max-w-6xl gap-6 px-4 py-8 md:px-6 lg:gap-10">
-        <Sidebar activeSlug={doc.slug} />
-        <div className="flex flex-1 flex-col overflow-hidden">
-          <div className="flex-1 overflow-y-auto pr-2">
-            <article className="markdown relative rounded-2xl border border-gray-100 bg-[var(--surface)] p-8 shadow-sm dark:border-slate-800">
-              <div dangerouslySetInnerHTML={{ __html: doc.html }} />
-            </article>
-          </div>
-        </div>
-        <OnThisPage toc={doc.toc} />
+    <div className="flex w-full">
+      <Sidebar activeSlug={doc.slug} />
+      <div className="flex flex-1 justify-center px-8 py-8">
+        <article className="markdown w-full max-w-4xl rounded-2xl border border-gray-100 bg-[var(--surface)] p-8 shadow-sm dark:border-slate-800">
+          <div dangerouslySetInnerHTML={{ __html: doc.html }} />
+        </article>
       </div>
+      <OnThisPage toc={doc.toc} />
     </div>
   );
 }

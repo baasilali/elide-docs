@@ -11,13 +11,13 @@
 }
 
 .dark {
-  --background: #0f172a;
+  --background: #000000;
   --foreground: #e2e8f0;
   --muted: #94a3b8;
   --border: #1e293b;
   --accent-pink: #ec4899;
   --accent-purple: #a855f7;
-  --surface: #111827;
+  --surface: rgba(20, 20, 20, 0.85);
 }
 
 @theme inline {
@@ -37,8 +37,13 @@ body {
   color: var(--foreground);
   font-family: var(--font-geist-sans), system-ui, -apple-system, BlinkMacSystemFont,
     "Segoe UI", sans-serif;
-  overflow: hidden;
-  overscroll-behavior: none;
+}
+
+.dark body {
+  background:
+    radial-gradient(ellipse 90% 55% at 50% -10%, rgba(236, 72, 153, 0.18), transparent),
+    radial-gradient(ellipse 60% 35% at 70% 10%, rgba(168, 85, 247, 0.12), transparent),
+    #000000;
 }
 
 a {

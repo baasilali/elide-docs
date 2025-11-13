@@ -27,7 +27,7 @@ export default async function Navbar() {
   const destinations = extractTopLevelDestinations(tree);
 
   return (
-    <header className="sticky top-0 z-40 border-b border-gray-200 bg-white/80 backdrop-blur dark:border-slate-800 dark:bg-slate-900/70">
+    <header className="sticky top-0 z-40 border-b border-gray-200/60 bg-transparent backdrop-blur-sm dark:border-white/10 dark:bg-transparent">
       <div className="mx-auto flex h-16 w-full max-w-6xl items-center gap-4 px-4 sm:px-6">
         <Link href="/" className="text-lg font-semibold text-gray-900 dark:text-slate-100">
           Elide Docs

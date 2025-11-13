@@ -95,7 +95,7 @@ export default async function Sidebar({ activeSlug }: SidebarProps) {
   const tree = await getContentTree();
 
   return (
-    <aside className="hidden h-full w-64 flex-shrink-0 border-r border-gray-200 bg-gray-50/80 px-4 py-6 md:block dark:border-slate-800 dark:bg-slate-900/40">
+    <aside className="sticky top-0 hidden h-screen w-64 flex-shrink-0 px-6 py-8 md:block">
       <ScrollArea className="h-full pr-2">
         <div className="space-y-1">{renderTree(tree, activeSlug)}</div>
       </ScrollArea>
