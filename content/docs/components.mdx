@@ -1,0 +1,264 @@
+---
+title: "Components"
+description: "Building blocks of Elide applications"
+date: "2025-11-18"
+---
+
+# Components
+
+Components are reusable building blocks for Elide applications. They encapsulate functionality and can be easily composed to create complex applications.
+
+## What are Components?
+
+Components in Elide are self-contained modules that:
+
+- Have a clear interface
+- Manage their own state
+- Can be composed with other components
+- Are easily testable
+
+## Creating Components
+
+### Basic Component
+
+```typescript
+// components/greeting.ts
+export interface GreetingProps {
+  name: string
+  greeting?: string
+}
+
+export function Greeting({ name, greeting = 'Hello' }: GreetingProps) {
+  return `${greeting}, ${name}!`
+}
+```
+
+### Stateful Component
+
+```typescript
+// components/counter.ts
+export class Counter {
+  private count = 0
+  
+  increment() {
+    this.count++
+  }
+  
+  decrement() {
+    this.count--
+  }
+  
+  get value() {
+    return this.count
+  }
+}
+```
+
+## Component Composition
+
+Combine components to build complex functionality:
+
+```typescript
+import { Database } from '@elide/database'
+import { Cache } from '@elide/cache'
+
+export class UserService {
+  constructor(
+    private db: Database,
+    private cache: Cache
+  ) {}
+  
+  async getUser(id: string) {
+    // Try cache first
+    const cached = await this.cache.get(`user:${id}`)
+    if (cached) return cached
+    
+    // Fetch from database
+    const user = await this.db.users.findById(id)
+    
+    // Cache for next time
+    await this.cache.set(`user:${id}`, user, { ttl: 300 })
+    
+    return user
+  }
+}
+```
+
+## Lifecycle Hooks
+
+Components can implement lifecycle hooks:
+
+```typescript
+export class MyComponent {
+  async onInit() {
+    // Called when component is initialized
+    console.log('Component initialized')
+  }
+  
+  async onDestroy() {
+    // Called when component is destroyed
+    console.log('Component destroyed')
+  }
+}
+```
+
+## Dependency Injection
+
+Elide provides a dependency injection system:
+
+```typescript
+import { Injectable, Inject } from '@elide/core'
+
+@Injectable()
+export class AuthService {
+  constructor(
+    @Inject('Database') private db: Database,
+    @Inject('Config') private config: Config
+  ) {}
+  
+  async authenticate(token: string) {
+    // Implementation
+  }
+}
+```
+
+## Component Testing
+
+Testing components is straightforward:
+
+```typescript
+import { test, expect } from '@elide/test'
+import { Greeting } from './greeting'
+
+test('Greeting returns correct message', () => {
+  const result = Greeting({ name: 'World' })
+  expect(result).toBe('Hello, World!')
+})
+
+test('Greeting uses custom greeting', () => {
+  const result = Greeting({ name: 'World', greeting: 'Hi' })
+  expect(result).toBe('Hi, World!')
+})
+```
+
+## Best Practices
+
+### Single Responsibility
+
+Each component should do one thing well:
+
+```typescript
+// Good: Focused component
+export class EmailValidator {
+  validate(email: string): boolean {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+  }
+}
+
+// Bad: Too many responsibilities
+export class UserManager {
+  validate(email: string) { /* ... */ }
+  sendEmail(to: string, body: string) { /* ... */ }
+  hashPassword(password: string) { /* ... */ }
+  // Too much!
+}
+```
+
+### Explicit Dependencies
+
+Always declare dependencies explicitly:
+
+```typescript
+// Good
+export class OrderService {
+  constructor(
+    private db: Database,
+    private payment: PaymentService
+  ) {}
+}
+
+// Bad: Hidden dependency
+export class OrderService {
+  process() {
+    const db = getGlobalDatabase()  // Hidden!
+  }
+}
+```
+
+### Immutability
+
+Prefer immutable data structures:
+
+```typescript
+// Good
+export function addItem(cart: Cart, item: Item): Cart {
+  return {
+    ...cart,
+    items: [...cart.items, item]
+  }
+}
+
+// Bad
+export function addItem(cart: Cart, item: Item): void {
+  cart.items.push(item)  // Mutation!
+}
+```
+
+## Component Patterns
+
+### Factory Pattern
+
+```typescript
+export class UserFactory {
+  create(data: UserData): User {
+    return {
+      ...data,
+      id: generateId(),
+      createdAt: new Date()
+    }
+  }
+}
+```
+
+### Repository Pattern
+
+```typescript
+export class UserRepository {
+  constructor(private db: Database) {}
+  
+  async findById(id: string) {
+    return this.db.users.findById(id)
+  }
+  
+  async save(user: User) {
+    return this.db.users.save(user)
+  }
+}
+```
+
+### Service Pattern
+
+```typescript
+export class NotificationService {
+  constructor(
+    private email: EmailService,
+    private sms: SMSService
+  ) {}
+  
+  async notify(user: User, message: string) {
+    if (user.preferences.email) {
+      await this.email.send(user.email, message)
+    }
+    if (user.preferences.sms) {
+      await this.sms.send(user.phone, message)
+    }
+  }
+}
+```
+
+## Next Steps
+
+- [JavaScript](/docs/javascript) - JavaScript API reference
+- [TypeScript](/docs/typescript) - TypeScript features
+- [API Reference](/docs/api-core) - Core APIs
+

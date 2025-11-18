@@ -1,0 +1,50 @@
+---
+title: "Database API"
+description: "Database access and ORM"
+date: "2025-11-18"
+---
+
+# Database API Reference
+
+The `@elide/database` package provides a powerful ORM and database access layer.
+
+## Connecting to Databases
+
+```typescript
+import { connect } from '@elide/database'
+
+const db = await connect('postgresql://localhost/mydb')
+
+// Or with options
+const db = await connect({
+  type: 'postgresql',
+  host: 'localhost',
+  port: 5432,
+  database: 'mydb',
+  username: 'user',
+  password: 'pass'
+})
+```
+
+## Querying Data
+
+```typescript
+// Find all
+const users = await db.users.findMany()
+
+// Find by ID
+const user = await db.users.findById('123')
+
+// Find with conditions
+const activeUsers = await db.users.findMany({
+  where: { active: true }
+})
+
+// Find one
+const user = await db.users.findOne({
+  where: { email: 'alice@example.com' }
+})
+```
+
+For complete database documentation, see the [Core API](/docs/api-core).
+

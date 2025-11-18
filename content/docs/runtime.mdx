@@ -1,0 +1,278 @@
+---
+title: "Runtime"
+description: "How the Elide runtime works under the hood"
+date: "2025-11-18"
+---
+
+import { Alert } from '@/components/ui/alert'
+import { Badge } from '@/components/ui/badge'
+
+# Elide Runtime
+
+The Elide runtime is a high-performance, polyglot execution environment built on GraalVM. This guide explores its internals and capabilities.
+
+## Runtime Architecture
+
+The runtime consists of several key subsystems:
+
+### Execution Engine
+
+The execution engine handles code compilation and execution:
+
+- **Parser**: Converts source code to Abstract Syntax Tree (AST)
+- **Compiler**: Transforms AST to optimized bytecode or native code
+- **Interpreter**: Fast execution for development
+- **JIT Compiler**: Optimizes hot paths during runtime
+
+### Memory Management
+
+Elide uses an advanced memory management system:
+
+- **Generational GC**: Separate young and old generations
+- **Concurrent Collection**: Non-blocking garbage collection
+- **Memory Pools**: Segregated memory regions for different object types
+- **Escape Analysis**: Stack allocation when possible
+
+## Language Support
+
+### JavaScript/TypeScript
+
+Full ES2024+ support with V8 compatibility:
+
+```javascript
+// Modern JavaScript features
+const data = await fetch('/api/data')
+const { results } = await data.json()
+
+// Top-level await
+await initializeApp()
+
+// Pattern matching (Stage 3)
+match (value) {
+  when String: console.log('String value')
+  when Number: console.log('Number value')
+}
+```
+
+### Python Integration
+
+Seamless Python interop:
+
+```python
+# Python code runs natively
+import numpy as np
+import pandas as pd
+
+def analyze_data(data):
+    df = pd.DataFrame(data)
+    return df.describe()
+```
+
+Call from JavaScript:
+
+```javascript
+import { analyze_data } from './analysis.py'
+
+const stats = await analyze_data(dataset)
+```
+
+## Performance Characteristics
+
+### Startup Time
+
+| Mode | Cold Start | Warm Start |
+|------|-----------|-----------|
+| JIT | ~500ms | ~50ms |
+| Native | ~5ms | ~2ms |
+
+### Memory Usage
+
+| Runtime | Hello World | Typical App |
+|---------|------------|-------------|
+| Elide | ~15MB | ~60MB |
+| Node.js | ~40MB | ~150MB |
+| Deno | ~35MB | ~120MB |
+
+### Throughput
+
+Elide achieves high throughput through:
+
+- Inline caching
+- Polymorphic inline caching
+- Loop optimization
+- Vectorization
+
+## Native Image Compilation
+
+Build native executables with:
+
+```bash
+elide build --native
+```
+
+### Benefits
+
+- **Fast Startup**: < 10ms
+- **Low Memory**: 30-50% reduction
+- **No Warmup**: Peak performance immediately
+- **Small Binary**: Typically 20-40MB
+
+### Limitations
+
+- No runtime reflection
+- Limited dynamic code loading
+- Longer build times
+
+<Alert>
+  <strong>Tip:</strong> Use native builds for production, JIT for development
+</Alert>
+
+## Optimization Techniques
+
+### Inline Caching
+
+Speeds up property access:
+
+```javascript
+function getName(obj) {
+  return obj.name  // Cached after first call
+}
+```
+
+### Escape Analysis
+
+Stack allocates objects when possible:
+
+```javascript
+function compute() {
+  const temp = { x: 1, y: 2 }  // May be stack-allocated
+  return temp.x + temp.y
+}
+```
+
+### Loop Unrolling
+
+Optimizes hot loops:
+
+```javascript
+// Original
+for (let i = 0; i < arr.length; i++) {
+  sum += arr[i]
+}
+
+// Optimized (conceptually)
+for (let i = 0; i < arr.length; i += 4) {
+  sum += arr[i] + arr[i+1] + arr[i+2] + arr[i+3]
+}
+```
+
+## Runtime Configuration
+
+Configure the runtime via `elide.config.js`:
+
+```javascript
+export default {
+  runtime: {
+    // Choose execution engine
+    engine: 'v8',  // or 'spidermonkey', 'jsc'
+    
+    // Memory settings
+    memory: {
+      heap: '2G',
+      youngGen: '512M'
+    },
+    
+    // Optimization level
+    optimize: 'max',  // or 'balanced', 'size'
+    
+    // Enable features
+    features: {
+      simd: true,
+      threads: true,
+      asyncContext: true
+    }
+  }
+}
+```
+
+## Debugging and Profiling
+
+### Source Maps
+
+Full source map support for debugging:
+
+```javascript
+// Errors show original TypeScript locations
+throw new Error('Something went wrong')
+// at myFunction (src/app.ts:42:10)
+```
+
+### Performance Profiling
+
+Built-in profiler:
+
+```bash
+elide run --profile app.ts
+```
+
+Generates flame graphs and performance reports.
+
+### Memory Profiling
+
+Track memory usage:
+
+```bash
+elide run --heap-snapshot app.ts
+```
+
+### Debugger
+
+Attach Chrome DevTools:
+
+```bash
+elide run --inspect app.ts
+```
+
+Then open `chrome://inspect`
+
+## Isolation and Security
+
+### Isolates
+
+Run code in isolated contexts:
+
+```javascript
+import { Isolate } from '@elide/runtime'
+
+const isolate = new Isolate({
+  memoryLimit: '128M',
+  timeLimit: 5000,
+  permissions: []
+})
+
+const result = await isolate.eval(`
+  // This code runs in isolation
+  compute(data)
+`)
+```
+
+### Capability System
+
+Fine-grained permissions:
+
+```javascript
+const isolate = new Isolate({
+  permissions: [
+    'network:read',
+    'filesystem:/data/*:read',
+    'env:NODE_ENV:read'
+  ]
+})
+```
+
+## Next Steps
+
+- [Components](/docs/components) - Build with components
+- [JavaScript](/docs/javascript) - JavaScript API reference
+- [Python](/docs/python) - Python integration guide
+

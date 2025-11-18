@@ -1,0 +1,423 @@
+---
+title: "Core API"
+description: "Core framework APIs and utilities"
+date: "2025-11-18"
+---
+
+# Core API Reference
+
+The `@elide/core` package provides fundamental APIs for building Elide applications.
+
+## Module System
+
+### `import` and `export`
+
+Standard ES module syntax:
+
+```typescript
+// Export
+export function greet(name: string): string {
+  return `Hello, ${name}!`
+}
+
+export class User {
+  constructor(public name: string) {}
+}
+
+// Default export
+export default function main() {
+  console.log('Hello, Elide!')
+}
+```
+
+```typescript
+// Import
+import main, { greet, User } from './module.ts'
+import * as utils from './utils.ts'
+```
+
+### Dynamic Imports
+
+Load modules dynamically:
+
+```typescript
+const module = await import('./dynamic-module.ts')
+module.doSomething()
+
+// Conditional loading
+if (needsFeature) {
+  const feature = await import('./feature.ts')
+  await feature.initialize()
+}
+```
+
+## Runtime APIs
+
+### `Elide` Global
+
+Access runtime information:
+
+```typescript
+// Runtime version
+console.log(Elide.version)
+
+// Platform info
+console.log(Elide.platform)  // 'darwin', 'linux', 'windows'
+console.log(Elide.arch)      // 'x64', 'arm64'
+
+// Runtime mode
+console.log(Elide.mode)      // 'development', 'production'
+```
+
+### Environment Variables
+
+```typescript
+// Access environment variables
+const apiKey = Elide.env.get('API_KEY')
+const port = Elide.env.get('PORT') ?? '3000'
+
+// Set environment variable
+Elide.env.set('DEBUG', 'true')
+
+// Check if variable exists
+if (Elide.env.has('NODE_ENV')) {
+  console.log('NODE_ENV is set')
+}
+
+// Get all variables
+const allEnv = Elide.env.toObject()
+```
+
+## Configuration
+
+### Loading Configuration
+
+```typescript
+import { loadConfig } from '@elide/core'
+
+const config = await loadConfig()
+console.log(config.app.name)
+console.log(config.app.version)
+```
+
+### Configuration Schema
+
+```typescript
+// elide.config.ts
+import { defineConfig } from '@elide/core'
+
+export default defineConfig({
+  app: {
+    name: 'My App',
+    version: '1.0.0'
+  },
+  runtime: {
+    engine: 'v8',
+    optimize: true
+  },
+  server: {
+    port: 3000,
+    host: '0.0.0.0'
+  }
+})
+```
+
+## Logging
+
+### Logger API
+
+```typescript
+import { Logger } from '@elide/core'
+
+const logger = new Logger('my-module')
+
+// Log levels
+logger.debug('Debug message')
+logger.info('Info message')
+logger.warn('Warning message')
+logger.error('Error message')
+
+// Structured logging
+logger.info('User logged in', {
+  userId: '123',
+  timestamp: new Date()
+})
+
+// Child loggers
+const childLogger = logger.child({ component: 'auth' })
+childLogger.info('Authentication successful')
+```
+
+### Log Configuration
+
+```typescript
+// elide.config.ts
+export default defineConfig({
+  logging: {
+    level: 'info',
+    format: 'json',
+    destinations: ['console', 'file'],
+    file: {
+      path: './logs/app.log',
+      maxSize: '10MB',
+      maxFiles: 5
+    }
+  }
+})
+```
+
+## Event System
+
+### Event Emitter
+
+```typescript
+import { EventEmitter } from '@elide/core'
+
+class UserService extends EventEmitter {
+  createUser(data: UserData) {
+    const user = this.db.users.create(data)
+    this.emit('user:created', user)
+    return user
+  }
+}
+
+const service = new UserService()
+
+// Listen to events
+service.on('user:created', (user) => {
+  console.log('New user:', user.name)
+})
+
+// One-time listener
+service.once('user:created', (user) => {
+  console.log('First user created!')
+})
+
+// Remove listener
+const handler = (user) => console.log(user)
+service.on('user:created', handler)
+service.off('user:created', handler)
+```
+
+## Error Handling
+
+### Standard Errors
+
+```typescript
+import { 
+  ElideError,
+  ValidationError,
+  NotFoundError,
+  UnauthorizedError
+} from '@elide/core'
+
+// Base error
+throw new ElideError('Something went wrong')
+
+// Validation error
+throw new ValidationError('Invalid email format')
+
+// Not found error
+throw new NotFoundError('User not found')
+
+// Unauthorized error
+throw new UnauthorizedError('Invalid credentials')
+```
+
+### Custom Errors
+
+```typescript
+import { ElideError } from '@elide/core'
+
+class PaymentError extends ElideError {
+  constructor(message: string, public code: string) {
+    super(message)
+    this.name = 'PaymentError'
+  }
+}
+
+throw new PaymentError('Payment failed', 'INSUFFICIENT_FUNDS')
+```
+
+## Dependency Injection
+
+### Injectable Services
+
+```typescript
+import { Injectable, Inject } from '@elide/core'
+
+@Injectable()
+class DatabaseService {
+  async query(sql: string) {
+    // Implementation
+  }
+}
+
+@Injectable()
+class UserService {
+  constructor(
+    @Inject(DatabaseService) private db: DatabaseService
+  ) {}
+  
+  async getUser(id: string) {
+    return this.db.query(`SELECT * FROM users WHERE id = ${id}`)
+  }
+}
+```
+
+### Dependency Container
+
+```typescript
+import { Container } from '@elide/core'
+
+const container = new Container()
+
+// Register service
+container.register(DatabaseService)
+container.register(UserService)
+
+// Resolve service
+const userService = container.resolve(UserService)
+const user = await userService.getUser('123')
+```
+
+## Utilities
+
+### Path Operations
+
+```typescript
+import { path } from '@elide/core'
+
+const fullPath = path.join('src', 'components', 'button.tsx')
+const dirname = path.dirname(fullPath)
+const basename = path.basename(fullPath)
+const extname = path.extname(fullPath)
+
+console.log(path.resolve('./relative/path'))
+console.log(path.isAbsolute('/absolute/path'))
+```
+
+### File System
+
+```typescript
+import { fs } from '@elide/core'
+
+// Read file
+const content = await fs.readFile('file.txt', 'utf8')
+
+// Write file
+await fs.writeFile('file.txt', 'Hello, world!')
+
+// Check if file exists
+if (await fs.exists('file.txt')) {
+  console.log('File exists')
+}
+
+// Read directory
+const files = await fs.readDir('./src')
+
+// Create directory
+await fs.mkdir('./new-dir', { recursive: true })
+
+// Remove file
+await fs.remove('file.txt')
+```
+
+### Crypto
+
+```typescript
+import { crypto } from '@elide/core'
+
+// Generate random string
+const token = await crypto.randomString(32)
+
+// Hash password
+const hashed = await crypto.hash('password123', 'sha256')
+
+// Compare hash
+const isValid = await crypto.compare('password123', hashed)
+
+// Generate UUID
+const id = crypto.randomUUID()
+
+// Encrypt/Decrypt
+const encrypted = await crypto.encrypt('secret data', 'encryption-key')
+const decrypted = await crypto.decrypt(encrypted, 'encryption-key')
+```
+
+### JSON Operations
+
+```typescript
+import { json } from '@elide/core'
+
+// Parse JSON
+const data = json.parse('{"name":"Alice"}')
+
+// Stringify with pretty print
+const str = json.stringify(data, { pretty: true })
+
+// Safe parse (returns Result type)
+const result = json.safeParse(input)
+if (result.success) {
+  console.log(result.data)
+} else {
+  console.error(result.error)
+}
+```
+
+## Performance
+
+### Timing
+
+```typescript
+import { perf } from '@elide/core'
+
+// Mark time
+perf.mark('start')
+await doSomething()
+perf.mark('end')
+
+// Measure duration
+const duration = perf.measure('operation', 'start', 'end')
+console.log(`Operation took ${duration}ms`)
+
+// Time function
+const result = await perf.time('myOperation', async () => {
+  return await expensiveOperation()
+})
+```
+
+### Caching
+
+```typescript
+import { Cache } from '@elide/core'
+
+const cache = new Cache({
+  maxSize: 1000,
+  ttl: 300 // 5 minutes
+})
+
+// Set value
+await cache.set('key', 'value')
+
+// Get value
+const value = await cache.get('key')
+
+// Check if exists
+if (await cache.has('key')) {
+  console.log('Key exists')
+}
+
+// Delete value
+await cache.delete('key')
+
+// Clear all
+await cache.clear()
+```
+
+## Next Steps
+
+- [Server API](/docs/api-server) - Server-side APIs
+- [Database](/docs/api-database) - Database access
+- [Configuration](/docs/configuration) - Configuration guide
+

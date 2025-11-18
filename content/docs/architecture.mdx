@@ -1,0 +1,221 @@
+---
+title: "Architecture"
+description: "Understanding Elide's architecture and design principles"
+date: "2025-11-18"
+---
+
+import { Card, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
+
+# Architecture
+
+Elide's architecture is designed for performance, flexibility, and developer experience. This guide explains the core components and how they work together.
+
+## Overview
+
+Elide is built on three main layers:
+
+1. **Runtime Layer** - Executes your code
+2. **API Layer** - Provides high-level interfaces
+3. **Tooling Layer** - Development and build tools
+
+## Runtime Layer
+
+The runtime is the foundation of Elide, built on GraalVM for optimal performance.
+
+### Components
+
+<div className="grid gap-4 md:grid-cols-2 mt-6 not-prose">
+  <Card>
+    <CardHeader>
+      <CardTitle>VM Engine</CardTitle>
+      <CardDescription>
+        Polyglot execution engine supporting multiple languages
+      </CardDescription>
+    </CardHeader>
+  </Card>
+  
+  <Card>
+    <CardHeader>
+      <CardTitle>Memory Manager</CardTitle>
+      <CardDescription>
+        Advanced garbage collection and memory optimization
+      </CardDescription>
+    </CardHeader>
+  </Card>
+  
+  <Card>
+    <CardHeader>
+      <CardTitle>Module Loader</CardTitle>
+      <CardDescription>
+        Efficient module resolution and caching
+      </CardDescription>
+    </CardHeader>
+  </Card>
+  
+  <Card>
+    <CardHeader>
+      <CardTitle>Security Sandbox</CardTitle>
+      <CardDescription>
+        Isolated execution contexts for safe code execution
+      </CardDescription>
+    </CardHeader>
+  </Card>
+</div>
+
+### Execution Flow
+
+```
+Source Code
+    ↓
+Parser & AST
+    ↓
+Optimizer
+    ↓
+Bytecode/Native
+    ↓
+Execution
+```
+
+## API Layer
+
+The API layer provides clean, intuitive interfaces for common tasks.
+
+### Core Modules
+
+- **@elide/server** - HTTP server and routing
+- **@elide/database** - Database access and ORM
+- **@elide/auth** - Authentication and authorization
+- **@elide/cache** - Caching primitives
+- **@elide/queue** - Job queues and background tasks
+
+### Example Usage
+
+```typescript
+import { serve } from '@elide/server'
+import { connect } from '@elide/database'
+
+const db = await connect('postgresql://localhost/mydb')
+
+serve({
+  port: 3000,
+  routes: {
+    '/users': async (req) => {
+      const users = await db.users.findMany()
+      return Response.json(users)
+    }
+  }
+})
+```
+
+## Polyglot Support
+
+Elide allows mixing multiple languages in the same application:
+
+```typescript
+// TypeScript
+import { compute } from './compute.py'
+
+const result = await compute(data)
+```
+
+```python
+# Python
+def compute(data):
+    return sum(data) / len(data)
+```
+
+## Performance Optimizations
+
+### Ahead-of-Time Compilation
+
+Elide can compile your application to native code:
+
+```bash
+elide build --native
+```
+
+Benefits:
+- Instant startup (< 10ms)
+- Lower memory usage (30-50% reduction)
+- Better throughput
+
+### Just-in-Time Optimization
+
+During development, JIT provides fast iteration:
+
+- Hot code path optimization
+- Adaptive compilation
+- Profile-guided optimization
+
+## Module System
+
+Elide supports multiple module formats:
+
+- **ESM** - ECMAScript Modules (recommended)
+- **CommonJS** - Node.js style modules
+- **Native** - Platform-specific modules
+
+### Module Resolution
+
+```
+import { foo } from 'bar'
+    ↓
+1. Check cache
+2. Resolve path
+3. Load module
+4. Execute & cache
+5. Return exports
+```
+
+## Security Model
+
+Elide implements multiple security layers:
+
+### Sandboxing
+
+Each module runs in an isolated context with limited permissions:
+
+```typescript
+import { sandbox } from '@elide/runtime'
+
+const untrusted = await sandbox({
+  code: userProvidedCode,
+  permissions: ['network:read']
+})
+```
+
+### Capability-based Security
+
+Modules must explicitly request capabilities:
+
+```typescript
+// elide.config.js
+export default {
+  permissions: {
+    network: true,
+    filesystem: ['./data']
+  }
+}
+```
+
+## Concurrency Model
+
+Elide uses a hybrid concurrency model:
+
+- **Async/Await** - For I/O operations
+- **Workers** - For CPU-intensive tasks
+- **Isolates** - For true parallelism
+
+```typescript
+import { Worker } from '@elide/worker'
+
+const worker = new Worker('./heavy-task.ts')
+const result = await worker.run(data)
+```
+
+## Next Steps
+
+- [Runtime](/docs/runtime) - Deep dive into the runtime
+- [Components](/docs/components) - Learn about components
+- [API Reference](/docs/api-core) - Explore the APIs
+

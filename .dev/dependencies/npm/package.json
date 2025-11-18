@@ -1,0 +1,13 @@
+{
+    "name": "elide-web-static-worker",
+    "description": "Static website via Cloudflare Workers and Elide.",
+    "scripts": {
+        "build-deploy": "elide build && elide deploy",
+        "deploy": "wrangler deploy"
+    },
+    "dependencies": {},
+    "devDependencies": {
+        "wrangler": "4.24.3",
+        "@elide-dev/types": "1.0.0-beta10"
+    }
+}

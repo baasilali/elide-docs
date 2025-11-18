@@ -1,0 +1,157 @@
+---
+title: "Deployment"
+description: "Deploy your Elide applications to production"
+date: "2025-11-18"
+---
+
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+
+# Deployment
+
+Deploy your Elide application to various platforms and environments.
+
+## Building for Production
+
+### Native Build
+
+Create an optimized native binary:
+
+```bash
+elide build --native
+```
+
+This creates a standalone executable in `dist/`:
+
+- Fast startup time (< 10ms)
+- Low memory usage
+- No runtime dependencies
+
+### Standard Build
+
+For JIT deployment:
+
+```bash
+elide build
+```
+
+## Deployment Platforms
+
+<Tabs defaultValue="docker" className="w-full">
+  <TabsList>
+    <TabsTrigger value="docker">Docker</TabsTrigger>
+    <TabsTrigger value="cloud">Cloud</TabsTrigger>
+    <TabsTrigger value="vps">VPS</TabsTrigger>
+  </TabsList>
+  
+  <TabsContent value="docker">
+    
+### Docker
+
+Create a `Dockerfile`:
+
+```dockerfile
+FROM elide/base:latest
+
+WORKDIR /app
+COPY . .
+
+RUN elide build --native
+
+EXPOSE 3000
+CMD ["./dist/app"]
+```
+
+Build and run:
+
+```bash
+docker build -t my-app .
+docker run -p 3000:3000 my-app
+```
+  </TabsContent>
+  
+  <TabsContent value="cloud">
+
+### Cloud Platforms
+
+Deploy to major cloud providers:
+
+**AWS Lambda**
+```bash
+elide deploy --platform aws-lambda
+```
+
+**Google Cloud Run**
+```bash
+elide deploy --platform gcp-cloud-run
+```
+
+**Azure Functions**
+```bash
+elide deploy --platform azure-functions
+```
+  </TabsContent>
+  
+  <TabsContent value="vps">
+
+### VPS/Dedicated Server
+
+1. Build your application:
+```bash
+elide build --native
+```
+
+2. Copy to server:
+```bash
+scp dist/app user@server:/opt/app
+```
+
+3. Run with systemd:
+```ini
+[Unit]
+Description=My Elide App
+After=network.target
+
+[Service]
+Type=simple
+User=www-data
+WorkingDirectory=/opt/app
+ExecStart=/opt/app/app
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+```
+  </TabsContent>
+</Tabs>
+
+## Environment Configuration
+
+Use environment variables for configuration:
+
+```bash
+# Production settings
+NODE_ENV=production
+PORT=3000
+DATABASE_URL=postgresql://prod-db/myapp
+API_KEY=prod-api-key
+```
+
+## Monitoring
+
+Monitor your application in production:
+
+```typescript
+import { monitor } from '@elide/monitoring'
+
+monitor.start({
+  metrics: true,
+  logging: true,
+  tracing: true
+})
+```
+
+## Next Steps
+
+- [Security](/docs/security) - Secure your deployment
+- [Configuration](/docs/configuration) - Environment configuration
+

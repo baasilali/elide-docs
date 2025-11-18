@@ -1,0 +1,174 @@
+---
+title: "Installation"
+description: "Install Elide on your system"
+date: "2025-11-18"
+---
+
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Alert } from '@/components/ui/alert'
+import { Badge } from '@/components/ui/badge'
+
+# Installation
+
+This guide covers different methods to install Elide on your system.
+
+## System Requirements
+
+- **Operating System**: macOS, Linux, or Windows
+- **Memory**: Minimum 2GB RAM (4GB+ recommended)
+- **Disk Space**: At least 500MB free space
+- **Node.js**: Version 18 or later (for JavaScript/TypeScript support)
+
+## Installation Methods
+
+### Package Managers
+
+The easiest way to install Elide is through a package manager:
+
+<Tabs defaultValue="npm" className="w-full">
+  <TabsList>
+    <TabsTrigger value="npm">npm</TabsTrigger>
+    <TabsTrigger value="yarn">yarn</TabsTrigger>
+    <TabsTrigger value="pnpm">pnpm</TabsTrigger>
+    <TabsTrigger value="homebrew">Homebrew</TabsTrigger>
+  </TabsList>
+  
+  <TabsContent value="npm">
+```bash
+npm install -g @elide/cli
+```
+  </TabsContent>
+  
+  <TabsContent value="yarn">
+```bash
+yarn global add @elide/cli
+```
+  </TabsContent>
+  
+  <TabsContent value="pnpm">
+```bash
+pnpm add -g @elide/cli
+```
+  </TabsContent>
+  
+  <TabsContent value="homebrew">
+```bash
+brew install elide
+```
+  </TabsContent>
+</Tabs>
+
+### Direct Download
+
+Download the latest release for your platform:
+
+- [macOS (Apple Silicon)](https://github.com/elide-dev/elide/releases)
+- [macOS (Intel)](https://github.com/elide-dev/elide/releases)
+- [Linux (x64)](https://github.com/elide-dev/elide/releases)
+- [Windows (x64)](https://github.com/elide-dev/elide/releases)
+
+After downloading, add the binary to your PATH:
+
+```bash
+# macOS/Linux
+export PATH="$PATH:/path/to/elide/bin"
+
+# Windows
+set PATH=%PATH%;C:\path\to\elide\bin
+```
+
+### Build from Source
+
+For the latest features, build from source:
+
+```bash
+git clone https://github.com/elide-dev/elide.git
+cd elide
+./gradlew build
+```
+
+<Alert>
+  <strong>Note:</strong> Building from source requires Java 21+ and Gradle 8+
+</Alert>
+
+## Verify Installation
+
+After installation, verify it works:
+
+```bash
+elide --version
+```
+
+You should see output like:
+
+```
+Elide 1.0.0
+Runtime: GraalVM 23.1.0
+```
+
+## Project Setup
+
+Create a new project to test your installation:
+
+```bash
+elide create hello-world
+cd hello-world
+elide dev
+```
+
+## IDE Support
+
+### Visual Studio Code
+
+Install the official Elide extension:
+
+1. Open VS Code
+2. Go to Extensions (Cmd+Shift+X)
+3. Search for "Elide"
+4. Click Install
+
+### IntelliJ IDEA
+
+Install the Elide plugin:
+
+1. Open IntelliJ IDEA
+2. Go to Settings > Plugins
+3. Search for "Elide"
+4. Click Install
+
+## Troubleshooting
+
+### Command Not Found
+
+If you get "command not found" after installation:
+
+1. Check your PATH variable
+2. Restart your terminal
+3. Try reinstalling with admin privileges
+
+### Permission Denied
+
+On macOS/Linux, you may need to make the binary executable:
+
+```bash
+chmod +x /path/to/elide
+```
+
+### Version Conflicts
+
+If you have multiple versions installed:
+
+```bash
+# List all versions
+elide versions
+
+# Switch to specific version
+elide use 1.0.0
+```
+
+## Next Steps
+
+- [Quick Start](/docs/quick-start) - Build your first app
+- [Configuration](/docs/configuration) - Configure your environment
+- [Architecture](/docs/architecture) - Understand how Elide works
+

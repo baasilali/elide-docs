@@ -1,0 +1,48 @@
+---
+title: "Security"
+description: "Security best practices and features"
+date: "2025-11-18"
+---
+
+import { Alert } from '@/components/ui/alert'
+
+# Security
+
+Security is a top priority in Elide. This guide covers security features and best practices.
+
+## Authentication
+
+### JWT Tokens
+
+```typescript
+import { jwt } from '@elide/auth'
+
+// Create token
+const token = await jwt.sign({
+  userId: '123',
+  role: 'admin'
+}, 'secret-key', {
+  expiresIn: '1h'
+})
+
+// Verify token
+const payload = await jwt.verify(token, 'secret-key')
+```
+
+<Alert>
+  <strong>Important:</strong> Always use environment variables for sensitive keys.
+</Alert>
+
+## Best Practices
+
+1. Use HTTPS in production
+2. Validate all user input
+3. Use parameterized queries
+4. Implement rate limiting
+5. Keep dependencies updated
+
+## Next Steps
+
+- [Configuration](/docs/configuration) - Configure security settings
+- [Deployment](/docs/deployment) - Deploy securely
+

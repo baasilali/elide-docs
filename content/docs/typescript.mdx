@@ -1,0 +1,427 @@
+---
+title: "TypeScript Support"
+description: "TypeScript support and features in Elide"
+date: "2025-11-18"
+---
+
+# TypeScript Support
+
+Elide has first-class TypeScript support with zero configuration required.
+
+## Getting Started
+
+Just create a `.ts` file and start coding:
+
+```typescript
+// app.ts
+interface User {
+  id: string
+  name: string
+  email: string
+}
+
+function greet(user: User): string {
+  return `Hello, ${user.name}!`
+}
+
+const user: User = {
+  id: '1',
+  name: 'Alice',
+  email: 'alice@example.com'
+}
+
+console.log(greet(user))
+```
+
+Run it directly:
+
+```bash
+elide run app.ts
+```
+
+## Configuration
+
+### tsconfig.json
+
+Elide respects your TypeScript configuration:
+
+```json
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "lib": ["ES2022"],
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  }
+}
+```
+
+### Path Mapping
+
+Use path aliases for clean imports:
+
+```typescript
+// Instead of
+import { User } from '../../../models/user'
+
+// Use
+import { User } from '@/models/user'
+```
+
+## Type Safety
+
+### Strict Mode
+
+Enable strict mode for maximum safety:
+
+```typescript
+// strictNullChecks
+function getName(user: User | null): string {
+  if (user === null) {
+    return 'Guest'
+  }
+  return user.name  // Safe!
+}
+
+// strictFunctionTypes
+type Callback = (value: string | number) => void
+const callback: Callback = (value: string) => {
+  // Error: Type 'string' is not assignable to 'string | number'
+}
+
+// noImplicitAny
+function add(a, b) {  // Error: Parameter implicitly has 'any' type
+  return a + b
+}
+```
+
+### Generics
+
+Full support for generic types:
+
+```typescript
+// Generic function
+function identity<T>(value: T): T {
+  return value
+}
+
+// Generic class
+class Container<T> {
+  constructor(private value: T) {}
+  
+  getValue(): T {
+    return this.value
+  }
+}
+
+// Generic constraints
+function getProperty<T, K extends keyof T>(obj: T, key: K): T[K] {
+  return obj[key]
+}
+
+// Generic utility types
+type Partial<T> = {
+  [P in keyof T]?: T[P]
+}
+
+type ReadOnly<T> = {
+  readonly [P in keyof T]: T[P]
+}
+```
+
+## Advanced Types
+
+### Union Types
+
+```typescript
+type Status = 'pending' | 'success' | 'error'
+
+function handleStatus(status: Status) {
+  switch (status) {
+    case 'pending':
+      console.log('Loading...')
+      break
+    case 'success':
+      console.log('Success!')
+      break
+    case 'error':
+      console.log('Error!')
+      break
+  }
+}
+```
+
+### Intersection Types
+
+```typescript
+interface Nameable {
+  name: string
+}
+
+interface Timestamped {
+  createdAt: Date
+  updatedAt: Date
+}
+
+type User = Nameable & Timestamped & {
+  email: string
+}
+```
+
+### Conditional Types
+
+```typescript
+type IsString<T> = T extends string ? true : false
+
+type A = IsString<string>  // true
+type B = IsString<number>  // false
+
+// Utility type
+type NonNullable<T> = T extends null | undefined ? never : T
+```
+
+### Template Literal Types
+
+```typescript
+type HTTPMethod = 'GET' | 'POST' | 'PUT' | 'DELETE'
+type Endpoint = `/api/${string}`
+type Route = `${HTTPMethod} ${Endpoint}`
+
+// Example: 'GET /api/users', 'POST /api/posts', etc.
+const route: Route = 'GET /api/users'
+```
+
+## Decorators
+
+Experimental decorators support:
+
+```typescript
+function log(target: any, propertyKey: string, descriptor: PropertyDescriptor) {
+  const originalMethod = descriptor.value
+  
+  descriptor.value = function(...args: any[]) {
+    console.log(`Calling ${propertyKey} with`, args)
+    const result = originalMethod.apply(this, args)
+    console.log(`Result:`, result)
+    return result
+  }
+  
+  return descriptor
+}
+
+class Calculator {
+  @log
+  add(a: number, b: number): number {
+    return a + b
+  }
+}
+```
+
+## Type Inference
+
+TypeScript's powerful type inference:
+
+```typescript
+// Infer from return type
+const users = [
+  { id: 1, name: 'Alice' },
+  { id: 2, name: 'Bob' }
+]
+// Type: { id: number; name: string }[]
+
+// Infer from function
+function createUser(name: string, email: string) {
+  return { name, email, createdAt: new Date() }
+}
+// Return type: { name: string; email: string; createdAt: Date }
+
+// Infer generic parameters
+const map = new Map([
+  ['key1', 1],
+  ['key2', 2]
+])
+// Type: Map<string, number>
+```
+
+## Type Guards
+
+Runtime type checking:
+
+```typescript
+// typeof guard
+function isString(value: unknown): value is string {
+  return typeof value === 'string'
+}
+
+// instanceof guard
+function isError(value: unknown): value is Error {
+  return value instanceof Error
+}
+
+// Custom guard
+interface User {
+  id: string
+  name: string
+}
+
+function isUser(value: unknown): value is User {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    'id' in value &&
+    'name' in value
+  )
+}
+
+// Usage
+function process(value: unknown) {
+  if (isUser(value)) {
+    console.log(value.name)  // Type narrowed to User
+  }
+}
+```
+
+## Utility Types
+
+Built-in utility types:
+
+```typescript
+interface User {
+  id: string
+  name: string
+  email: string
+  password: string
+}
+
+// Partial - make all properties optional
+type PartialUser = Partial<User>
+
+// Required - make all properties required
+type RequiredUser = Required<PartialUser>
+
+// Readonly - make all properties readonly
+type ReadonlyUser = Readonly<User>
+
+// Pick - select specific properties
+type UserCredentials = Pick<User, 'email' | 'password'>
+
+// Omit - exclude specific properties
+type PublicUser = Omit<User, 'password'>
+
+// Record - create object type
+type UserMap = Record<string, User>
+
+// Exclude - exclude from union
+type Status = 'pending' | 'success' | 'error'
+type SuccessOrError = Exclude<Status, 'pending'>
+
+// Extract - extract from union
+type SuccessOnly = Extract<Status, 'success'>
+
+// ReturnType - get function return type
+function getUser() {
+  return { id: '1', name: 'Alice' }
+}
+type User = ReturnType<typeof getUser>
+```
+
+## Declaration Files
+
+Create type definitions for JavaScript libraries:
+
+```typescript
+// types/my-library.d.ts
+declare module 'my-library' {
+  export function doSomething(value: string): number
+  
+  export interface Config {
+    option: boolean
+  }
+  
+  export class MyClass {
+    constructor(config: Config)
+    method(): void
+  }
+}
+```
+
+## Type-Only Imports
+
+Import only types (removed at runtime):
+
+```typescript
+// Import type only
+import type { User } from './types'
+
+// Import both value and type
+import { type User, getUser } from './api'
+```
+
+## Performance
+
+TypeScript compilation is fast in Elide:
+
+- Incremental compilation
+- Parallel type checking
+- Efficient module resolution
+- Smart caching
+
+## Best Practices
+
+### Use Strict Mode
+
+```json
+{
+  "compilerOptions": {
+    "strict": true
+  }
+}
+```
+
+### Prefer Interfaces Over Types
+
+```typescript
+// Good
+interface User {
+  name: string
+  email: string
+}
+
+// Also good, but interfaces are more extensible
+type User = {
+  name: string
+  email: string
+}
+```
+
+### Use Unknown Instead of Any
+
+```typescript
+// Bad
+function process(value: any) {
+  return value.toUpperCase()  // No type safety
+}
+
+// Good
+function process(value: unknown) {
+  if (typeof value === 'string') {
+    return value.toUpperCase()  // Type-safe
+  }
+}
+```
+
+## Next Steps
+
+- [JavaScript](/docs/javascript) - JavaScript features
+- [Components](/docs/components) - Build components
+- [API Reference](/docs/api-core) - Core APIs
+

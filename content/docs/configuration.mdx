@@ -1,0 +1,76 @@
+---
+title: "Configuration"
+description: "Advanced configuration options"
+date: "2025-11-18"
+---
+
+# Configuration
+
+Learn how to configure your Elide application for different environments and use cases.
+
+## Configuration File
+
+Create `elide.config.js` or `elide.config.ts`:
+
+```typescript
+import { defineConfig } from '@elide/core'
+
+export default defineConfig({
+  app: {
+    name: 'My Application',
+    version: '1.0.0'
+  },
+  runtime: {
+    engine: 'v8',
+    optimize: true,
+    memory: {
+      heap: '2G'
+    }
+  },
+  server: {
+    port: 3000,
+    host: '0.0.0.0',
+    cors: true
+  },
+  logging: {
+    level: 'info',
+    format: 'json'
+  }
+})
+```
+
+## Environment Variables
+
+Access environment variables:
+
+```typescript
+const apiKey = process.env.API_KEY
+const dbUrl = process.env.DATABASE_URL
+```
+
+Create `.env` file:
+
+```bash
+API_KEY=your-api-key
+DATABASE_URL=postgresql://localhost/mydb
+NODE_ENV=development
+```
+
+## Environment-Specific Configuration
+
+```typescript
+export default defineConfig({
+  runtime: {
+    optimize: process.env.NODE_ENV === 'production'
+  },
+  logging: {
+    level: process.env.NODE_ENV === 'production' ? 'warn' : 'debug'
+  }
+})
+```
+
+## Next Steps
+
+- [Deployment](/docs/deployment) - Deploy your application
+- [Best Practices](/docs/best-practices) - Follow best practices
+

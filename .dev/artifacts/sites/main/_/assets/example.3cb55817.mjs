@@ -1,0 +1,1 @@
+function sayHello(name){return`Hello, ${name}, from JavaScript!`}document.addEventListener(`DOMContentLoaded`,()=>{console.log(sayHello(`World`))});

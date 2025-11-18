@@ -1,0 +1,403 @@
+---
+title: "Python Integration"
+description: "Python runtime integration in Elide"
+date: "2025-11-18"
+---
+
+# Python Integration
+
+Elide provides seamless Python integration, allowing you to use Python libraries alongside JavaScript/TypeScript code.
+
+## Getting Started
+
+Create a Python file and import it from JavaScript:
+
+```python
+# math_utils.py
+def fibonacci(n):
+    """Calculate the nth Fibonacci number"""
+    if n <= 1:
+        return n
+    return fibonacci(n-1) + fibonacci(n-2)
+
+def factorial(n):
+    """Calculate factorial of n"""
+    if n <= 1:
+        return 1
+    return n * factorial(n-1)
+```
+
+```typescript
+// app.ts
+import { fibonacci, factorial } from './math_utils.py'
+
+console.log(fibonacci(10))  // 55
+console.log(factorial(5))   // 120
+```
+
+## Data Exchange
+
+### Primitive Types
+
+Automatic conversion between JavaScript and Python:
+
+```python
+# types.py
+def get_string():
+    return "Hello from Python"
+
+def get_number():
+    return 42
+
+def get_boolean():
+    return True
+
+def get_none():
+    return None
+```
+
+```typescript
+import { get_string, get_number, get_boolean, get_none } from './types.py'
+
+const str = get_string()    // string
+const num = get_number()    // number
+const bool = get_boolean()  // boolean
+const none = get_none()     // null
+```
+
+### Collections
+
+Arrays and objects work seamlessly:
+
+```python
+# collections.py
+def get_list():
+    return [1, 2, 3, 4, 5]
+
+def get_dict():
+    return {
+        "name": "Alice",
+        "age": 30,
+        "active": True
+    }
+```
+
+```typescript
+import { get_list, get_dict } from './collections.py'
+
+const arr = get_list()  // number[]
+const obj = get_dict()  // { name: string, age: number, active: boolean }
+```
+
+## NumPy Integration
+
+Use NumPy for numerical computing:
+
+```python
+# analysis.py
+import numpy as np
+
+def compute_statistics(data):
+    """Compute statistics for an array"""
+    arr = np.array(data)
+    return {
+        "mean": float(np.mean(arr)),
+        "median": float(np.median(arr)),
+        "std": float(np.std(arr)),
+        "min": float(np.min(arr)),
+        "max": float(np.max(arr))
+    }
+
+def matrix_multiply(a, b):
+    """Multiply two matrices"""
+    result = np.dot(a, b)
+    return result.tolist()
+```
+
+```typescript
+import { compute_statistics, matrix_multiply } from './analysis.py'
+
+const data = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+const stats = compute_statistics(data)
+console.log(stats)
+// { mean: 5.5, median: 5.5, std: 2.87, min: 1, max: 10 }
+```
+
+## Pandas Integration
+
+Process data with Pandas:
+
+```python
+# data_processing.py
+import pandas as pd
+
+def process_csv(data):
+    """Process CSV data"""
+    df = pd.DataFrame(data)
+    
+    # Basic statistics
+    summary = df.describe().to_dict()
+    
+    # Group by operation
+    grouped = df.groupby('category').agg({
+        'value': ['sum', 'mean', 'count']
+    }).to_dict()
+    
+    return {
+        'summary': summary,
+        'grouped': grouped
+    }
+
+def clean_data(data):
+    """Clean and transform data"""
+    df = pd.DataFrame(data)
+    
+    # Remove duplicates
+    df = df.drop_duplicates()
+    
+    # Fill missing values
+    df = df.fillna(0)
+    
+    # Convert to dict
+    return df.to_dict('records')
+```
+
+```typescript
+import { process_csv, clean_data } from './data_processing.py'
+
+const rawData = [
+  { category: 'A', value: 10 },
+  { category: 'B', value: 20 },
+  { category: 'A', value: 15 },
+]
+
+const processed = process_csv(rawData)
+const cleaned = clean_data(rawData)
+```
+
+## Machine Learning
+
+Use scikit-learn for ML:
+
+```python
+# ml_model.py
+from sklearn.linear_model import LinearRegression
+import numpy as np
+
+class Model:
+    def __init__(self):
+        self.model = LinearRegression()
+    
+    def train(self, X, y):
+        """Train the model"""
+        X_array = np.array(X)
+        y_array = np.array(y)
+        self.model.fit(X_array, y_array)
+        return {
+            'score': float(self.model.score(X_array, y_array)),
+            'coefficients': self.model.coef_.tolist()
+        }
+    
+    def predict(self, X):
+        """Make predictions"""
+        X_array = np.array(X)
+        predictions = self.model.predict(X_array)
+        return predictions.tolist()
+```
+
+```typescript
+import { Model } from './ml_model.py'
+
+const model = new Model()
+
+// Training data
+const X = [[1], [2], [3], [4], [5]]
+const y = [2, 4, 6, 8, 10]
+
+// Train
+const result = model.train(X, y)
+console.log('Training score:', result.score)
+
+// Predict
+const predictions = model.predict([[6], [7]])
+console.log('Predictions:', predictions)
+```
+
+## Async Support
+
+Python async functions work with JavaScript promises:
+
+```python
+# async_ops.py
+import asyncio
+
+async def fetch_data(url):
+    """Simulate async data fetching"""
+    await asyncio.sleep(1)
+    return {
+        "url": url,
+        "data": "Some data"
+    }
+
+async def process_multiple(urls):
+    """Process multiple URLs concurrently"""
+    tasks = [fetch_data(url) for url in urls]
+    results = await asyncio.gather(*tasks)
+    return results
+```
+
+```typescript
+import { fetch_data, process_multiple } from './async_ops.py'
+
+// Single async call
+const data = await fetch_data('https://example.com')
+
+// Multiple concurrent calls
+const urls = [
+  'https://api1.example.com',
+  'https://api2.example.com',
+  'https://api3.example.com'
+]
+const results = await process_multiple(urls)
+```
+
+## Error Handling
+
+Python exceptions become JavaScript errors:
+
+```python
+# errors.py
+def divide(a, b):
+    if b == 0:
+        raise ValueError("Cannot divide by zero")
+    return a / b
+
+class CustomError(Exception):
+    pass
+
+def risky_operation():
+    raise CustomError("Something went wrong")
+```
+
+```typescript
+import { divide, risky_operation } from './errors.py'
+
+try {
+  const result = divide(10, 0)
+} catch (error) {
+  console.error('Error:', error.message)
+  // Error: Cannot divide by zero
+}
+
+try {
+  risky_operation()
+} catch (error) {
+  console.error('Custom error:', error)
+}
+```
+
+## Class Integration
+
+Python classes work as JavaScript classes:
+
+```python
+# user.py
+class User:
+    def __init__(self, name, email):
+        self.name = name
+        self.email = email
+        self.active = True
+    
+    def activate(self):
+        self.active = True
+    
+    def deactivate(self):
+        self.active = False
+    
+    def to_dict(self):
+        return {
+            "name": self.name,
+            "email": self.email,
+            "active": self.active
+        }
+```
+
+```typescript
+import { User } from './user.py'
+
+const user = new User('Alice', 'alice@example.com')
+console.log(user.name)  // 'Alice'
+
+user.deactivate()
+const data = user.to_dict()
+console.log(data)  // { name: 'Alice', email: '...', active: false }
+```
+
+## Package Management
+
+Install Python packages:
+
+```bash
+# Using pip
+elide pip install numpy pandas scikit-learn
+
+# Using requirements.txt
+echo "numpy==1.24.0" > requirements.txt
+echo "pandas==2.0.0" >> requirements.txt
+elide pip install -r requirements.txt
+```
+
+Configure in `elide.config.js`:
+
+```javascript
+export default {
+  python: {
+    packages: [
+      'numpy',
+      'pandas',
+      'scikit-learn'
+    ]
+  }
+}
+```
+
+## Performance Considerations
+
+### Minimize Boundary Crossings
+
+```typescript
+// Bad: Multiple calls
+for (let i = 0; i < 1000; i++) {
+  const result = pythonFunction(i)
+}
+
+// Good: Single call
+const results = pythonBatchFunction(Array.from({ length: 1000 }, (_, i) => i))
+```
+
+### Use Appropriate Data Structures
+
+```python
+# Return simple types when possible
+def compute(data):
+    # Instead of returning Pandas DataFrame
+    # return df
+    
+    # Return plain dict
+    return df.to_dict('records')
+```
+
+## Best Practices
+
+1. **Type Hints**: Use Python type hints for better IDE support
+2. **Return Simple Types**: Convert complex Python objects to dicts/lists
+3. **Error Handling**: Use try/catch on the JavaScript side
+4. **Batch Operations**: Process multiple items in one call
+5. **Documentation**: Document Python functions for JavaScript users
+
+## Next Steps
+
+- [JavaScript](/docs/javascript) - JavaScript features
+- [TypeScript](/docs/typescript) - TypeScript support
+- [Components](/docs/components) - Build components
+
