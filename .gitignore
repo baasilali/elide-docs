@@ -1,8 +1,11 @@
 node_modules
-dist
 .elide
 *.log
 .DS_Store
 .env
 .env.local
+.dev
 
+# Build outputs
+dist/
+public/styles.css

@@ -1,9 +1,5 @@
-'use client'
-
 import { useState, useEffect } from 'react'
-import Link from 'next/link'
-import Image from 'next/image'
-import { usePathname } from 'next/navigation'
+import { Link, useLocation } from 'react-router-dom'
 import { cn } from '@/lib/utils'
 import { 
   Cpu, 
@@ -62,7 +58,8 @@ const secondaryLinks = [
 ]
 
 export function NavBar() {
-  const pathname = usePathname()
+  const location = useLocation()
+  const pathname = location.pathname
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
 
@@ -100,11 +97,9 @@ export function NavBar() {
               href="/" 
               className="flex items-center gap-2 hover:opacity-80 transition-opacity"
             >
-              <Image
+              <img
                 src="/light.svg"
                 alt="Elide"
-                width={32}
-                height={32}
                 className="h-8 w-auto"
               />
             </Link>
