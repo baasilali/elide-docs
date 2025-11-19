@@ -1,76 +1,330 @@
 ---
 title: "Configuration"
-description: "Advanced configuration options"
-date: "2025-11-18"
+description: "Configure Elide applications and runtime"
+date: "2025-11-19"
 ---
+
+import { Alert } from '@/components/ui/alert'
 
 # Configuration
 
-Learn how to configure your Elide application for different environments and use cases.
+Learn how to configure Elide applications for different environments.
 
-## Configuration File
+## Project Configuration
 
-Create `elide.config.js` or `elide.config.ts`:
+### elide.pkl
 
-```typescript
-import { defineConfig } from '@elide/core'
+Create an `elide.pkl` file for project configuration:
 
-export default defineConfig({
-  app: {
-    name: 'My Application',
-    version: '1.0.0'
-  },
-  runtime: {
-    engine: 'v8',
-    optimize: true,
-    memory: {
-      heap: '2G'
-    }
-  },
-  server: {
-    port: 3000,
-    host: '0.0.0.0',
-    cors: true
-  },
-  logging: {
-    level: 'info',
-    format: 'json'
+```pkl
+// elide.pkl - Project configuration
+app {
+  name = "my-elide-app"
+  version = "1.0.0"
+  entry = "src/main.ts"
+  displayName = "My Elide Application"
+}
+
+runtime {
+  // Enabled languages
+  languages = ["javascript", "typescript", "python"]
+  
+  // Runtime optimizations
+  optimize = true
+  
+  // Memory configuration
+  memory {
+    heap = "2G"
+    stack = "1M"
   }
-})
+  
+  // Garbage collection
+  gc = "g1"
+}
+
+server {
+  port = 8080
+  host = "0.0.0.0"
+  
+  // HTTP/2 support
+  http2 = true
+  
+  // TLS configuration
+  tls {
+    enabled = false
+    cert = "./cert.pem"
+    key = "./key.pem"
+  }
+  
+  // Request limits
+  maxHeaderSize = 16384   // 16KB
+  maxBodySize = 10485760  // 10MB
+  
+  // Timeouts
+  requestTimeout = 30000
+  keepAliveTimeout = 60000
+}
+
+build {
+  // Build target
+  target = "native"  // or "jvm", "jar"
+  
+  // Output directory
+  output = "dist/"
+  
+  // Optimization level
+  optimization = "aggressive"
+  
+  // Include debug info
+  debug = false
+}
+
+logging {
+  level = "info"
+  format = "json"
+  output = "stdout"
+}
 ```
 
 ## Environment Variables
 
-Access environment variables:
-
-```typescript
-const apiKey = process.env.API_KEY
-const dbUrl = process.env.DATABASE_URL
-```
-
-Create `.env` file:
+### .env File
 
 ```bash
-API_KEY=your-api-key
-DATABASE_URL=postgresql://localhost/mydb
-NODE_ENV=development
+# .env
+PORT=3000
+HOST=0.0.0.0
+NODE_ENV=production
+
+# Database
+DATABASE_URL=postgresql://localhost:5432/mydb
+DB_POOL_SIZE=10
+
+# Redis
+REDIS_URL=redis://localhost:6379
+
+# API Keys (never commit!)
+API_KEY=your-secret-key
+JWT_SECRET=your-jwt-secret
+
+# AWS
+AWS_REGION=us-east-1
+AWS_ACCESS_KEY_ID=your-access-key
+AWS_SECRET_ACCESS_KEY=your-secret-key
 ```
 
-## Environment-Specific Configuration
+### Access Environment Variables
 
-```typescript
-export default defineConfig({
+```javascript
+const port = process.env.PORT || 3000
+const dbUrl = process.env.DATABASE_URL
+const apiKey = process.env.API_KEY
+
+console.log(`Server starting on port ${port}`)
+```
+
+## Runtime Configuration
+
+### CLI Arguments
+
+```bash
+# Set memory limit
+elide run --memory=2G app.js
+
+# Enable GC logging
+elide run --gc-log app.js
+
+# Set garbage collector
+elide run --gc=zgc app.js
+
+# Debug mode
+elide run --inspect=9229 app.js
+
+# Verbose logging
+elide run --verbose app.js
+
+# Set environment
+elide run --env=production app.js
+```
+
+### Programmatic Configuration
+
+```javascript
+// Configure runtime
+Elide.configure({
   runtime: {
-    optimize: process.env.NODE_ENV === 'production'
+    memory: '2G',
+    gc: 'g1',
+    optimize: true
   },
+  
+  server: {
+    port: 8080,
+    http2: true
+  },
+  
   logging: {
-    level: process.env.NODE_ENV === 'production' ? 'warn' : 'debug'
+    level: 'info'
   }
 })
 ```
 
+## Build Configuration
+
+### Native Build Options
+
+```bash
+# Basic native build
+elide build --native app.js
+
+# Optimize for size
+elide build --native --optimize=size app.js
+
+# Optimize for speed
+elide build --native --optimize=speed app.js
+
+# Include debug info
+elide build --native --debug app.js
+
+# Set output name
+elide build --native --output=myapp app.js
+
+# Profile-guided optimization
+elide build --native --pgo app.js
+```
+
+### Build Configuration File
+
+```javascript
+// elide.build.js
+export default {
+  target: 'native',
+  
+  optimization: {
+    level: 'aggressive',
+    pgo: true,
+    stripDebug: true
+  },
+  
+  output: {
+    directory: 'dist/',
+    name: 'myapp'
+  },
+  
+  native: {
+    gc: 'serial',
+    staticLink: true,
+    compression: true
+  }
+}
+```
+
+## Environment-Specific Configuration
+
+### Multiple Environments
+
+```typescript
+// config.ts
+const config = {
+  development: {
+    port: 3000,
+    debug: true,
+    logging: 'debug'
+  },
+  
+  production: {
+    port: 8080,
+    debug: false,
+    logging: 'error'
+  },
+  
+  test: {
+    port: 9000,
+    debug: true,
+    logging: 'silent'
+  }
+}
+
+const env = process.env.NODE_ENV || 'development'
+export default config[env]
+```
+
+## Server Configuration
+
+### HTTP Server
+
+```javascript
+Elide.http.configure({
+  port: 8080,
+  host: '0.0.0.0',
+  
+  // HTTP/2
+  http2: {
+    enabled: true,
+    maxConcurrentStreams: 100
+  },
+  
+  // Compression
+  compression: {
+    enabled: true,
+    level: 6,
+    threshold: 1024
+  },
+  
+  // Static files
+  static: {
+    root: './public',
+    index: 'index.html',
+    cache: 3600
+  },
+  
+  // Timeouts
+  timeouts: {
+    request: 30000,
+    keepAlive: 60000,
+    idle: 120000
+  },
+  
+  // Limits
+  limits: {
+    headerSize: 16384,
+    bodySize: 10485760,
+    urlLength: 8192
+  }
+})
+```
+
+## Logging Configuration
+
+```javascript
+// Configure logging
+Elide.logging.configure({
+  level: 'info', // debug, info, warn, error
+  format: 'json', // json, text
+  
+  outputs: [
+    { type: 'console' },
+    { type: 'file', path: './logs/app.log' }
+  ],
+  
+  // Structured logging
+  fields: {
+    app: 'my-app',
+    environment: process.env.NODE_ENV
+  }
+})
+
+// Use logger
+Elide.log.info('Server started', { port: 8080 })
+Elide.log.error('Error occurred', { error: err })
+```
+
 ## Next Steps
 
-- [Deployment](/docs/deployment) - Deploy your application
-- [Best Practices](/docs/best-practices) - Follow best practices
+- **[Deployment](/docs/deployment)** - Deploy configuration
+- **[Security](/docs/security)** - Security configuration
+- **[Server API](/docs/api-server)** - HTTP server config
 
+<Alert>
+  <strong>Best Practice:</strong> Use environment variables for secrets and environment-specific values. Never commit secrets to version control!
+</Alert>

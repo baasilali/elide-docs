@@ -1,423 +1,261 @@
 ---
 title: "Core API"
-description: "Core framework APIs and utilities"
-date: "2025-11-18"
+description: "Core framework modules and utilities"
+date: "2025-11-19"
 ---
 
 # Core API Reference
 
-The `@elide/core` package provides fundamental APIs for building Elide applications.
+The Elide framework provides modular components for building applications. Choose only what you need.
 
-## Module System
+## Framework Modules
 
-### `import` and `export`
+| Module | Platform | Description |
+|--------|----------|-------------|
+| **core** | All | Essential utilities, type system, collections |
+| **base** | JVM, JS, Native | Extended APIs not yet available on all platforms |
+| **server** | JVM, Native | HTTP server, routing, middleware |
+| **ssr** | JVM, JS | Server-side rendering annotations and logic |
+| **graalvm** | JVM, Native | GraalVM integration and JavaScript support |
+| **test** | All | Testing utilities and assertions |
 
-Standard ES module syntax:
+## Core Module
 
-```typescript
-// Export
-export function greet(name: string): string {
-  return `Hello, ${name}!`
+### Using Core
+
+```kotlin
+// Kotlin
+import elide.core.*
+
+// Java
+import tools.elide.core.*;
+```
+
+```javascript
+// JavaScript/TypeScript
+import { ... } from '@elide/core'
+```
+
+### Collections
+
+Efficient, immutable data structures:
+
+```kotlin
+// Persistent list
+val list = persistentListOf(1, 2, 3)
+val updated = list.add(4) // Original unchanged
+
+// Persistent map
+val map = persistentMapOf("key" to "value")
+val updated = map.put("key2", "value2")
+
+// Persistent set
+val set = persistentSetOf(1, 2, 3)
+```
+
+### Type System
+
+```kotlin
+// Sealed types for result handling
+sealed class Result<T> {
+  data class Success<T>(val value: T) : Result<T>()
+  data class Error<T>(val error: String) : Result<T>()
 }
 
-export class User {
-  constructor(public name: string) {}
-}
-
-// Default export
-export default function main() {
-  console.log('Hello, Elide!')
-}
-```
-
-```typescript
-// Import
-import main, { greet, User } from './module.ts'
-import * as utils from './utils.ts'
-```
-
-### Dynamic Imports
-
-Load modules dynamically:
-
-```typescript
-const module = await import('./dynamic-module.ts')
-module.doSomething()
-
-// Conditional loading
-if (needsFeature) {
-  const feature = await import('./feature.ts')
-  await feature.initialize()
-}
-```
-
-## Runtime APIs
-
-### `Elide` Global
-
-Access runtime information:
-
-```typescript
-// Runtime version
-console.log(Elide.version)
-
-// Platform info
-console.log(Elide.platform)  // 'darwin', 'linux', 'windows'
-console.log(Elide.arch)      // 'x64', 'arm64'
-
-// Runtime mode
-console.log(Elide.mode)      // 'development', 'production'
-```
-
-### Environment Variables
-
-```typescript
-// Access environment variables
-const apiKey = Elide.env.get('API_KEY')
-const port = Elide.env.get('PORT') ?? '3000'
-
-// Set environment variable
-Elide.env.set('DEBUG', 'true')
-
-// Check if variable exists
-if (Elide.env.has('NODE_ENV')) {
-  console.log('NODE_ENV is set')
-}
-
-// Get all variables
-const allEnv = Elide.env.toObject()
-```
-
-## Configuration
-
-### Loading Configuration
-
-```typescript
-import { loadConfig } from '@elide/core'
-
-const config = await loadConfig()
-console.log(config.app.name)
-console.log(config.app.version)
-```
-
-### Configuration Schema
-
-```typescript
-// elide.config.ts
-import { defineConfig } from '@elide/core'
-
-export default defineConfig({
-  app: {
-    name: 'My App',
-    version: '1.0.0'
-  },
-  runtime: {
-    engine: 'v8',
-    optimize: true
-  },
-  server: {
-    port: 3000,
-    host: '0.0.0.0'
+fun fetchData(): Result<Data> {
+  return try {
+    Result.Success(loadData())
+  } catch (e: Exception) {
+    Result.Error(e.message)
   }
-})
+}
 ```
 
-## Logging
+## Base Module
 
-### Logger API
+### Extended APIs
 
-```typescript
-import { Logger } from '@elide/core'
+```kotlin
+import elide.base.*
 
-const logger = new Logger('my-module')
+// Lazy evaluation
+val expensive by lazy {
+  computeExpensiveValue()
+}
 
-// Log levels
-logger.debug('Debug message')
-logger.info('Info message')
-logger.warn('Warning message')
-logger.error('Error message')
-
-// Structured logging
-logger.info('User logged in', {
-  userId: '123',
-  timestamp: new Date()
-})
-
-// Child loggers
-const childLogger = logger.child({ component: 'auth' })
-childLogger.info('Authentication successful')
+// Memoization
+val memoized = memoize { input ->
+  expensiveComputation(input)
+}
 ```
 
-### Log Configuration
+## Server Module
 
-```typescript
-// elide.config.ts
-export default defineConfig({
-  logging: {
-    level: 'info',
-    format: 'json',
-    destinations: ['console', 'file'],
-    file: {
-      path: './logs/app.log',
-      maxSize: '10MB',
-      maxFiles: 5
-    }
-  }
-})
-```
+### Annotations
 
-## Event System
+```kotlin
+import elide.server.annotations.*
 
-### Event Emitter
-
-```typescript
-import { EventEmitter } from '@elide/core'
-
-class UserService extends EventEmitter {
-  createUser(data: UserData) {
-    const user = this.db.users.create(data)
-    this.emit('user:created', user)
-    return user
+@Page("/")
+class HomePage {
+  @Get
+  fun index(): Response {
+    return Response.ok("Hello!")
   }
 }
 
-const service = new UserService()
-
-// Listen to events
-service.on('user:created', (user) => {
-  console.log('New user:', user.name)
-})
-
-// One-time listener
-service.once('user:created', (user) => {
-  console.log('First user created!')
-})
-
-// Remove listener
-const handler = (user) => console.log(user)
-service.on('user:created', handler)
-service.off('user:created', handler)
-```
-
-## Error Handling
-
-### Standard Errors
-
-```typescript
-import { 
-  ElideError,
-  ValidationError,
-  NotFoundError,
-  UnauthorizedError
-} from '@elide/core'
-
-// Base error
-throw new ElideError('Something went wrong')
-
-// Validation error
-throw new ValidationError('Invalid email format')
-
-// Not found error
-throw new NotFoundError('User not found')
-
-// Unauthorized error
-throw new UnauthorizedError('Invalid credentials')
-```
-
-### Custom Errors
-
-```typescript
-import { ElideError } from '@elide/core'
-
-class PaymentError extends ElideError {
-  constructor(message: string, public code: string) {
-    super(message)
-    this.name = 'PaymentError'
+@API("/api")
+class UserAPI {
+  @Get("/users")
+  fun listUsers(): List<User> {
+    return userService.findAll()
   }
-}
-
-throw new PaymentError('Payment failed', 'INSUFFICIENT_FUNDS')
-```
-
-## Dependency Injection
-
-### Injectable Services
-
-```typescript
-import { Injectable, Inject } from '@elide/core'
-
-@Injectable()
-class DatabaseService {
-  async query(sql: string) {
-    // Implementation
-  }
-}
-
-@Injectable()
-class UserService {
-  constructor(
-    @Inject(DatabaseService) private db: DatabaseService
-  ) {}
   
-  async getUser(id: string) {
-    return this.db.query(`SELECT * FROM users WHERE id = ${id}`)
+  @Post("/users")
+  fun createUser(@Body user: User): User {
+    return userService.create(user)
   }
 }
 ```
 
-### Dependency Container
+### Controllers
 
-```typescript
-import { Container } from '@elide/core'
-
-const container = new Container()
-
-// Register service
-container.register(DatabaseService)
-container.register(UserService)
-
-// Resolve service
-const userService = container.resolve(UserService)
-const user = await userService.getUser('123')
-```
-
-## Utilities
-
-### Path Operations
-
-```typescript
-import { path } from '@elide/core'
-
-const fullPath = path.join('src', 'components', 'button.tsx')
-const dirname = path.dirname(fullPath)
-const basename = path.basename(fullPath)
-const extname = path.extname(fullPath)
-
-console.log(path.resolve('./relative/path'))
-console.log(path.isAbsolute('/absolute/path'))
-```
-
-### File System
-
-```typescript
-import { fs } from '@elide/core'
-
-// Read file
-const content = await fs.readFile('file.txt', 'utf8')
-
-// Write file
-await fs.writeFile('file.txt', 'Hello, world!')
-
-// Check if file exists
-if (await fs.exists('file.txt')) {
-  console.log('File exists')
-}
-
-// Read directory
-const files = await fs.readDir('./src')
-
-// Create directory
-await fs.mkdir('./new-dir', { recursive: true })
-
-// Remove file
-await fs.remove('file.txt')
-```
-
-### Crypto
-
-```typescript
-import { crypto } from '@elide/core'
-
-// Generate random string
-const token = await crypto.randomString(32)
-
-// Hash password
-const hashed = await crypto.hash('password123', 'sha256')
-
-// Compare hash
-const isValid = await crypto.compare('password123', hashed)
-
-// Generate UUID
-const id = crypto.randomUUID()
-
-// Encrypt/Decrypt
-const encrypted = await crypto.encrypt('secret data', 'encryption-key')
-const decrypted = await crypto.decrypt(encrypted, 'encryption-key')
-```
-
-### JSON Operations
-
-```typescript
-import { json } from '@elide/core'
-
-// Parse JSON
-const data = json.parse('{"name":"Alice"}')
-
-// Stringify with pretty print
-const str = json.stringify(data, { pretty: true })
-
-// Safe parse (returns Result type)
-const result = json.safeParse(input)
-if (result.success) {
-  console.log(result.data)
-} else {
-  console.error(result.error)
+```kotlin
+@Controller
+class UserController(
+  private val userService: UserService
+) {
+  @Get("/users/{id}")
+  fun getUser(@Path id: String): User {
+    return userService.findById(id)
+  }
+  
+  @Put("/users/{id}")
+  fun updateUser(
+    @Path id: String,
+    @Body user: User
+  ): User {
+    return userService.update(id, user)
+  }
 }
 ```
 
-## Performance
+## SSR Module
 
-### Timing
+### Server-Side Rendering
 
-```typescript
-import { perf } from '@elide/core'
+```kotlin
+import elide.ssr.*
 
-// Mark time
-perf.mark('start')
-await doSomething()
-perf.mark('end')
-
-// Measure duration
-const duration = perf.measure('operation', 'start', 'end')
-console.log(`Operation took ${duration}ms`)
-
-// Time function
-const result = await perf.time('myOperation', async () => {
-  return await expensiveOperation()
-})
+@SSR
+class ProfilePage {
+  @Render
+  fun render(user: User): String {
+    return """
+      <!DOCTYPE html>
+      <html>
+        <head><title>${user.name}</title></head>
+        <body>
+          <h1>${user.name}</h1>
+          <p>${user.email}</p>
+        </body>
+      </html>
+    """
+  }
+}
 ```
 
-### Caching
+## GraalVM Module
 
-```typescript
-import { Cache } from '@elide/core'
+### Polyglot Integration
 
-const cache = new Cache({
-  maxSize: 1000,
-  ttl: 300 // 5 minutes
-})
+```kotlin
+import elide.runtime.gvm.*
 
-// Set value
-await cache.set('key', 'value')
+// Execute JavaScript
+val context = createContext()
+val result = context.eval("js", "1 + 2")
 
-// Get value
-const value = await cache.get('key')
+// Call JavaScript from Kotlin
+val jsFunction = context.getBindings("js")
+  .getMember("myFunction")
 
-// Check if exists
-if (await cache.has('key')) {
-  console.log('Key exists')
+val result = jsFunction.execute(arg1, arg2)
+```
+
+## Test Module
+
+### Testing Utilities
+
+```kotlin
+import elide.test.*
+
+class UserServiceTest : ElideTest() {
+  @Test
+  fun `should create user`() {
+    val user = User(name = "Alice")
+    val created = userService.create(user)
+    
+    assertThat(created.id).isNotNull()
+    assertThat(created.name).isEqualTo("Alice")
+  }
+  
+  @Test
+  suspend fun `should fetch user async`() {
+    val user = userService.fetchAsync(123)
+    assertThat(user.id).isEqualTo(123)
+  }
 }
+```
 
-// Delete value
-await cache.delete('key')
+## Using Framework Modules
 
-// Clear all
-await cache.clear()
+### Gradle
+
+```kotlin
+dependencies {
+  // Core (always needed)
+  implementation("dev.elide:elide-core")
+  
+  // Base (optional)
+  implementation("dev.elide:elide-base")
+  
+  // Server (for HTTP)
+  implementation("dev.elide:elide-server")
+  
+  // SSR (for rendering)
+  implementation("dev.elide:elide-ssr")
+  
+  // GraalVM (for polyglot)
+  implementation("dev.elide:elide-graalvm")
+  
+  // Test (for testing)
+  testImplementation("dev.elide:elide-test")
+}
+```
+
+### Maven
+
+```xml
+<dependencies>
+  <dependency>
+    <groupId>dev.elide</groupId>
+    <artifactId>elide-core</artifactId>
+    <version>${elide.version}</version>
+  </dependency>
+  
+  <dependency>
+    <groupId>dev.elide</groupId>
+    <artifactId>elide-server</artifactId>
+    <version>${elide.version}</version>
+  </dependency>
+</dependencies>
 ```
 
 ## Next Steps
 
-- [Server API](/docs/api-server) - Server-side APIs
-- [Database](/docs/api-database) - Database access
-- [Configuration](/docs/configuration) - Configuration guide
+- **[Server API](/docs/api-server)** - HTTP server details
+- **[Architecture](/docs/architecture)** - Framework design
+- **[Configuration](/docs/configuration)** - Configure modules
 
+For full API documentation, see [docs.elide.dev/apidocs](https://docs.elide.dev/apidocs)

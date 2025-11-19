@@ -1,136 +1,449 @@
 ---
-title: "Quick Start Guide"
-description: "Get up and running with Elide in minutes"
-date: "2025-11-18"
+title: "Quick Start"
+description: "Build your first Elide application in minutes"
+date: "2025-11-19"
 ---
 
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Alert } from '@/components/ui/alert'
-import { Button } from '@/components/ui/button'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
-# Quick Start
+# Quick Start Guide
 
-This guide will help you create your first Elide application in just a few minutes.
+Get up and running with Elide in less than 5 minutes. This guide will walk you through creating your first application.
 
 ## Prerequisites
 
-Before you begin, make sure you have:
+Before you begin, make sure you have Elide installed. If not, see the [Installation Guide](/docs/installation).
 
-- Node.js 18 or later
-- npm, yarn, or pnpm
-- A code editor (VS Code recommended)
+```bash
+# Verify installation
+elide --version
+```
 
-## Installation
+## Your First Application
 
-Install the Elide CLI globally:
+Let's create a simple HTTP server that responds to requests.
 
-<Tabs defaultValue="npm" className="w-full">
+### Step 1: Create a Project Directory
+
+```bash
+mkdir my-elide-app
+cd my-elide-app
+```
+
+### Step 2: Create server.js
+
+Create a file called `server.js`:
+
+```javascript
+// server.js - A simple HTTP server
+const app = Elide.http
+
+// Homepage route
+app.router.handle("GET", "/", (request, response) => {
+  response.send(200, "Welcome to Elide!")
+})
+
+// API endpoint
+app.router.handle("GET", "/api/hello", (request, response) => {
+  response.json({
+    message: "Hello from Elide!",
+    timestamp: Date.now(),
+    version: "1.0.0"
+  })
+})
+
+// Echo endpoint
+app.router.handle("POST", "/api/echo", (request, response) => {
+  const body = request.body
+  response.json({
+    echoed: body,
+    length: body.length
+  })
+})
+
+console.log("🚀 Server running on http://localhost:8080")
+```
+
+### Step 3: Run Your Application
+
+<Tabs defaultValue="jit" className="w-full">
   <TabsList>
-    <TabsTrigger value="npm">npm</TabsTrigger>
-    <TabsTrigger value="yarn">yarn</TabsTrigger>
-    <TabsTrigger value="pnpm">pnpm</TabsTrigger>
+    <TabsTrigger value="jit">JIT Mode (Development)</TabsTrigger>
+    <TabsTrigger value="native">Native (Production)</TabsTrigger>
   </TabsList>
   
-  <TabsContent value="npm">
+  <TabsContent value="jit">
+
+**JIT Mode** - Fast iteration during development:
+
 ```bash
-npm install -g @elide/cli
+elide run server.js
 ```
+
+The server starts in ~50ms and recompiles code on the fly. Perfect for development!
+
   </TabsContent>
   
-  <TabsContent value="yarn">
+  <TabsContent value="native">
+
+**Native Mode** - Maximum performance for production:
+
 ```bash
-yarn global add @elide/cli
+# Compile to native binary
+elide build --native server.js
+
+# Run the binary
+./server
 ```
-  </TabsContent>
-  
-  <TabsContent value="pnpm">
-```bash
-pnpm add -g @elide/cli
-```
+
+Cold start in < 10ms! The binary includes everything and has no runtime dependencies.
+
   </TabsContent>
 </Tabs>
 
-## Create Your First Project
-
-Use the CLI to create a new project:
+### Step 4: Test Your Server
 
 ```bash
-elide create my-app
-cd my-app
+# Test the homepage
+curl http://localhost:8080/
+
+# Test the API
+curl http://localhost:8080/api/hello
+
+# Test the echo endpoint
+curl -X POST http://localhost:8080/api/echo \
+  -H "Content-Type: application/json" \
+  -d '{"message": "Hello Elide"}'
 ```
 
-This will create a new directory with the following structure:
+## Example 2: TypeScript Application
 
+Elide has first-class TypeScript support with built-in compilation.
+
+### Create app.ts
+
+```typescript
+// app.ts - TypeScript with type safety
+interface User {
+  id: number
+  name: string
+  email: string
+}
+
+interface ApiResponse<T> {
+  success: boolean
+  data?: T
+  error?: string
+}
+
+const app = Elide.http
+
+// In-memory user store
+const users: Map<number, User> = new Map([
+  [1, { id: 1, name: "Alice", email: "alice@example.com" }],
+  [2, { id: 2, name: "Bob", email: "bob@example.com" }]
+])
+
+// Get all users
+app.router.handle("GET", "/api/users", (request, response) => {
+  const userList = Array.from(users.values())
+  const result: ApiResponse<User[]> = {
+    success: true,
+    data: userList
+  }
+  response.json(result)
+})
+
+// Get user by ID
+app.router.handle("GET", "/api/users/:id", (request, response) => {
+  const id = parseInt(request.params.id)
+  const user = users.get(id)
+  
+  if (user) {
+    const result: ApiResponse<User> = {
+      success: true,
+      data: user
+    }
+    response.json(result)
+  } else {
+    const result: ApiResponse<never> = {
+      success: false,
+      error: "User not found"
+    }
+    response.status(404).json(result)
+  }
+})
+
+console.log("✨ TypeScript server ready!")
 ```
-my-app/
-├── src/
-│   ├── index.ts
-│   └── app.ts
-├── elide.config.js
-└── package.json
+
+### Run TypeScript
+
+```bash
+# Elide compiles TypeScript automatically
+elide run app.ts
+```
+
+<Alert>
+  <strong>No build step required!</strong> Elide compiles TypeScript on the fly during development and ahead-of-time for production builds.
+</Alert>
+
+## Example 3: Polyglot Application
+
+One of Elide's superpowers is running multiple languages together.
+
+### Create polyglot-app.js
+
+```javascript
+// polyglot-app.js - JavaScript calling Python
+const app = Elide.http
+
+// Import Python function
+const { analyze_sentiment } = await import('./sentiment.py')
+
+app.router.handle("POST", "/api/sentiment", async (request, response) => {
+  const { text } = request.body
+  
+  // Call Python function from JavaScript!
+  const sentiment = await analyze_sentiment(text)
+  
+  response.json({
+    text,
+    sentiment,
+    analyzed_at: new Date().toISOString()
+  })
+})
+
+console.log("🔀 Polyglot server running!")
+```
+
+### Create sentiment.py
+
+```python
+# sentiment.py - Python sentiment analysis
+
+def analyze_sentiment(text: str) -> dict:
+    """Analyze sentiment of text"""
+    # Simple sentiment analysis
+    positive_words = ['good', 'great', 'awesome', 'excellent', 'love']
+    negative_words = ['bad', 'terrible', 'awful', 'hate', 'poor']
+    
+    words = text.lower().split()
+    
+    positive_count = sum(1 for word in words if word in positive_words)
+    negative_count = sum(1 for word in words if word in negative_words)
+    
+    if positive_count > negative_count:
+        sentiment = 'positive'
+        score = positive_count / len(words)
+    elif negative_count > positive_count:
+        sentiment = 'negative'
+        score = negative_count / len(words)
+    else:
+        sentiment = 'neutral'
+        score = 0.0
+    
+    return {
+        'sentiment': sentiment,
+        'score': score,
+        'positive_words': positive_count,
+        'negative_words': negative_count
+    }
+```
+
+### Run Polyglot App
+
+```bash
+elide run polyglot-app.js
+```
+
+Test it:
+
+```bash
+curl -X POST http://localhost:8080/api/sentiment \
+  -H "Content-Type: application/json" \
+  -d '{"text": "This is awesome and great!"}'
 ```
 
 ## Project Structure
 
-Let's look at the main files:
+For larger applications, organize your code:
 
-### `src/index.ts`
-
-This is your application's entry point:
-
-```typescript
-import { serve } from '@elide/server'
-
-serve({
-  port: 3000,
-  handler: (req) => {
-    return new Response('Hello from Elide!')
-  }
-})
+```
+my-app/
+├── elide.pkl          # Project configuration
+├── src/
+│   ├── main.ts        # Entry point
+│   ├── routes/        # Route handlers
+│   │   ├── api.ts
+│   │   └── pages.ts
+│   ├── lib/           # Utilities
+│   │   └── db.ts
+│   └── types/         # TypeScript types
+│       └── index.ts
+├── public/            # Static assets
+│   ├── index.html
+│   └── styles.css
+└── tests/             # Test files
+    └── api.test.ts
 ```
 
-### `elide.config.js`
+## Configuration with elide.pkl
 
-Configuration file for your Elide application:
+Create an `elide.pkl` file for project configuration:
 
-```javascript
-export default {
-  runtime: {
-    engine: 'v8',
-    optimize: true
-  }
+```pkl
+// elide.pkl - Project configuration
+app {
+  name = "my-elide-app"
+  version = "1.0.0"
+  entry = "src/main.ts"
+}
+
+runtime {
+  languages = ["javascript", "typescript", "python"]
+  optimize = true
+}
+
+server {
+  port = 8080
+  host = "0.0.0.0"
+}
+
+build {
+  target = "native"
+  output = "dist/"
 }
 ```
 
-## Run Your Application
-
-Start the development server:
+Then simply run:
 
 ```bash
-elide dev
+elide run    # Uses config automatically
+elide build  # Builds according to config
 ```
 
-Your application will be available at `http://localhost:3000`
+## Environment Variables
+
+Use `.env` files for configuration:
+
+```bash
+# .env
+PORT=3000
+DATABASE_URL=postgresql://localhost/mydb
+API_KEY=your-secret-key
+```
+
+Access in your code:
+
+```javascript
+const port = process.env.PORT || 8080
+const dbUrl = process.env.DATABASE_URL
+const apiKey = process.env.API_KEY
+
+console.log(`Starting server on port ${port}`)
+```
+
+## Common Commands
+
+| Command | Description |
+|---------|-------------|
+| `elide run file.js` | Run JavaScript file in JIT mode |
+| `elide run file.ts` | Run TypeScript (auto-compiled) |
+| `elide run file.py` | Run Python script |
+| `elide build --native` | Compile to native binary |
+| `elide build --jar` | Create JAR file |
+| `elide serve dist/` | Serve static files |
+| `elide info` | Show system information |
+| `elide --version` | Show Elide version |
+
+## Performance Tips
+
+### Development Mode (JIT)
+- Fast iteration
+- Code recompilation
+- Full debugging support
+- Higher memory usage
+
+```bash
+elide run --mode=dev server.js
+```
+
+### Production Mode (Native)
+- Compile once, run forever
+- Instant startup
+- Minimal memory
+- Maximum throughput
+
+```bash
+elide build --native --optimize server.js
+```
+
+## What's Next?
+
+Now that you've built your first Elide application:
+
+1. **[Architecture](/docs/architecture)** - Learn how Elide works under the hood
+2. **[JavaScript APIs](/docs/javascript)** - Explore JavaScript runtime features
+3. **[Server API](/docs/api-server)** - Deep dive into HTTP server capabilities
+4. **[Deployment](/docs/deployment)** - Deploy to production
+
+## Examples Repository
+
+Check out more examples at [github.com/elide-dev/elide/examples](https://github.com/elide-dev/elide/tree/main/examples):
+
+- REST API with database
+- GraphQL server
+- WebSocket chat
+- Server-side rendering
+- Static site generator
+- CLI tools
+- Serverless functions
 
 <Alert>
-  <strong>Hot Reload:</strong> The dev server automatically reloads when you make changes to your code.
+  <strong>Pro Tip:</strong> Start with JIT mode during development for fast iteration, then compile to native for production deployment. This gives you the best of both worlds!
 </Alert>
 
-## Build for Production
+## Troubleshooting
 
-When you're ready to deploy, create a production build:
+### Server Won't Start
 
 ```bash
-elide build
+# Check if port is in use
+lsof -i :8080
+
+# Use a different port
+PORT=3000 elide run server.js
 ```
 
-This creates an optimized binary in the `dist/` directory.
+### Native Build Fails
 
-## Next Steps
+```bash
+# Make sure you have GraalVM native-image
+elide info
 
-Now that you have a basic application running, explore:
+# Install if needed (macOS)
+brew install graalvm/tap/graalvm-ce-java21
 
-- [Architecture](/docs/architecture) - Learn about Elide's architecture
-- [API Reference](/docs/api-core) - Explore the available APIs
-- [Configuration](/docs/configuration) - Advanced configuration options
+# Verify
+native-image --version
+```
 
+### TypeScript Errors
+
+```bash
+# Enable verbose logging
+elide run --verbose app.ts
+
+# Check TypeScript version
+elide info typescript
+```
+
+## Getting Help
+
+- **Documentation**: [docs.elide.dev](https://docs.elide.dev)
+- **GitHub Issues**: [github.com/elide-dev/elide/issues](https://github.com/elide-dev/elide/issues)
+- **Examples**: [github.com/elide-dev/elide/examples](https://github.com/elide-dev/elide/tree/main/examples)
+
+You're now ready to build amazing applications with Elide! 🚀

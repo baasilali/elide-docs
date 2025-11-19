@@ -1,221 +1,576 @@
 ---
 title: "Architecture"
 description: "Understanding Elide's architecture and design principles"
-date: "2025-11-18"
+date: "2025-11-19"
 ---
 
+import { Alert } from '@/components/ui/alert'
 import { Card, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 
 # Architecture
 
-Elide's architecture is designed for performance, flexibility, and developer experience. This guide explains the core components and how they work together.
+Elide's architecture is designed for maximum performance, flexibility, and developer experience. This guide explains how all the pieces fit together.
 
-## Overview
+## High-Level Overview
 
-Elide is built on three main layers:
+Elide consists of three main layers working together:
 
-1. **Runtime Layer** - Executes your code
-2. **API Layer** - Provides high-level interfaces
-3. **Tooling Layer** - Development and build tools
+```
+┌─────────────────────────────────────────┐
+│         Application Code                │
+│  (JavaScript, TypeScript, Python, etc)  │
+└─────────────────────────────────────────┘
+               ↓
+┌─────────────────────────────────────────┐
+│          Elide Framework                │
+│    (APIs, Server, Database, etc)        │
+└─────────────────────────────────────────┘
+               ↓
+┌─────────────────────────────────────────┐
+│         GraalVM Runtime                 │
+│  (Polyglot Engine, JIT, Native Image)   │
+└─────────────────────────────────────────┘
+               ↓
+┌─────────────────────────────────────────┐
+│        Operating System                 │
+│    (Linux, macOS, Windows)              │
+└─────────────────────────────────────────┘
+```
 
-## Runtime Layer
-
-The runtime is the foundation of Elide, built on GraalVM for optimal performance.
-
-### Components
+## Core Components
 
 <div className="grid gap-4 md:grid-cols-2 mt-6 not-prose">
   <Card>
     <CardHeader>
-      <CardTitle>VM Engine</CardTitle>
+      <CardTitle>Polyglot Engine</CardTitle>
       <CardDescription>
-        Polyglot execution engine supporting multiple languages
+        GraalVM-based engine supporting multiple languages with seamless interop
       </CardDescription>
     </CardHeader>
   </Card>
   
   <Card>
     <CardHeader>
-      <CardTitle>Memory Manager</CardTitle>
+      <CardTitle>Module System</CardTitle>
       <CardDescription>
-        Advanced garbage collection and memory optimization
+        ES modules, CommonJS, and native module loading with automatic resolution
       </CardDescription>
     </CardHeader>
   </Card>
   
   <Card>
     <CardHeader>
-      <CardTitle>Module Loader</CardTitle>
+      <CardTitle>HTTP Server</CardTitle>
       <CardDescription>
-        Efficient module resolution and caching
+        High-performance Netty-based server with HTTP/1.1, HTTP/2, and HTTP/3 support
       </CardDescription>
     </CardHeader>
   </Card>
   
   <Card>
     <CardHeader>
-      <CardTitle>Security Sandbox</CardTitle>
+      <CardTitle>Native Image</CardTitle>
       <CardDescription>
-        Isolated execution contexts for safe code execution
+        Ahead-of-time compilation to native binaries for instant startup
       </CardDescription>
     </CardHeader>
   </Card>
 </div>
 
-### Execution Flow
+## The Runtime Layer
+
+### GraalVM Foundation
+
+Elide is built on GraalVM, which provides:
+
+- **Polyglot Engine**: Run multiple languages in one VM
+- **Truffle Framework**: High-performance language implementation
+- **SubstrateVM**: Native image compilation
+- **LLVM Integration**: Support for native libraries
+
+### Execution Modes
+
+Elide supports two execution modes:
+
+#### 1. JIT Mode (Development)
 
 ```
-Source Code
-    ↓
-Parser & AST
-    ↓
-Optimizer
-    ↓
-Bytecode/Native
-    ↓
-Execution
+Source Code → Parser → Interpreter → JIT Compiler → Machine Code
+              ↓
+         AST Cache
 ```
 
-## API Layer
+- **Fast iteration**: Code changes reflected immediately
+- **Dynamic optimization**: Hot paths optimized at runtime
+- **Full debugging**: Source maps, breakpoints, profiling
 
-The API layer provides clean, intuitive interfaces for common tasks.
+#### 2. Native Mode (Production)
 
-### Core Modules
-
-- **@elide/server** - HTTP server and routing
-- **@elide/database** - Database access and ORM
-- **@elide/auth** - Authentication and authorization
-- **@elide/cache** - Caching primitives
-- **@elide/queue** - Job queues and background tasks
-
-### Example Usage
-
-```typescript
-import { serve } from '@elide/server'
-import { connect } from '@elide/database'
-
-const db = await connect('postgresql://localhost/mydb')
-
-serve({
-  port: 3000,
-  routes: {
-    '/users': async (req) => {
-      const users = await db.users.findMany()
-      return Response.json(users)
-    }
-  }
-})
+```
+Source Code → AOT Compiler → Native Binary
+                 ↓
+           Static Analysis
+                 ↓
+           Dead Code Elimination
+                 ↓
+           Machine Code
 ```
 
-## Polyglot Support
+- **Instant startup**: < 10ms cold start
+- **Low memory**: Minimal heap required
+- **Predictable performance**: No JIT warmup
 
-Elide allows mixing multiple languages in the same application:
+## Memory Architecture
 
-```typescript
-// TypeScript
-import { compute } from './compute.py'
+### Memory Layout
 
-const result = await compute(data)
+```
+┌──────────────────────────────────────┐
+│         Stack Memory                 │
+│    (Local variables, call frames)    │
+├──────────────────────────────────────┤
+│         Young Generation             │
+│      (Short-lived objects)           │
+├──────────────────────────────────────┤
+│         Old Generation               │
+│      (Long-lived objects)            │
+├──────────────────────────────────────┤
+│         Code Cache                   │
+│    (JIT compiled code)               │
+├──────────────────────────────────────┤
+│         Metaspace                    │
+│    (Class metadata)                  │
+└──────────────────────────────────────┘
 ```
 
-```python
-# Python
-def compute(data):
-    return sum(data) / len(data)
-```
+### Garbage Collection
 
-## Performance Optimizations
+Elide uses advanced GC algorithms:
 
-### Ahead-of-Time Compilation
+- **Serial GC**: For single-threaded apps
+- **G1 GC**: For balanced latency and throughput
+- **ZGC**: For ultra-low latency (< 1ms pauses)
+- **Epsilon GC**: No GC for short-lived apps
 
-Elide can compile your application to native code:
+Choose based on your needs:
 
 ```bash
-elide build --native
+# Low latency
+elide run --gc=zgc app.js
+
+# High throughput
+elide run --gc=g1 app.js
+
+# No GC (ephemeral workloads)
+elide run --gc=epsilon app.js
 ```
 
-Benefits:
-- Instant startup (< 10ms)
-- Lower memory usage (30-50% reduction)
-- Better throughput
-
-### Just-in-Time Optimization
-
-During development, JIT provides fast iteration:
-
-- Hot code path optimization
-- Adaptive compilation
-- Profile-guided optimization
-
 ## Module System
-
-Elide supports multiple module formats:
-
-- **ESM** - ECMAScript Modules (recommended)
-- **CommonJS** - Node.js style modules
-- **Native** - Platform-specific modules
 
 ### Module Resolution
 
 ```
-import { foo } from 'bar'
-    ↓
-1. Check cache
-2. Resolve path
-3. Load module
-4. Execute & cache
-5. Return exports
+Import Statement
+       ↓
+┌──────────────────┐
+│  Module Resolver │
+└──────────────────┘
+       ↓
+    ┌─────┐
+    │Cache?│
+    └─────┘
+     Yes ↓  ↓ No
+         ↓  ↓
+         ↓  └──> Load → Parse → Compile → Cache
+         ↓            ↓
+         └────────────┘
+                ↓
+            Execute
+```
+
+### Supported Formats
+
+| Format | Extension | Support |
+|--------|-----------|---------|
+| ES Modules | `.mjs`, `.js` | Full |
+| CommonJS | `.cjs`, `.js` | Full |
+| TypeScript | `.ts`, `.tsx` | Full (auto-compile) |
+| Python | `.py` | Full |
+| Java/Kotlin | `.class`, `.jar` | Full |
+| WebAssembly | `.wasm` | Full |
+
+### Module Loading Example
+
+```javascript
+// ES Modules
+import { readFile } from 'node:fs/promises'
+import { serve } from '@elide/server'
+
+// CommonJS
+const express = require('express')
+
+// TypeScript
+import type { User } from './types'
+
+// Python interop
+const { analyze } = await import('./ml/model.py')
+
+// WebAssembly
+const wasm = await WebAssembly.instantiateStreaming(
+  fetch('./module.wasm')
+)
+```
+
+## HTTP Server Architecture
+
+### Request Flow
+
+```
+Client Request
+      ↓
+┌─────────────────┐
+│  Netty Pipeline │
+├─────────────────┤
+│  SSL/TLS Layer  │
+├─────────────────┤
+│  HTTP Decoder   │
+├─────────────────┤
+│  Router         │───────> Route Matching
+├─────────────────┤              ↓
+│  Middleware     │───────> Auth, CORS, etc.
+├─────────────────┤              ↓
+│  Handler        │───────> Your Code
+├─────────────────┤              ↓
+│  Response       │<─────── Return Response
+└─────────────────┘
+      ↓
+Client Response
+```
+
+### Event Loop
+
+Elide uses a non-blocking event loop for high concurrency:
+
+```
+┌────────────────────┐
+│   Event Loop       │
+│                    │
+│  ┌──────────────┐  │
+│  │ Accept Conn  │  │
+│  └──────────────┘  │
+│         ↓          │
+│  ┌──────────────┐  │
+│  │ Read Request │  │
+│  └──────────────┘  │
+│         ↓          │
+│  ┌──────────────┐  │
+│  │ Process      │───────> Worker Thread Pool
+│  └──────────────┘  │      (for blocking I/O)
+│         ↓          │
+│  ┌──────────────┐  │
+│  │ Write Response│ │
+│  └──────────────┘  │
+└────────────────────┘
+```
+
+Single event loop handles thousands of concurrent connections. Blocking operations are offloaded to worker threads.
+
+## Language Integration
+
+### Polyglot Interop
+
+All supported languages share the same memory space:
+
+```
+┌─────────────────────────────────────┐
+│      Shared Object Space            │
+├─────────────────────────────────────┤
+│  JavaScript ←→ Python ←→ Java       │
+│       Objects pass by reference      │
+└─────────────────────────────────────┘
+```
+
+Example of seamless interop:
+
+```javascript
+// JavaScript
+const users = [
+  { name: "Alice", age: 30 },
+  { name: "Bob", age: 25 }
+]
+
+// Call Python with JavaScript array
+const analyzed = python.analyze(users)
+
+// Python receives it natively
+// def analyze(users):
+//     return sorted(users, key=lambda u: u['age'])
+```
+
+### Zero-Copy Operations
+
+When passing data between languages, Elide uses zero-copy when possible:
+
+```
+JavaScript Array
+       ↓
+   GraalVM
+ Shared Memory
+       ↓
+  Python List
+```
+
+No serialization overhead!
+
+## Compilation Pipeline
+
+### TypeScript Compilation
+
+```
+TypeScript Source
+       ↓
+  Type Checker
+       ↓
+   Transpiler
+       ↓
+ JavaScript (ES2024)
+       ↓
+ Elide Runtime
+```
+
+### Native Image Build
+
+```
+Application Code
+       ↓
+┌──────────────────┐
+│ Static Analysis  │ ──> Determine reachable code
+└──────────────────┘
+       ↓
+┌──────────────────┐
+│ Heap Snapshot    │ ──> Serialize initialized data
+└──────────────────┘
+       ↓
+┌──────────────────┐
+│ AOT Compilation  │ ──> Compile to machine code
+└──────────────────┘
+       ↓
+┌──────────────────┐
+│ Link & Package   │ ──> Create executable
+└──────────────────┘
+       ↓
+   Native Binary
 ```
 
 ## Security Model
 
-Elide implements multiple security layers:
-
 ### Sandboxing
 
-Each module runs in an isolated context with limited permissions:
+Elide provides isolation between guest code and host:
 
-```typescript
-import { sandbox } from '@elide/runtime'
-
-const untrusted = await sandbox({
-  code: userProvidedCode,
-  permissions: ['network:read']
-})
+```
+┌──────────────────────────────────┐
+│        Host Environment          │
+│  (File system, network, etc)     │
+└──────────────────────────────────┘
+               ↑
+         Permission Checks
+               ↑
+┌──────────────────────────────────┐
+│       Elide Security Layer       │
+│  (Context isolation, policies)   │
+└──────────────────────────────────┘
+               ↑
+┌──────────────────────────────────┐
+│         Guest Code               │
+│  (Your application)              │
+└──────────────────────────────────┘
 ```
 
-### Capability-based Security
+### Security Features
 
-Modules must explicitly request capabilities:
+- **Context Isolation**: Each execution context is sandboxed
+- **Resource Limits**: Memory, CPU, file access limits
+- **Permission Model**: Explicit grants for sensitive operations
+- **Code Signing**: Verify binary integrity
+- **Secrets Management**: Encrypted storage for credentials
 
-```typescript
-// elide.config.js
-export default {
-  permissions: {
-    network: true,
-    filesystem: ['./data']
+## Performance Optimizations
+
+### Just-In-Time (JIT) Compilation
+
+The JIT compiler optimizes hot code paths:
+
+1. **Profiling**: Track method execution frequency
+2. **Inlining**: Eliminate function call overhead
+3. **Escape Analysis**: Stack-allocate when possible
+4. **Vectorization**: Use SIMD instructions
+5. **Loop Optimization**: Unroll, vectorize loops
+
+### Ahead-Of-Time (AOT) Compilation
+
+Native images apply aggressive optimizations:
+
+- **Dead Code Elimination**: Remove unused code
+- **Constant Folding**: Pre-compute constants
+- **Method Devirtualization**: Direct calls when possible
+- **Inlining**: Inline across module boundaries
+- **Profile-Guided Optimization**: Use training runs
+
+## Configuration Architecture
+
+### elide.pkl Configuration
+
+```pkl
+app {
+  name = "my-app"
+  version = "1.0.0"
+}
+
+runtime {
+  languages = ["javascript", "python"]
+  memory {
+    heap = "2G"
+    stack = "1M"
+  }
+  gc = "g1"
+}
+
+server {
+  port = 8080
+  http2 = true
+  tls {
+    enabled = true
+    cert = "./cert.pem"
+    key = "./key.pem"
   }
 }
 ```
 
-## Concurrency Model
+### Runtime Configuration Layers
 
-Elide uses a hybrid concurrency model:
-
-- **Async/Await** - For I/O operations
-- **Workers** - For CPU-intensive tasks
-- **Isolates** - For true parallelism
-
-```typescript
-import { Worker } from '@elide/worker'
-
-const worker = new Worker('./heavy-task.ts')
-const result = await worker.run(data)
 ```
+1. elide.pkl (Project config)
+       ↓
+2. .env (Environment variables)
+       ↓
+3. CLI Arguments
+       ↓
+4. Defaults
+       ↓
+  Final Configuration
+```
+
+## Deployment Architecture
+
+### Development Workflow
+
+```
+Source Code
+    ↓
+elide run (JIT mode)
+    ↓
+Hot Reload
+    ↓
+Test & Debug
+```
+
+### Production Workflow
+
+```
+Source Code
+    ↓
+elide build --native
+    ↓
+Native Binary
+    ↓
+┌─────────────────────────┐
+│  Deploy to:             │
+│  • Docker               │
+│  • Kubernetes           │
+│  • Serverless           │
+│  • VPS                  │
+│  • Edge/CDN             │
+└─────────────────────────┘
+```
+
+## Framework Modules
+
+Elide provides modular components:
+
+| Module | Purpose | Platform |
+|--------|---------|----------|
+| **core** | Essential utilities, type system | All |
+| **base** | Extended APIs, collections | JVM, JS, Native |
+| **server** | HTTP server, routing, middleware | JVM, Native |
+| **ssr** | Server-side rendering | JVM, JS |
+| **graalvm** | GraalVM integration, polyglot | JVM, Native |
+| **test** | Testing utilities | All |
+
+### Dependency Graph
+
+```
+      ┌─────────┐
+      │   ssr   │
+      └────┬────┘
+           │
+      ┌────┴────┐
+      │ server  │
+      └────┬────┘
+           │
+      ┌────┴────┐
+      │  base   │
+      └────┬────┘
+           │
+      ┌────┴────┐
+      │  core   │
+      └─────────┘
+```
+
+Only include what you need!
+
+## Design Principles
+
+### 1. Performance First
+- Zero-cost abstractions
+- Optimal data structures
+- Minimal allocations
+- Cache-friendly code
+
+### 2. Developer Experience
+- Clean, intuitive APIs
+- Excellent error messages
+- Fast feedback loops
+- Great tooling
+
+### 3. Flexibility
+- Polyglot by design
+- Modular architecture
+- Multiple deployment options
+- Extensible platform
+
+### 4. Standards Compliance
+- Web standards (Fetch, Response, etc.)
+- ECMAScript compatibility
+- Python compatibility
+- POSIX compliance
+
+## Comparison with Other Runtimes
+
+| Feature | Elide | Node.js | Deno | Bun |
+|---------|-------|---------|------|-----|
+| **Startup** | < 10ms (native) | ~500ms | ~100ms | ~80ms |
+| **Memory** | ~10MB (native) | ~50MB | ~40MB | ~30MB |
+| **Languages** | JS, TS, Python, Java | JS, TS | JS, TS | JS, TS |
+| **HTTP Server** | 800K+ req/s | 200K req/s | 300K req/s | 400K req/s |
+| **Native Compile** | ✓ | ✗ | ✓ | ✗ |
 
 ## Next Steps
 
-- [Runtime](/docs/runtime) - Deep dive into the runtime
-- [Components](/docs/components) - Learn about components
-- [API Reference](/docs/api-core) - Explore the APIs
+- **[Runtime Details](/docs/runtime)** - Deep dive into the runtime
+- **[JavaScript Guide](/docs/javascript)** - JavaScript-specific features
+- **[Server API](/docs/api-server)** - HTTP server capabilities
 
+<Alert>
+  <strong>Key Takeaway:</strong> Elide's architecture is designed to give you the flexibility of a dynamic runtime with the performance of native code. Choose JIT for development, native for production.
+</Alert>

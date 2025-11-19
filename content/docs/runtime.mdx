@@ -1,7 +1,7 @@
 ---
 title: "Runtime"
-description: "How the Elide runtime works under the hood"
-date: "2025-11-18"
+description: "Deep dive into the Elide runtime and execution engine"
+date: "2025-11-19"
 ---
 
 import { Alert } from '@/components/ui/alert'
@@ -9,270 +9,552 @@ import { Badge } from '@/components/ui/badge'
 
 # Elide Runtime
 
-The Elide runtime is a high-performance, polyglot execution environment built on GraalVM. This guide explores its internals and capabilities.
+The Elide runtime is a high-performance polyglot execution environment built on GraalVM's Truffle framework. This guide explores its internals and capabilities.
 
 ## Runtime Architecture
 
-The runtime consists of several key subsystems:
+The runtime consists of several interconnected subsystems:
 
-### Execution Engine
+```
+┌─────────────────────────────────────────┐
+│         Execution Engine                │
+│  Parser → AST → Optimizer → Executor    │
+└─────────────────────────────────────────┘
+               ↓
+┌─────────────────────────────────────────┐
+│        Memory Management                │
+│  GC, Heap, Stack, Code Cache            │
+└─────────────────────────────────────────┘
+               ↓
+┌─────────────────────────────────────────┐
+│         Module System                   │
+│  ES Modules, CommonJS, Python, Java     │
+└─────────────────────────────────────────┘
+               ↓
+┌─────────────────────────────────────────┐
+│         Intrinsics Layer                │
+│  Console, Fetch, FS, Crypto, etc        │
+└─────────────────────────────────────────┘
+```
 
-The execution engine handles code compilation and execution:
+## Execution Modes
 
-- **Parser**: Converts source code to Abstract Syntax Tree (AST)
-- **Compiler**: Transforms AST to optimized bytecode or native code
-- **Interpreter**: Fast execution for development
-- **JIT Compiler**: Optimizes hot paths during runtime
+Elide offers two distinct execution modes, each optimized for different use cases.
 
-### Memory Management
+### JIT Mode (Just-In-Time)
 
-Elide uses an advanced memory management system:
+**Best for:** Development, hot-reload scenarios, dynamic workloads
 
-- **Generational GC**: Separate young and old generations
-- **Concurrent Collection**: Non-blocking garbage collection
-- **Memory Pools**: Segregated memory regions for different object types
-- **Escape Analysis**: Stack allocation when possible
+```bash
+elide run app.js
+```
+
+**Characteristics:**
+- ~50-500ms startup time
+- Dynamic code optimization
+- Full debugging support
+- Higher memory usage (~50-100MB minimum)
+- Peak performance after warmup
+
+**When JIT Kicks In:**
+
+```
+Cold → Interpreted → Profiled → JIT Compiled → Optimized
+ 0ms      100ms        1s          5s            10s+
+```
+
+### Native Mode (Ahead-of-Time)
+
+**Best for:** Production, serverless, CLI tools, resource-constrained environments
+
+```bash
+elide build --native app.js
+```
+
+**Characteristics:**
+- < 10ms startup time
+- No warmup required
+- Minimal memory (~10-20MB for simple apps)
+- Single binary, no dependencies
+- Deterministic performance
 
 ## Language Support
 
 ### JavaScript/TypeScript
 
-Full ES2024+ support with V8 compatibility:
+Elide provides full ES2024+ support with V8-compatible APIs.
+
+#### Modern JavaScript Features
 
 ```javascript
-// Modern JavaScript features
-const data = await fetch('/api/data')
-const { results } = await data.json()
-
 // Top-level await
-await initializeApp()
+const config = await fetch('/config.json').then(r => r.json())
 
-// Pattern matching (Stage 3)
-match (value) {
-  when String: console.log('String value')
-  when Number: console.log('Number value')
+// Private fields
+class User {
+  #password
+  
+  constructor(name, password) {
+    this.name = name
+    this.#password = password
+  }
 }
+
+// Optional chaining & nullish coalescing
+const port = process.env.PORT ?? 3000
+const host = config?.server?.host ?? 'localhost'
+
+// BigInt support
+const largeNumber = 9007199254740991n + 1n
+
+// Template literals
+const html = String.raw`
+  <div class="user">
+    <h1>${user.name}</h1>
+  </div>
+`
 ```
+
+#### Performance Optimizations
+
+The runtime applies several optimizations:
+
+1. **Inline Caching**: Fast property access
+2. **Hidden Classes**: Optimize object layouts
+3. **Escape Analysis**: Stack allocation when possible
+4. **Loop Optimization**: Unrolling, hoisting
+5. **Dead Code Elimination**: Remove unused code
 
 ### Python Integration
 
-Seamless Python interop:
+Full CPython-compatible Python via GraalPython.
+
+#### Python Runtime
 
 ```python
-# Python code runs natively
+# Native Python execution
+import sys
+import json
+from datetime import datetime
+
+def process_data(items):
+    """Process a list of items"""
+    results = []
+    for item in items:
+        results.append({
+            'id': item['id'],
+            'processed_at': datetime.now().isoformat(),
+            'value': item['value'] * 2
+        })
+    return results
+
+# Use Python's rich ecosystem
 import numpy as np
 import pandas as pd
 
-def analyze_data(data):
+def analyze(data):
     df = pd.DataFrame(data)
-    return df.describe()
+    return df.describe().to_dict()
 ```
 
-Call from JavaScript:
+#### JavaScript ↔ Python Interop
+
+Seamless data exchange between languages:
 
 ```javascript
-import { analyze_data } from './analysis.py'
+// Import Python module from JavaScript
+const { process_data, analyze } = await import('./processor.py')
 
-const stats = await analyze_data(dataset)
+// Call Python functions with JavaScript data
+const items = [
+  { id: 1, value: 100 },
+  { id: 2, value: 200 }
+]
+
+const processed = await process_data(items)
+console.log(processed)
+
+// Pass arrays, objects, primitives - all work!
+const stats = await analyze(items)
+```
+
+**Zero-copy data sharing:**
+- Arrays pass by reference
+- Objects share memory
+- No serialization overhead
+
+### JVM Languages
+
+Native support for Java, Kotlin, Scala, and other JVM languages.
+
+```java
+// Java class
+public class Calculator {
+    public static int add(int a, int b) {
+        return a + b;
+    }
+}
+```
+
+```javascript
+// Use from JavaScript
+const Calculator = Java.type('Calculator')
+const result = Calculator.add(10, 20)
+console.log(result) // 30
+```
+
+## Memory Management
+
+### Heap Organization
+
+```
+┌─────────────────────────────┐
+│     Young Generation        │  ← New objects allocated here
+│                             │
+│  Eden Space | Survivor 0|1  │
+├─────────────────────────────┤
+│     Old Generation          │  ← Long-lived objects promoted here
+│                             │
+│  Tenured Space              │
+├─────────────────────────────┤
+│     Metaspace              │  ← Class metadata
+└─────────────────────────────┘
+```
+
+### Garbage Collection
+
+Elide supports multiple GC algorithms:
+
+| GC | Latency | Throughput | Use Case |
+|----|---------|------------|----------|
+| **Serial GC** | Moderate | High | Single-threaded apps |
+| **G1 GC** | Balanced | Balanced | Most applications |
+| **ZGC** | < 1ms | Good | Low-latency required |
+| **Epsilon GC** | N/A | Maximum | Short-lived apps |
+
+#### Choosing a GC
+
+```bash
+# Ultra-low latency (< 1ms pauses)
+elide run --gc=zgc --gc-max-pause=1ms app.js
+
+# High throughput
+elide run --gc=g1 app.js
+
+# No GC (for short-lived apps)
+elide run --gc=epsilon app.js
+```
+
+### Memory Tuning
+
+```bash
+# Set heap size
+elide run --memory=2G app.js
+
+# Set young generation size
+elide run --memory-young=512M app.js
+
+# Enable detailed GC logging
+elide run --gc-log=gc.log app.js
 ```
 
 ## Performance Characteristics
 
 ### Startup Time
 
-| Mode | Cold Start | Warm Start |
-|------|-----------|-----------|
-| JIT | ~500ms | ~50ms |
-| Native | ~5ms | ~2ms |
+| Mode | Cold Start | Explanation |
+|------|------------|-------------|
+| **JIT** | ~50-500ms | Parse + compile + initialize |
+| **Native** | ~5-10ms | Pre-compiled, instant |
 
 ### Memory Usage
 
-| Runtime | Hello World | Typical App |
-|---------|------------|-------------|
-| Elide | ~15MB | ~60MB |
-| Node.js | ~40MB | ~150MB |
-| Deno | ~35MB | ~120MB |
+Typical memory footprint:
 
-### Throughput
+| Application | JIT Mode | Native Mode |
+|-------------|----------|-------------|
+| Hello World | ~50MB | ~10MB |
+| REST API | ~100MB | ~30MB |
+| Full App | ~200MB+ | ~50MB+ |
 
-Elide achieves high throughput through:
+### HTTP Throughput
 
-- Inline caching
-- Polymorphic inline caching
-- Loop optimization
-- Vectorization
+Elide's HTTP server performance (Linux, 32 cores):
 
-## Native Image Compilation
-
-Build native executables with:
-
-```bash
-elide build --native
-```
-
-### Benefits
-
-- **Fast Startup**: < 10ms
-- **Low Memory**: 30-50% reduction
-- **No Warmup**: Peak performance immediately
-- **Small Binary**: Typically 20-40MB
-
-### Limitations
-
-- No runtime reflection
-- Limited dynamic code loading
-- Longer build times
+| Scenario | Requests/sec | Latency (p50) | Latency (p99) |
+|----------|--------------|---------------|---------------|
+| Hello World | 800K+ | 0.5ms | 2ms |
+| JSON API | 400K+ | 1ms | 4ms |
+| Database Query | 100K+ | 5ms | 15ms |
 
 <Alert>
-  <strong>Tip:</strong> Use native builds for production, JIT for development
+  <strong>Benchmark Setup:</strong> AMD EPYC 7713, 64 cores, 256GB RAM, Ubuntu 22.04, using wrk benchmarking tool with 256 connections.
 </Alert>
 
-## Optimization Techniques
+## Module System
 
-### Inline Caching
+### Module Resolution
 
-Speeds up property access:
+Elide implements the Node.js module resolution algorithm with extensions.
 
-```javascript
-function getName(obj) {
-  return obj.name  // Cached after first call
-}
-```
+#### Resolution Order
 
-### Escape Analysis
+For `import foo from 'bar'`:
 
-Stack allocates objects when possible:
+1. **Core modules**: `node:fs`, `@elide/server`
+2. **Relative paths**: `./bar`, `../bar`
+3. **node_modules**: Search up directory tree
+4. **Package exports**: Check package.json exports field
 
-```javascript
-function compute() {
-  const temp = { x: 1, y: 2 }  // May be stack-allocated
-  return temp.x + temp.y
-}
-```
-
-### Loop Unrolling
-
-Optimizes hot loops:
+### Supported Formats
 
 ```javascript
-// Original
-for (let i = 0; i < arr.length; i++) {
-  sum += arr[i]
-}
+// ES Modules (.mjs, .js with "type": "module")
+import { readFile } from 'node:fs/promises'
 
-// Optimized (conceptually)
-for (let i = 0; i < arr.length; i += 4) {
-  sum += arr[i] + arr[i+1] + arr[i+2] + arr[i+3]
-}
+// CommonJS (.cjs, .js with "type": "commonjs")
+const fs = require('fs')
+
+// TypeScript (.ts, .tsx)
+import type { User } from './types'
+
+// JSON
+import config from './config.json' with { type: 'json' }
+
+// WebAssembly
+const wasm = await WebAssembly.instantiateStreaming(
+  fetch('./module.wasm')
+)
 ```
 
-## Runtime Configuration
+### Module Caching
 
-Configure the runtime via `elide.config.js`:
+Modules are cached after first load:
+
+```
+First Import:
+  Load → Parse → Compile → Cache → Execute
+
+Subsequent Imports:
+  Cache Hit → Execute
+```
+
+Clear cache programmatically:
 
 ```javascript
-export default {
-  runtime: {
-    // Choose execution engine
-    engine: 'v8',  // or 'spidermonkey', 'jsc'
-    
-    // Memory settings
-    memory: {
-      heap: '2G',
-      youngGen: '512M'
-    },
-    
-    // Optimization level
-    optimize: 'max',  // or 'balanced', 'size'
-    
-    // Enable features
-    features: {
-      simd: true,
-      threads: true,
-      asyncContext: true
-    }
-  }
-}
+// Clear specific module
+delete require.cache[require.resolve('./module')]
+
+// In native mode, cache is persistent across runs
 ```
 
-## Debugging and Profiling
+## Intrinsics
 
-### Source Maps
+Elide provides built-in APIs (intrinsics) that are optimized and secure.
 
-Full source map support for debugging:
+### Console
 
 ```javascript
-// Errors show original TypeScript locations
-throw new Error('Something went wrong')
-// at myFunction (src/app.ts:42:10)
+// Standard console methods
+console.log('Hello', 'World')
+console.error('Error:', error)
+console.warn('Warning!')
+console.debug('Debug info')
+
+// Timing
+console.time('operation')
+// ... do work
+console.timeEnd('operation')
+
+// Assertions
+console.assert(value > 0, 'Value must be positive')
+
+// Tables
+console.table([
+  { name: 'Alice', age: 30 },
+  { name: 'Bob', age: 25 }
+])
 ```
 
-### Performance Profiling
+### Fetch API
 
-Built-in profiler:
-
-```bash
-elide run --profile app.ts
-```
-
-Generates flame graphs and performance reports.
-
-### Memory Profiling
-
-Track memory usage:
-
-```bash
-elide run --heap-snapshot app.ts
-```
-
-### Debugger
-
-Attach Chrome DevTools:
-
-```bash
-elide run --inspect app.ts
-```
-
-Then open `chrome://inspect`
-
-## Isolation and Security
-
-### Isolates
-
-Run code in isolated contexts:
+Standard Web Fetch API:
 
 ```javascript
-import { Isolate } from '@elide/runtime'
+// GET request
+const response = await fetch('https://api.example.com/data')
+const data = await response.json()
 
-const isolate = new Isolate({
-  memoryLimit: '128M',
-  timeLimit: 5000,
-  permissions: []
+// POST with body
+const result = await fetch('https://api.example.com/users', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({ name: 'Alice' })
 })
 
-const result = await isolate.eval(`
-  // This code runs in isolation
-  compute(data)
+// With timeout
+const controller = new AbortController()
+setTimeout(() => controller.abort(), 5000)
+
+const response = await fetch(url, {
+  signal: controller.signal
+})
+```
+
+### File System
+
+```javascript
+// Read file
+const content = await Elide.fs.readFile('./file.txt', 'utf-8')
+
+// Write file
+await Elide.fs.writeFile('./output.txt', 'Hello, World!')
+
+// List directory
+const files = await Elide.fs.readdir('./directory')
+
+// File stats
+const stats = await Elide.fs.stat('./file.txt')
+console.log(stats.size, stats.mtime)
+
+// Watch for changes (development mode)
+const watcher = Elide.fs.watch('./src', (event, filename) => {
+  console.log(`${filename} ${event}`)
+})
+```
+
+### Crypto
+
+```javascript
+// Generate random bytes
+const bytes = crypto.getRandomValues(new Uint8Array(32))
+
+// Hash data
+const data = new TextEncoder().encode('Hello, World!')
+const hash = await crypto.subtle.digest('SHA-256', data)
+
+// Encode to hex
+const hashHex = Array.from(new Uint8Array(hash))
+  .map(b => b.toString(16).padStart(2, '0'))
+  .join('')
+
+// HMAC
+const key = await crypto.subtle.generateKey(
+  { name: 'HMAC', hash: 'SHA-256' },
+  true,
+  ['sign', 'verify']
+)
+
+const signature = await crypto.subtle.sign(
+  'HMAC',
+  key,
+  data
+)
+```
+
+## Sandboxing & Security
+
+### Context Isolation
+
+Each execution context is isolated:
+
+```javascript
+// Create isolated context
+const context = Elide.createContext({
+  permissions: {
+    fs: ['./data'],      // Only access ./data directory
+    net: ['example.com'], // Only connect to example.com
+    env: false           // No environment variable access
+  },
+  memory: '100M',        // Memory limit
+  timeout: 5000          // Execution timeout (ms)
+})
+
+// Run code in context
+const result = await context.eval(`
+  // This code runs isolated
+  const data = await fetch('https://example.com/api')
+  return data.json()
 `)
 ```
 
-### Capability System
-
-Fine-grained permissions:
+### Resource Limits
 
 ```javascript
-const isolate = new Isolate({
-  permissions: [
-    'network:read',
-    'filesystem:/data/*:read',
-    'env:NODE_ENV:read'
-  ]
+// Set resource limits
+Elide.setLimits({
+  memory: '512M',      // Maximum heap size
+  cpu: 0.5,            // CPU quota (50% of one core)
+  threads: 10,         // Max thread count
+  files: 100,          // Max open file descriptors
+  timeout: 30000       // Max execution time (ms)
 })
+```
+
+## Debugging & Profiling
+
+### Enable Debugging
+
+```bash
+# Enable debugging on port 9229
+elide run --inspect=9229 app.js
+
+# Wait for debugger to attach
+elide run --inspect-brk=9229 app.js
+```
+
+Connect with Chrome DevTools: `chrome://inspect`
+
+### CPU Profiling
+
+```bash
+# Generate CPU profile
+elide run --cpu-profile app.js
+
+# Output: cpu-profile.cpuprofile (open in Chrome DevTools)
+```
+
+### Memory Profiling
+
+```bash
+# Generate heap snapshot
+elide run --heap-snapshot app.js
+
+# Periodic snapshots
+elide run --heap-snapshot-interval=10000 app.js
+```
+
+### Performance Metrics
+
+```javascript
+// Built-in performance API
+const start = performance.now()
+
+// ... do work
+
+const duration = performance.now() - start
+console.log(`Operation took ${duration}ms`)
+
+// Mark and measure
+performance.mark('start-fetch')
+const data = await fetch('/api/data')
+performance.mark('end-fetch')
+
+performance.measure('fetch-duration', 'start-fetch', 'end-fetch')
+
+// Get all measurements
+const measurements = performance.getEntriesByType('measure')
+console.log(measurements)
 ```
 
 ## Next Steps
 
-- [Components](/docs/components) - Build with components
-- [JavaScript](/docs/javascript) - JavaScript API reference
-- [Python](/docs/python) - Python integration guide
+- **[JavaScript Guide](/docs/javascript)** - JavaScript-specific APIs
+- **[TypeScript Guide](/docs/typescript)** - TypeScript features
+- **[Python Guide](/docs/python)** - Python integration
 
+<Alert>
+  <strong>Performance Tip:</strong> Use native mode for production to get instant startup and minimal memory usage. Use JIT mode during development for fast iteration.
+</Alert>

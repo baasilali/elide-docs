@@ -1,264 +1,160 @@
 ---
 title: "Components"
 description: "Building blocks of Elide applications"
-date: "2025-11-18"
+date: "2025-11-19"
 ---
 
 # Components
 
-Components are reusable building blocks for Elide applications. They encapsulate functionality and can be easily composed to create complex applications.
+Elide applications are built from modular, composable components.
 
-## What are Components?
+## Core Components
 
-Components in Elide are self-contained modules that:
+### Runtime Engine
+- **Polyglot Execution**: Run multiple languages in one process
+- **JIT Compilation**: Dynamic optimization during runtime
+- **AOT Compilation**: Ahead-of-time native compilation
+- **Memory Management**: Advanced garbage collection
 
-- Have a clear interface
-- Manage their own state
-- Can be composed with other components
-- Are easily testable
+### Module System
+- **ES Modules**: Modern JavaScript module system
+- **CommonJS**: Node.js compatibility
+- **Dynamic Import**: Lazy loading of modules
+- **Polyglot Imports**: Import across languages
 
-## Creating Components
+### HTTP Server
+- **High Performance**: 800K+ requests/second
+- **Netty-Based**: Battle-tested networking
+- **HTTP/2 & HTTP/3**: Modern protocol support
+- **WebSockets**: Real-time communication
 
-### Basic Component
+## Application Components
+
+### Controllers
+
+Handle HTTP requests:
 
 ```typescript
-// components/greeting.ts
-export interface GreetingProps {
-  name: string
-  greeting?: string
-}
-
-export function Greeting({ name, greeting = 'Hello' }: GreetingProps) {
-  return `${greeting}, ${name}!`
-}
-```
-
-### Stateful Component
-
-```typescript
-// components/counter.ts
-export class Counter {
-  private count = 0
-  
-  increment() {
-    this.count++
+@Controller('/api')
+class UserController {
+  @Get('/users')
+  async listUsers() {
+    return await userService.findAll()
   }
   
-  decrement() {
-    this.count--
-  }
-  
-  get value() {
-    return this.count
+  @Post('/users')
+  async createUser(@Body user: User) {
+    return await userService.create(user)
   }
 }
 ```
 
-## Component Composition
+### Services
 
-Combine components to build complex functionality:
+Business logic layer:
 
 ```typescript
-import { Database } from '@elide/database'
-import { Cache } from '@elide/cache'
-
-export class UserService {
-  constructor(
-    private db: Database,
-    private cache: Cache
-  ) {}
+@Service()
+class UserService {
+  constructor(private db: Database) {}
   
-  async getUser(id: string) {
-    // Try cache first
-    const cached = await this.cache.get(`user:${id}`)
-    if (cached) return cached
-    
-    // Fetch from database
-    const user = await this.db.users.findById(id)
-    
-    // Cache for next time
-    await this.cache.set(`user:${id}`, user, { ttl: 300 })
-    
-    return user
+  async findAll(): Promise<User[]> {
+    return await this.db.query('SELECT * FROM users')
+  }
+  
+  async create(user: User): Promise<User> {
+    return await this.db.insert('users', user)
   }
 }
 ```
 
-## Lifecycle Hooks
+### Middleware
 
-Components can implement lifecycle hooks:
+Request/response processors:
 
 ```typescript
-export class MyComponent {
-  async onInit() {
-    // Called when component is initialized
-    console.log('Component initialized')
+function authMiddleware(req, res, next) {
+  if (!req.headers.authorization) {
+    return res.status(401).json({ error: 'Unauthorized' })
   }
-  
-  async onDestroy() {
-    // Called when component is destroyed
-    console.log('Component destroyed')
+  next()
+}
+```
+
+### Filters
+
+Global request/response filters:
+
+```typescript
+@Filter()
+class LoggingFilter {
+  async filter(req: Request, res: Response, next: Function) {
+    console.log(`${req.method} ${req.path}`)
+    await next()
   }
 }
 ```
+
+## Framework Components
+
+### Module: Core
+Essential utilities and type system for all platforms.
+
+### Module: Base
+Extended functionality for JVM, JavaScript, and Native platforms.
+
+### Module: Server
+HTTP server, routing, and middleware for JVM and Native.
+
+### Module: SSR
+Server-side rendering for JVM and JavaScript.
+
+### Module: GraalVM
+GraalVM integration and polyglot support.
+
+## Component Lifecycle
+
+```
+Initialize → Configure → Start → Run → Shutdown
+```
+
+Each component follows this lifecycle:
+
+1. **Initialize**: Component is created
+2. **Configure**: Configuration is applied
+3. **Start**: Component begins operation
+4. **Run**: Component performs its function
+5. **Shutdown**: Component cleans up resources
 
 ## Dependency Injection
 
-Elide provides a dependency injection system:
+Components can depend on other components:
 
 ```typescript
-import { Injectable, Inject } from '@elide/core'
-
 @Injectable()
-export class AuthService {
-  constructor(
-    @Inject('Database') private db: Database,
-    @Inject('Config') private config: Config
-  ) {}
-  
-  async authenticate(token: string) {
-    // Implementation
-  }
-}
-```
-
-## Component Testing
-
-Testing components is straightforward:
-
-```typescript
-import { test, expect } from '@elide/test'
-import { Greeting } from './greeting'
-
-test('Greeting returns correct message', () => {
-  const result = Greeting({ name: 'World' })
-  expect(result).toBe('Hello, World!')
-})
-
-test('Greeting uses custom greeting', () => {
-  const result = Greeting({ name: 'World', greeting: 'Hi' })
-  expect(result).toBe('Hi, World!')
-})
-```
-
-## Best Practices
-
-### Single Responsibility
-
-Each component should do one thing well:
-
-```typescript
-// Good: Focused component
-export class EmailValidator {
-  validate(email: string): boolean {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+class EmailService {
+  send(to: string, subject: string, body: string) {
+    // Send email
   }
 }
 
-// Bad: Too many responsibilities
-export class UserManager {
-  validate(email: string) { /* ... */ }
-  sendEmail(to: string, body: string) { /* ... */ }
-  hashPassword(password: string) { /* ... */ }
-  // Too much!
-}
-```
-
-### Explicit Dependencies
-
-Always declare dependencies explicitly:
-
-```typescript
-// Good
-export class OrderService {
+@Service()
+class UserService {
   constructor(
     private db: Database,
-    private payment: PaymentService
-  ) {}
-}
-
-// Bad: Hidden dependency
-export class OrderService {
-  process() {
-    const db = getGlobalDatabase()  // Hidden!
-  }
-}
-```
-
-### Immutability
-
-Prefer immutable data structures:
-
-```typescript
-// Good
-export function addItem(cart: Cart, item: Item): Cart {
-  return {
-    ...cart,
-    items: [...cart.items, item]
-  }
-}
-
-// Bad
-export function addItem(cart: Cart, item: Item): void {
-  cart.items.push(item)  // Mutation!
-}
-```
-
-## Component Patterns
-
-### Factory Pattern
-
-```typescript
-export class UserFactory {
-  create(data: UserData): User {
-    return {
-      ...data,
-      id: generateId(),
-      createdAt: new Date()
-    }
-  }
-}
-```
-
-### Repository Pattern
-
-```typescript
-export class UserRepository {
-  constructor(private db: Database) {}
-  
-  async findById(id: string) {
-    return this.db.users.findById(id)
-  }
-  
-  async save(user: User) {
-    return this.db.users.save(user)
-  }
-}
-```
-
-### Service Pattern
-
-```typescript
-export class NotificationService {
-  constructor(
-    private email: EmailService,
-    private sms: SMSService
+    private email: EmailService  // Injected automatically
   ) {}
   
-  async notify(user: User, message: string) {
-    if (user.preferences.email) {
-      await this.email.send(user.email, message)
-    }
-    if (user.preferences.sms) {
-      await this.sms.send(user.phone, message)
-    }
+  async register(user: User) {
+    const created = await this.db.insert('users', user)
+    await this.email.send(user.email, 'Welcome', 'Thanks for signing up!')
+    return created
   }
 }
 ```
 
 ## Next Steps
 
-- [JavaScript](/docs/javascript) - JavaScript API reference
-- [TypeScript](/docs/typescript) - TypeScript features
-- [API Reference](/docs/api-core) - Core APIs
-
+- **[Architecture](/docs/architecture)** - Understand the architecture
+- **[API Reference](/docs/api-core)** - Framework modules
+- **[Quick Start](/docs/quick-start)** - Build your first app

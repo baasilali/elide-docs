@@ -1,48 +1,314 @@
 ---
 title: "Security"
-description: "Security best practices and features"
-date: "2025-11-18"
+description: "Security best practices and features in Elide"
+date: "2025-11-19"
 ---
 
 import { Alert } from '@/components/ui/alert'
 
 # Security
 
-Security is a top priority in Elide. This guide covers security features and best practices.
+Elide provides multiple layers of security to protect your applications.
+
+## Sandboxing
+
+### Context Isolation
+
+Each execution context is isolated:
+
+```javascript
+// Create isolated context
+const context = Elide.createContext({
+  permissions: {
+    fs: ['./data'],         // Limited file system access
+    net: ['api.example.com'], // Limited network access
+    env: false              // No environment variables
+  },
+  memory: '100M',           // Memory limit
+  timeout: 5000             // Execution timeout
+})
+
+// Run untrusted code safely
+const result = await context.eval(`
+  // This code runs in isolation
+  const data = await fetch('https://api.example.com/data')
+  return data.json()
+`)
+```
+
+### Resource Limits
+
+```javascript
+// Set resource limits
+Elide.setLimits({
+  memory: '512M',     // Max heap size
+  cpu: 0.5,           // CPU quota (50% of one core)
+  threads: 10,        // Max thread count
+  files: 100,         // Max open file descriptors
+  timeout: 30000      // Max execution time (ms)
+})
+```
+
+## HTTP Security
+
+### Headers
+
+```javascript
+// Security headers
+app.router.use((req, res, next) => {
+  res.setHeader('X-Frame-Options', 'DENY')
+  res.setHeader('X-Content-Type-Options', 'nosniff')
+  res.setHeader('X-XSS-Protection', '1; mode=block')
+  res.setHeader('Strict-Transport-Security', 'max-age=31536000')
+  res.setHeader('Content-Security-Policy', "default-src 'self'")
+  next()
+})
+```
+
+### CORS
+
+```javascript
+// Configure CORS
+app.router.use((req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', 'https://example.com')
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST')
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type')
+  res.setHeader('Access-Control-Max-Age', '86400')
+  next()
+})
+```
+
+### Rate Limiting
+
+```javascript
+const limiter = createRateLimiter({
+  windowMs: 60000,  // 1 minute
+  max: 100,         // Max requests per window
+  message: 'Too many requests'
+})
+
+app.router.use('/api', limiter)
+```
 
 ## Authentication
 
 ### JWT Tokens
 
-```typescript
-import { jwt } from '@elide/auth'
+```javascript
+import { sign, verify } from '@elide/jwt'
 
-// Create token
-const token = await jwt.sign({
-  userId: '123',
-  role: 'admin'
-}, 'secret-key', {
-  expiresIn: '1h'
-})
+// Generate token
+const token = await sign(
+  { userId: 123, role: 'admin' },
+  process.env.JWT_SECRET,
+  { expiresIn: '1h' }
+)
 
 // Verify token
-const payload = await jwt.verify(token, 'secret-key')
+const decoded = await verify(token, process.env.JWT_SECRET)
+console.log(decoded.userId)
 ```
 
-<Alert>
-  <strong>Important:</strong> Always use environment variables for sensitive keys.
-</Alert>
+### Middleware
+
+```javascript
+async function authMiddleware(req, res, next) {
+  const token = req.headers['authorization']?.replace('Bearer ', '')
+  
+  if (!token) {
+    return res.status(401).json({ error: 'No token provided' })
+  }
+  
+  try {
+    const decoded = await verify(token, process.env.JWT_SECRET)
+    req.user = decoded
+    next()
+  } catch (error) {
+    res.status(401).json({ error: 'Invalid token' })
+  }
+}
+
+// Apply to routes
+app.router.handle("GET", "/protected", authMiddleware, (req, res) => {
+  res.json({ message: 'Protected data', user: req.user })
+})
+```
+
+## Cryptography
+
+### Hashing
+
+```javascript
+import { hash, verify } from '@elide/crypto'
+
+// Hash password
+const hashed = await hash('password123', {
+  algorithm: 'bcrypt',
+  cost: 12
+})
+
+// Verify password
+const valid = await verify('password123', hashed)
+```
+
+### Encryption
+
+```javascript
+import { encrypt, decrypt } from '@elide/crypto'
+
+// Encrypt data
+const encrypted = await encrypt(data, key, {
+  algorithm: 'aes-256-gcm'
+})
+
+// Decrypt data
+const decrypted = await decrypt(encrypted, key)
+```
+
+## Input Validation
+
+### Sanitization
+
+```javascript
+import { sanitize, validate } from '@elide/validator'
+
+// Sanitize input
+const clean = sanitize(userInput, {
+  allowedTags: [],
+  allowedAttributes: {}
+})
+
+// Validate email
+const isValid = validate.email('user@example.com')
+
+// Validate schema
+const schema = {
+  name: { type: 'string', required: true },
+  age: { type: 'number', min: 0, max: 150 },
+  email: { type: 'email', required: true }
+}
+
+const errors = validate.schema(data, schema)
+if (errors.length > 0) {
+  res.status(400).json({ errors })
+}
+```
+
+## Secrets Management
+
+### Environment Variables
+
+```javascript
+// Never commit secrets!
+const apiKey = process.env.API_KEY
+const dbPassword = process.env.DB_PASSWORD
+
+// Use .env file (not in git)
+// .env
+// API_KEY=your-secret-key
+// DB_PASSWORD=secret-password
+```
+
+### Encrypted Storage
+
+```javascript
+// Store secrets encrypted
+const secrets = new SecretStore({
+  encryption: {
+    key: process.env.MASTER_KEY
+  }
+})
+
+await secrets.set('api-key', apiKey)
+const retrieved = await secrets.get('api-key')
+```
 
 ## Best Practices
 
-1. Use HTTPS in production
-2. Validate all user input
-3. Use parameterized queries
-4. Implement rate limiting
-5. Keep dependencies updated
+### 1. Input Validation
+
+```javascript
+// ❌ Don't trust user input
+const userId = req.params.id
+db.query(`SELECT * FROM users WHERE id = ${userId}`)
+
+// ✅ Use parameterized queries
+const userId = parseInt(req.params.id)
+if (isNaN(userId)) {
+  return res.status(400).json({ error: 'Invalid ID' })
+}
+db.query('SELECT * FROM users WHERE id = $1', [userId])
+```
+
+### 2. Error Handling
+
+```javascript
+// ❌ Don't expose internals
+try {
+  await riskyOperation()
+} catch (error) {
+  res.status(500).json({ error: error.stack })
+}
+
+// ✅ Generic error messages
+try {
+  await riskyOperation()
+} catch (error) {
+  console.error('Error:', error)
+  res.status(500).json({ error: 'Internal server error' })
+}
+```
+
+### 3. Authentication
+
+```javascript
+// ❌ Weak passwords
+if (password.length >= 6) { /* accept */ }
+
+// ✅ Strong requirements
+if (password.length < 12 || 
+    !/[A-Z]/.test(password) ||
+    !/[a-z]/.test(password) ||
+    !/[0-9]/.test(password)) {
+  return { error: 'Password too weak' }
+}
+```
+
+### 4. HTTPS Only
+
+```javascript
+// Force HTTPS
+app.router.use((req, res, next) => {
+  if (process.env.NODE_ENV === 'production' && !req.secure) {
+    return res.redirect(301, `https://${req.headers.host}${req.url}`)
+  }
+  next()
+})
+```
+
+## Security Checklist
+
+- [ ] Use HTTPS in production
+- [ ] Set security headers
+- [ ] Validate all input
+- [ ] Use parameterized queries
+- [ ] Hash passwords with bcrypt/argon2
+- [ ] Implement rate limiting
+- [ ] Keep dependencies updated
+- [ ] Don't expose error details
+- [ ] Use environment variables for secrets
+- [ ] Enable CORS only when needed
+- [ ] Implement authentication
+- [ ] Use secure session management
+- [ ] Enable CSP headers
+- [ ] Regular security audits
 
 ## Next Steps
 
-- [Configuration](/docs/configuration) - Configure security settings
-- [Deployment](/docs/deployment) - Deploy securely
+- **[Configuration](/docs/configuration)** - Configure security
+- **[Deployment](/docs/deployment)** - Deploy securely
+- **[Server API](/docs/api-server)** - Secure HTTP endpoints
 
+<Alert>
+  <strong>Security First:</strong> Elide provides built-in sandboxing and security features, but you must still follow best practices in your application code!
+</Alert>

@@ -1,37 +1,47 @@
 ---
 title: "Deployment"
-description: "Deploy your Elide applications to production"
-date: "2025-11-18"
+description: "Deploy Elide applications to production"
+date: "2025-11-19"
 ---
 
+import { Alert } from '@/components/ui/alert'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
 # Deployment
 
-Deploy your Elide application to various platforms and environments.
+Deploy your Elide applications to various platforms and environments.
 
-## Building for Production
+## Build for Production
 
-### Native Build
+### Native Binary
 
-Create an optimized native binary:
+Compile to a standalone native binary:
 
 ```bash
-elide build --native
+# Build native binary
+elide build --native app.js
+
+# Output: ./app (Linux/macOS) or app.exe (Windows)
 ```
 
-This creates a standalone executable in `dist/`:
-
-- Fast startup time (< 10ms)
-- Low memory usage
+**Benefits:**
+- < 10ms startup time
+- ~10-20MB memory footprint
 - No runtime dependencies
+- Single file deployment
 
-### Standard Build
+### JAR Distribution
 
-For JIT deployment:
+For JVM deployment:
 
 ```bash
-elide build
+# Build JAR
+elide build --jar app.js
+
+# Output: ./app.jar
+
+# Run the JAR
+java -jar app.jar
 ```
 
 ## Deployment Platforms
@@ -39,76 +49,215 @@ elide build
 <Tabs defaultValue="docker" className="w-full">
   <TabsList>
     <TabsTrigger value="docker">Docker</TabsTrigger>
-    <TabsTrigger value="cloud">Cloud</TabsTrigger>
+    <TabsTrigger value="kubernetes">Kubernetes</TabsTrigger>
+    <TabsTrigger value="serverless">Serverless</TabsTrigger>
     <TabsTrigger value="vps">VPS</TabsTrigger>
   </TabsList>
   
   <TabsContent value="docker">
-    
+
 ### Docker
 
 Create a `Dockerfile`:
 
 ```dockerfile
-FROM elide/base:latest
+FROM elide/base:latest AS builder
 
 WORKDIR /app
 COPY . .
 
-RUN elide build --native
+# Build native binary
+RUN elide build --native app.js
 
-EXPOSE 3000
-CMD ["./dist/app"]
+# Runtime image
+FROM scratch
+COPY --from=builder /app/app /app
+
+EXPOSE 8080
+ENTRYPOINT ["/app"]
+```
+
+Multi-stage build with minimal runtime:
+
+```dockerfile
+FROM elide/builder:latest AS builder
+WORKDIR /build
+COPY . .
+RUN elide build --native --optimize=size app.js
+
+FROM alpine:latest
+RUN apk --no-cache add ca-certificates
+COPY --from=builder /build/app /usr/local/bin/app
+EXPOSE 8080
+CMD ["app"]
 ```
 
 Build and run:
 
 ```bash
-docker build -t my-app .
-docker run -p 3000:3000 my-app
+# Build image
+docker build -t myapp .
+
+# Run container
+docker run -p 8080:8080 myapp
+
+# With environment variables
+docker run -p 8080:8080 \
+  -e PORT=8080 \
+  -e NODE_ENV=production \
+  myapp
 ```
+
   </TabsContent>
   
-  <TabsContent value="cloud">
+  <TabsContent value="kubernetes">
 
-### Cloud Platforms
+### Kubernetes
 
-Deploy to major cloud providers:
+Create deployment manifest:
 
-**AWS Lambda**
-```bash
-elide deploy --platform aws-lambda
+```yaml
+# deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: elide-app
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: elide-app
+  template:
+    metadata:
+      labels:
+        app: elide-app
+    spec:
+      containers:
+      - name: app
+        image: myregistry/elide-app:latest
+        ports:
+        - containerPort: 8080
+        env:
+        - name: NODE_ENV
+          value: production
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "250m"
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: elide-app
+spec:
+  selector:
+    app: elide-app
+  ports:
+  - port: 80
+    targetPort: 8080
+  type: LoadBalancer
 ```
 
-**Google Cloud Run**
+Deploy:
+
 ```bash
-elide deploy --platform gcp-cloud-run
+kubectl apply -f deployment.yaml
 ```
 
-**Azure Functions**
+  </TabsContent>
+  
+  <TabsContent value="serverless">
+
+### Serverless
+
+#### AWS Lambda
+
 ```bash
-elide deploy --platform azure-functions
+# Build for Lambda
+elide build --native --target=lambda app.js
+
+# Deploy with Serverless Framework
+serverless deploy
 ```
+
+`serverless.yml`:
+
+```yaml
+service: elide-app
+
+provider:
+  name: aws
+  runtime: provided.al2
+  region: us-east-1
+
+functions:
+  api:
+    handler: app
+    events:
+      - http:
+          path: /{proxy+}
+          method: ANY
+```
+
+#### Google Cloud Functions
+
+```bash
+# Deploy
+gcloud functions deploy elide-app \
+  --runtime custom \
+  --entry-point handler \
+  --trigger-http \
+  --allow-unauthenticated
+```
+
+#### Azure Functions
+
+```bash
+# Deploy
+func azure functionapp publish elide-app
+```
+
   </TabsContent>
   
   <TabsContent value="vps">
 
 ### VPS/Dedicated Server
 
-1. Build your application:
+#### 1. Build Application
+
 ```bash
-elide build --native
+elide build --native --optimize app.js
 ```
 
-2. Copy to server:
+#### 2. Copy to Server
+
 ```bash
-scp dist/app user@server:/opt/app
+scp app user@server:/opt/app/
+scp .env user@server:/opt/app/.env
 ```
 
-3. Run with systemd:
+#### 3. Create Systemd Service
+
+`/etc/systemd/system/elide-app.service`:
+
 ```ini
 [Unit]
-Description=My Elide App
+Description=Elide Application
 After=network.target
 
 [Service]
@@ -117,41 +266,260 @@ User=www-data
 WorkingDirectory=/opt/app
 ExecStart=/opt/app/app
 Restart=always
+RestartSec=5
+
+# Environment
+Environment=NODE_ENV=production
+EnvironmentFile=/opt/app/.env
+
+# Security
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ReadWritePaths=/opt/app/data
 
 [Install]
 WantedBy=multi-user.target
 ```
+
+#### 4. Start Service
+
+```bash
+# Reload systemd
+sudo systemctl daemon-reload
+
+# Enable on boot
+sudo systemctl enable elide-app
+
+# Start service
+sudo systemctl start elide-app
+
+# Check status
+sudo systemctl status elide-app
+
+# View logs
+journalctl -u elide-app -f
+```
+
   </TabsContent>
 </Tabs>
 
-## Environment Configuration
+## Reverse Proxy
 
-Use environment variables for configuration:
+### Nginx
+
+```nginx
+# /etc/nginx/sites-available/elide-app
+server {
+    listen 80;
+    server_name example.com;
+
+    location / {
+        proxy_pass http://localhost:8080;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+```
+
+### SSL with Let's Encrypt
 
 ```bash
-# Production settings
-NODE_ENV=production
-PORT=3000
-DATABASE_URL=postgresql://prod-db/myapp
-API_KEY=prod-api-key
+# Install certbot
+sudo apt install certbot python3-certbot-nginx
+
+# Get certificate
+sudo certbot --nginx -d example.com
+
+# Auto-renewal
+sudo certbot renew --dry-run
+```
+
+## Cloud Platforms
+
+### AWS Elastic Beanstalk
+
+```bash
+# Install EB CLI
+pip install awsebcli
+
+# Initialize
+eb init
+
+# Create environment
+eb create production
+
+# Deploy
+eb deploy
+```
+
+### Google Cloud Run
+
+```bash
+# Build and deploy
+gcloud run deploy elide-app \
+  --source . \
+  --platform managed \
+  --region us-central1 \
+  --allow-unauthenticated
+```
+
+### Azure App Service
+
+```bash
+# Deploy
+az webapp up \
+  --name elide-app \
+  --resource-group mygroup \
+  --location eastus
+```
+
+### Fly.io
+
+```bash
+# Install flyctl
+curl -L https://fly.io/install.sh | sh
+
+# Launch app
+fly launch
+
+# Deploy
+fly deploy
+```
+
+## CI/CD
+
+### GitHub Actions
+
+```yaml
+# .github/workflows/deploy.yml
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Elide
+        uses: elide-dev/setup-elide@v2
+      
+      - name: Build
+        run: elide build --native app.js
+      
+      - name: Deploy to production
+        run: |
+          scp app ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:/opt/app/
+          ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} \
+            'sudo systemctl restart elide-app'
 ```
 
 ## Monitoring
 
-Monitor your application in production:
+### Health Checks
 
-```typescript
-import { monitor } from '@elide/monitoring'
-
-monitor.start({
-  metrics: true,
-  logging: true,
-  tracing: true
+```javascript
+// Add health endpoint
+app.router.handle("GET", "/health", (req, res) => {
+  res.json({
+    status: 'ok',
+    uptime: process.uptime(),
+    timestamp: Date.now()
+  })
 })
+
+app.router.handle("GET", "/ready", async (req, res) => {
+  // Check database, etc.
+  const dbHealthy = await checkDatabase()
+  
+  if (dbHealthy) {
+    res.json({ ready: true })
+  } else {
+    res.status(503).json({ ready: false })
+  }
+})
+```
+
+### Logging
+
+```javascript
+// Structured logging
+console.log(JSON.stringify({
+  level: 'info',
+  message: 'Request received',
+  method: req.method,
+  path: req.path,
+  timestamp: new Date().toISOString()
+}))
+```
+
+## Performance Optimization
+
+### Native Build Optimizations
+
+```bash
+# Optimize for speed
+elide build --native --optimize=speed app.js
+
+# Optimize for size
+elide build --native --optimize=size app.js
+
+# Profile-guided optimization
+elide build --native --pgo app.js
+
+# Strip debug info
+elide build --native --strip app.js
+```
+
+### Caching
+
+```javascript
+// Cache responses
+app.router.use((req, res, next) => {
+  if (req.method === 'GET') {
+    res.setHeader('Cache-Control', 'public, max-age=3600')
+  }
+  next()
+})
+```
+
+## Scaling
+
+### Horizontal Scaling
+
+```bash
+# Run multiple instances
+for i in {1..4}; do
+  PORT=$((8080 + i)) elide run app.js &
+done
+
+# Load balancer distributes traffic
+```
+
+### Containerization
+
+```bash
+# Scale with Docker Compose
+docker-compose up --scale app=4
 ```
 
 ## Next Steps
 
-- [Security](/docs/security) - Secure your deployment
-- [Configuration](/docs/configuration) - Environment configuration
+- **[Configuration](/docs/configuration)** - Production config
+- **[Security](/docs/security)** - Secure deployment
+- **[Monitoring]** - Production monitoring
 
+<Alert>
+  <strong>Pro Tip:</strong> Native binaries start in < 10ms and use minimal memory, making them perfect for serverless and containerized deployments!
+</Alert>

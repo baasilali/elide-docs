@@ -1,153 +1,103 @@
 ---
-title: "JavaScript Support"
-description: "JavaScript runtime and APIs in Elide"
-date: "2025-11-18"
+title: "JavaScript"
+description: "JavaScript runtime features and APIs in Elide"
+date: "2025-11-19"
 ---
 
-import { Badge } from '@/components/ui/badge'
 import { Alert } from '@/components/ui/alert'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
-# JavaScript Support
+# JavaScript in Elide
 
-Elide provides full support for modern JavaScript with excellent compatibility and performance.
+Elide provides a full-featured JavaScript runtime with ES2024+ support, Node.js compatibility, and Web standard APIs.
 
-## Language Features
+## Language Support
 
-### ES2024+ Support
+### ECMAScript Compatibility
 
-All modern JavaScript features are supported:
+Elide supports all modern JavaScript features:
 
 ```javascript
-// Optional chaining
-const name = user?.profile?.name
+// ES2024+ Features
+const data = [1, 2, 3, 4, 5]
 
-// Nullish coalescing
-const port = config.port ?? 3000
+// Array grouping
+const grouped = data.groupBy(n => n % 2 === 0 ? 'even' : 'odd')
 
-// Private fields
-class User {
-  #password
-  constructor(password) {
-    this.#password = password
-  }
-}
+// Promise.withResolvers
+const { promise, resolve, reject } = Promise.withResolvers()
 
 // Top-level await
-const data = await fetch('/api/data')
+const config = await fetch('/config.json').then(r => r.json())
 
-// Array methods
-const numbers = [1, 2, 3, 4, 5]
-const doubled = numbers.map(n => n * 2)
-const sum = numbers.reduce((a, b) => a + b, 0)
-```
+// Optional chaining & nullish coalescing
+const port = config?.server?.port ?? 3000
 
-### Module System
-
-Full ESM support with CommonJS compatibility:
-
-```javascript
-// ESM (recommended)
-import { createServer } from '@elide/server'
-export default createServer()
-
-// CommonJS (supported)
-const { createServer } = require('@elide/server')
-module.exports = createServer()
-
-// Dynamic imports
-const module = await import('./dynamic-module.js')
-```
-
-## Standard APIs
-
-### Console
-
-```javascript
-console.log('Hello, world!')
-console.error('Error message')
-console.warn('Warning')
-console.info('Information')
-console.debug('Debug info')
-
-// Structured logging
-console.table([
-  { name: 'Alice', age: 30 },
-  { name: 'Bob', age: 25 }
-])
-
-// Timing
-console.time('operation')
-// ... do something
-console.timeEnd('operation')
-```
-
-### Timers
-
-```javascript
-// setTimeout
-const id = setTimeout(() => {
-  console.log('Delayed')
-}, 1000)
-clearTimeout(id)
-
-// setInterval
-const intervalId = setInterval(() => {
-  console.log('Repeating')
-}, 1000)
-clearInterval(intervalId)
-
-// setImmediate
-setImmediate(() => {
-  console.log('Next tick')
-})
-```
-
-### Promises
-
-```javascript
-// Promise creation
-const promise = new Promise((resolve, reject) => {
-  setTimeout(() => resolve('Done'), 1000)
-})
-
-// Async/await
-async function fetchData() {
-  try {
-    const response = await fetch('/api/data')
-    const data = await response.json()
-    return data
-  } catch (error) {
-    console.error('Error:', error)
-    throw error
+// Private class fields
+class Database {
+  #connection
+  
+  async connect() {
+    this.#connection = await createConnection()
   }
 }
 
-// Promise combinators
-const results = await Promise.all([
-  fetch('/api/users'),
-  fetch('/api/posts')
+// BigInt
+const large = 9007199254740991n + 1n
+```
+
+### async/await
+
+```javascript
+// Async functions
+async function fetchUser(id) {
+  const response = await fetch(`/api/users/${id}`)
+  if (!response.ok) {
+    throw new Error(`User ${id} not found`)
+  }
+  return response.json()
+}
+
+// Parallel execution
+const [user, posts, comments] = await Promise.all([
+  fetchUser(1),
+  fetch('/api/posts').then(r => r.json()),
+  fetch('/api/comments').then(r => r.json())
 ])
 
-const fastest = await Promise.race([
-  fetch('/api/server1'),
-  fetch('/api/server2')
+// Promise.allSettled
+const results = await Promise.allSettled([
+  fetch('/api/user'),
+  fetch('/api/posts'),
+  fetch('/api/comments')
 ])
+
+results.forEach(result => {
+  if (result.status === 'fulfilled') {
+    console.log('Success:', result.value)
+  } else {
+    console.error('Error:', result.reason)
+  }
+})
 ```
+
+## Web APIs
 
 ### Fetch API
 
-Full Fetch API implementation:
+Standard Web Fetch for HTTP requests:
 
 ```javascript
 // GET request
 const response = await fetch('https://api.example.com/data')
 const data = await response.json()
 
-// POST request
-const response = await fetch('https://api.example.com/users', {
+// POST with JSON
+const result = await fetch('/api/users', {
   method: 'POST',
   headers: {
-    'Content-Type': 'application/json'
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${token}`
   },
   body: JSON.stringify({
     name: 'Alice',
@@ -155,210 +105,530 @@ const response = await fetch('https://api.example.com/users', {
   })
 })
 
-// With error handling
+// With timeout
+const controller = new AbortController()
+const timeout = setTimeout(() => controller.abort(), 5000)
+
 try {
-  const response = await fetch('/api/data')
-  if (!response.ok) {
-    throw new Error(`HTTP ${response.status}`)
-  }
+  const response = await fetch(url, {
+    signal: controller.signal
+  })
   const data = await response.json()
-} catch (error) {
-  console.error('Fetch failed:', error)
+} finally {
+  clearTimeout(timeout)
 }
+
+// Form data
+const formData = new FormData()
+formData.append('file', fileBlob, 'document.pdf')
+formData.append('user', 'alice')
+
+await fetch('/upload', {
+  method: 'POST',
+  body: formData
+})
 ```
 
-## Web APIs
-
-### URL
+### URL API
 
 ```javascript
-const url = new URL('https://example.com/path?key=value')
-console.log(url.hostname)  // 'example.com'
-console.log(url.pathname)  // '/path'
-console.log(url.searchParams.get('key'))  // 'value'
+const url = new URL('https://example.com/path?foo=bar')
 
-// URLSearchParams
-const params = new URLSearchParams({ key: 'value', foo: 'bar' })
-console.log(params.toString())  // 'key=value&foo=bar'
+// Properties
+console.log(url.protocol) // 'https:'
+console.log(url.hostname) // 'example.com'
+console.log(url.pathname) // '/path'
+
+// Search params
+url.searchParams.set('page', '2')
+url.searchParams.append('filter', 'active')
+url.searchParams.delete('foo')
+
+console.log(url.toString())
+// 'https://example.com/path?page=2&filter=active'
+
+// URL patterns
+const pattern = new URLPattern('/users/:id')
+const match = pattern.exec('/users/123')
+console.log(match.pathname.groups.id) // '123'
 ```
 
 ### TextEncoder/TextDecoder
 
 ```javascript
-// Encode text to bytes
+// Encode to UTF-8
 const encoder = new TextEncoder()
-const bytes = encoder.encode('Hello, world!')
+const bytes = encoder.encode('Hello, 世界')
 
-// Decode bytes to text
+// Decode from UTF-8
 const decoder = new TextDecoder()
 const text = decoder.decode(bytes)
+
+// Different encodings
+const latin1Decoder = new TextDecoder('iso-8859-1')
+const text2 = latin1Decoder.decode(latin1Bytes)
 ```
 
-### Crypto
+### Streams API
 
 ```javascript
-// Generate random values
-const array = new Uint8Array(16)
-crypto.getRandomValues(array)
-
-// Generate UUID
-const uuid = crypto.randomUUID()
-
-// Hash data
-const data = new TextEncoder().encode('Hello')
-const hash = await crypto.subtle.digest('SHA-256', data)
-```
-
-## Performance APIs
-
-### Performance Timing
-
-```javascript
-// Mark points in time
-performance.mark('start')
-await doSomething()
-performance.mark('end')
-
-// Measure duration
-performance.measure('operation', 'start', 'end')
-
-// Get measurements
-const measures = performance.getEntriesByType('measure')
-console.log(measures[0].duration)
-```
-
-### Memory Usage
-
-```javascript
-// Get memory information
-const memory = performance.memory
-console.log(memory.usedJSHeapSize)
-console.log(memory.jsHeapSizeLimit)
-```
-
-## Error Handling
-
-### Standard Errors
-
-```javascript
-try {
-  throw new Error('Something went wrong')
-} catch (error) {
-  console.error(error.message)
-  console.error(error.stack)
-}
-
-// Custom errors
-class ValidationError extends Error {
-  constructor(message) {
-    super(message)
-    this.name = 'ValidationError'
+// Readable stream
+const stream = new ReadableStream({
+  start(controller) {
+    controller.enqueue('chunk 1')
+    controller.enqueue('chunk 2')
+    controller.close()
   }
+})
+
+// Consume stream
+for await (const chunk of stream) {
+  console.log(chunk)
 }
 
-throw new ValidationError('Invalid input')
+// Transform stream
+const transformStream = new TransformStream({
+  transform(chunk, controller) {
+    controller.enqueue(chunk.toUpperCase())
+  }
+})
+
+const transformed = readableStream
+  .pipeThrough(transformStream)
 ```
 
-### Async Error Handling
+## Built-in Modules
+
+### Console
 
 ```javascript
-// With async/await
-try {
-  await riskyOperation()
-} catch (error) {
-  console.error('Operation failed:', error)
-}
+// Standard logging
+console.log('Hello', 'World')
+console.info('Information')
+console.warn('Warning!')
+console.error('Error occurred')
+console.debug('Debug info')
 
-// With promises
-riskyOperation()
-  .catch(error => console.error(error))
+// Formatting
+console.log('User: %s, Age: %d', name, age)
 
-// Unhandled rejection handler
-process.on('unhandledRejection', (reason, promise) => {
-  console.error('Unhandled rejection:', reason)
+// Groups
+console.group('User Details')
+console.log('Name:', user.name)
+console.log('Email:', user.email)
+console.groupEnd()
+
+// Tables
+console.table([
+  { name: 'Alice', age: 30 },
+  { name: 'Bob', age: 25 }
+])
+
+// Timing
+console.time('fetch')
+await fetch('/api/data')
+console.timeEnd('fetch')
+
+// Assertions
+console.assert(value > 0, 'Value must be positive')
+
+// Stack trace
+console.trace('Show call stack')
+```
+
+### Timers
+
+```javascript
+// setTimeout
+const timeoutId = setTimeout(() => {
+  console.log('Executed after 1 second')
+}, 1000)
+
+clearTimeout(timeoutId)
+
+// setInterval
+const intervalId = setInterval(() => {
+  console.log('Executed every second')
+}, 1000)
+
+clearInterval(intervalId)
+
+// setImmediate (Node.js compat)
+setImmediate(() => {
+  console.log('Executed in next tick')
+})
+
+// queueMicrotask
+queueMicrotask(() => {
+  console.log('Executed as microtask')
 })
 ```
 
-## Advanced Features
-
-### Weak References
+### Performance API
 
 ```javascript
-const cache = new Map()
+// High-resolution timing
+const start = performance.now()
 
-function addToCache(key, value) {
-  const ref = new WeakRef(value)
-  cache.set(key, ref)
-}
+// ... do work
 
-function getFromCache(key) {
-  const ref = cache.get(key)
-  return ref?.deref()
-}
-```
+const duration = performance.now() - start
+console.log(`Operation took ${duration}ms`)
 
-### Proxies
+// Marks and measures
+performance.mark('start')
+await doWork()
+performance.mark('end')
 
-```javascript
-const handler = {
-  get(target, prop) {
-    console.log(`Accessing ${prop}`)
-    return target[prop]
-  },
-  set(target, prop, value) {
-    console.log(`Setting ${prop} to ${value}`)
-    target[prop] = value
-    return true
-  }
-}
+performance.measure('work-duration', 'start', 'end')
 
-const obj = new Proxy({}, handler)
-obj.name = 'Alice'  // Logs: Setting name to Alice
-console.log(obj.name)  // Logs: Accessing name
-```
+const measures = performance.getEntriesByType('measure')
+console.log(measures[0].duration)
 
-### Symbols
-
-```javascript
-// Unique identifiers
-const id = Symbol('id')
-const obj = { [id]: 123 }
-
-// Well-known symbols
-class MyArray {
-  [Symbol.iterator]() {
-    // Custom iteration
-  }
-}
+// Resource timing
+const entries = performance.getEntriesByType('resource')
+entries.forEach(entry => {
+  console.log(`${entry.name}: ${entry.duration}ms`)
+})
 ```
 
 ## Node.js Compatibility
 
-Elide provides compatibility with common Node.js APIs:
+### Process
 
 ```javascript
-import * as fs from 'node:fs'
-import * as path from 'node:path'
-import * as process from 'node:process'
-
-// File operations
-const data = fs.readFileSync('file.txt', 'utf8')
-
-// Path operations
-const fullPath = path.join(__dirname, 'file.txt')
+// Environment variables
+const port = process.env.PORT || 3000
+const env = process.env.NODE_ENV || 'development'
 
 // Process info
-console.log(process.env.NODE_ENV)
+console.log(process.version) // Elide version
+console.log(process.platform) // linux, darwin, win32
+console.log(process.arch) // x64, arm64
+
+// Current directory
 console.log(process.cwd())
+
+// Change directory
+process.chdir('/path/to/directory')
+
+// Exit codes
+process.exit(0) // Success
+process.exit(1) // Error
+
+// Event handlers
+process.on('uncaughtException', (error) => {
+  console.error('Uncaught exception:', error)
+  process.exit(1)
+})
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('Unhandled rejection:', reason)
+})
+
+// Signals
+process.on('SIGINT', () => {
+  console.log('Received SIGINT')
+  process.exit(0)
+})
+
+process.on('SIGTERM', () => {
+  console.log('Received SIGTERM')
+  cleanup()
+  process.exit(0)
+})
 ```
 
-<Alert>
-  <strong>Note:</strong> Use 'node:' prefix for Node.js built-in modules
-</Alert>
+### Buffer
+
+```javascript
+// Create buffer
+const buf1 = Buffer.from('Hello')
+const buf2 = Buffer.from([0x48, 0x65, 0x6c, 0x6c, 0x6f])
+const buf3 = Buffer.alloc(10) // Zeroed buffer
+const buf4 = Buffer.allocUnsafe(10) // Uninitialized (faster)
+
+// Convert to string
+const text = buf1.toString('utf8')
+const hex = buf1.toString('hex')
+const base64 = buf1.toString('base64')
+
+// Concatenate
+const combined = Buffer.concat([buf1, buf2])
+
+// Compare
+const result = buf1.compare(buf2) // -1, 0, or 1
+
+// Slice
+const slice = buf1.slice(0, 2)
+```
+
+### Path
+
+```javascript
+import * as path from 'node:path'
+
+// Join paths
+const fullPath = path.join('/users', 'alice', 'documents')
+// '/users/alice/documents'
+
+// Resolve absolute path
+const absolute = path.resolve('docs', 'guide.md')
+// '/current/dir/docs/guide.md'
+
+// Get directory name
+const dir = path.dirname('/path/to/file.txt')
+// '/path/to'
+
+// Get base name
+const base = path.basename('/path/to/file.txt')
+// 'file.txt'
+
+// Get extension
+const ext = path.extname('file.txt')
+// '.txt'
+
+// Parse path
+const parsed = path.parse('/path/to/file.txt')
+// {
+//   root: '/',
+//   dir: '/path/to',
+//   base: 'file.txt',
+//   ext: '.txt',
+//   name: 'file'
+// }
+```
+
+## Elide-Specific APIs
+
+### HTTP Server
+
+```javascript
+// Built-in high-performance HTTP server
+const app = Elide.http
+
+app.router.handle("GET", "/", (request, response) => {
+  response.send(200, "Hello, Elide!")
+})
+
+app.router.handle("POST", "/api/data", (request, response) => {
+  const body = request.body
+  
+  response.json({
+    received: body,
+    timestamp: Date.now()
+  })
+})
+
+app.router.handle("GET", "/users/:id", (request, response) => {
+  const userId = request.params.id
+  
+  // Fetch user...
+  response.json({ id: userId, name: "Alice" })
+})
+
+console.log("Server running on http://localhost:8080")
+```
+
+### File System
+
+```javascript
+// Read file
+const content = await Elide.fs.readFile('./file.txt', 'utf-8')
+
+// Write file
+await Elide.fs.writeFile('./output.txt', 'Hello, World!')
+
+// Read directory
+const files = await Elide.fs.readdir('./directory')
+
+// File stats
+const stats = await Elide.fs.stat('./file.txt')
+console.log({
+  size: stats.size,
+  mtime: stats.mtime,
+  isFile: stats.isFile(),
+  isDirectory: stats.isDirectory()
+})
+
+// Check if exists
+const exists = await Elide.fs.exists('./file.txt')
+
+// Delete file
+await Elide.fs.unlink('./file.txt')
+
+// Create directory
+await Elide.fs.mkdir('./new-dir', { recursive: true })
+
+// Watch for changes (development mode)
+const watcher = Elide.fs.watch('./src', (event, filename) => {
+  console.log(`${filename} ${event}`)
+})
+```
+
+## Error Handling
+
+### Try/Catch
+
+```javascript
+try {
+  const data = await fetch('/api/data')
+  const json = await data.json()
+  return json
+} catch (error) {
+  if (error instanceof TypeError) {
+    console.error('Network error:', error.message)
+  } else if (error instanceof SyntaxError) {
+    console.error('Invalid JSON:', error.message)
+  } else {
+    console.error('Unknown error:', error)
+  }
+  throw error
+}
+```
+
+### Custom Errors
+
+```javascript
+class ValidationError extends Error {
+  constructor(message, field) {
+    super(message)
+    this.name = 'ValidationError'
+    this.field = field
+  }
+}
+
+function validateUser(user) {
+  if (!user.email) {
+    throw new ValidationError('Email is required', 'email')
+  }
+  if (!user.name) {
+    throw new ValidationError('Name is required', 'name')
+  }
+}
+
+try {
+  validateUser({ email: '' })
+} catch (error) {
+  if (error instanceof ValidationError) {
+    console.error(`Validation failed: ${error.field} - ${error.message}`)
+  }
+}
+```
+
+## Module System
+
+### ES Modules
+
+```javascript
+// Default export
+export default function greet(name) {
+  return `Hello, ${name}!`
+}
+
+// Named exports
+export const PI = 3.14159
+export function add(a, b) {
+  return a + b
+}
+
+// Import
+import greet from './greet.js'
+import { PI, add } from './math.js'
+
+// Import all
+import * as math from './math.js'
+console.log(math.PI, math.add(1, 2))
+
+// Dynamic import
+const module = await import('./dynamic.js')
+module.init()
+```
+
+### CommonJS
+
+```javascript
+// Export
+module.exports = {
+  greet(name) {
+    return `Hello, ${name}!`
+  }
+}
+
+// Or single export
+module.exports = function greet(name) {
+  return `Hello, ${name}!`
+}
+
+// Import
+const { greet } = require('./greet')
+const greet = require('./greet')
+```
+
+## Best Practices
+
+### Async Patterns
+
+```javascript
+// ❌ Don't: Sequential awaits when not needed
+const user = await fetchUser(id)
+const posts = await fetchPosts(id)
+const comments = await fetchComments(id)
+
+// ✅ Do: Parallel execution
+const [user, posts, comments] = await Promise.all([
+  fetchUser(id),
+  fetchPosts(id),
+  fetchComments(id)
+])
+```
+
+### Error Handling
+
+```javascript
+// ❌ Don't: Silent failures
+try {
+  await riskyOperation()
+} catch (error) {
+  // Swallowed error
+}
+
+// ✅ Do: Proper error handling
+try {
+  await riskyOperation()
+} catch (error) {
+  console.error('Operation failed:', error)
+  // Handle or rethrow
+  throw error
+}
+```
+
+### Memory Management
+
+```javascript
+// ❌ Don't: Memory leaks with timers
+setInterval(() => {
+  // This runs forever
+}, 1000)
+
+// ✅ Do: Clear timers when done
+const intervalId = setInterval(() => {
+  // Do work
+}, 1000)
+
+// Clean up
+process.on('SIGTERM', () => {
+  clearInterval(intervalId)
+  process.exit(0)
+})
+```
 
 ## Next Steps
 
-- [TypeScript](/docs/typescript) - TypeScript features
-- [Python](/docs/python) - Python integration
-- [API Reference](/docs/api-core) - Core APIs
+- **[TypeScript Guide](/docs/typescript)** - TypeScript features
+- **[Server API](/docs/api-server)** - Build HTTP servers
+- **[Runtime](/docs/runtime)** - Deep dive into the runtime
 
+<Alert>
+  <strong>Pro Tip:</strong> Elide's JavaScript runtime is designed to be familiar to Node.js and Deno developers. Most code will work without modification!
+</Alert>

@@ -1,174 +1,546 @@
 ---
 title: "Installation"
-description: "Install Elide on your system"
-date: "2025-11-18"
+description: "Install Elide on macOS, Linux, or Windows"
+date: "2025-11-19"
 ---
 
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Alert } from '@/components/ui/alert'
-import { Badge } from '@/components/ui/badge'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
 # Installation
 
-This guide covers different methods to install Elide on your system.
+This guide covers installing Elide on your system.
 
 ## System Requirements
 
-- **Operating System**: macOS, Linux, or Windows
-- **Memory**: Minimum 2GB RAM (4GB+ recommended)
-- **Disk Space**: At least 500MB free space
-- **Node.js**: Version 18 or later (for JavaScript/TypeScript support)
+Before installing Elide, ensure your system meets these requirements:
 
-## Installation Methods
+| Requirement | Minimum | Recommended |
+|-------------|---------|-------------|
+| **Operating System** | macOS 11+, Linux (glibc 2.17+), Windows 10+ | Latest stable |
+| **Memory** | 2GB RAM | 4GB+ RAM |
+| **Disk Space** | 500MB | 2GB+ |
+| **Architecture** | x86_64, arm64 | arm64 (Apple Silicon) |
 
-### Package Managers
+<Alert>
+  <strong>Note:</strong> For native image compilation, you'll need GraalVM. The installation scripts handle this automatically.
+</Alert>
 
-The easiest way to install Elide is through a package manager:
+## Quick Install
 
-<Tabs defaultValue="npm" className="w-full">
+<Tabs defaultValue="script" className="w-full">
   <TabsList>
-    <TabsTrigger value="npm">npm</TabsTrigger>
-    <TabsTrigger value="yarn">yarn</TabsTrigger>
-    <TabsTrigger value="pnpm">pnpm</TabsTrigger>
+    <TabsTrigger value="script">Install Script</TabsTrigger>
     <TabsTrigger value="homebrew">Homebrew</TabsTrigger>
+    <TabsTrigger value="docker">Docker</TabsTrigger>
+    <TabsTrigger value="github">GitHub Actions</TabsTrigger>
   </TabsList>
   
-  <TabsContent value="npm">
+  <TabsContent value="script">
+
+### Install Script (Recommended)
+
+The easiest way to install Elide on Linux or macOS:
+
 ```bash
-npm install -g @elide/cli
+curl -sSL --tlsv1.2 https://elide.sh | bash -s -
 ```
-  </TabsContent>
-  
-  <TabsContent value="yarn">
+
+This script will:
+- Detect your OS and architecture
+- Download the appropriate binary
+- Install to `/usr/local/bin` (or user directory)
+- Set up PATH automatically
+
+After installation:
+
 ```bash
-yarn global add @elide/cli
+# Verify installation
+elide --version
+
+# Show system info
+elide info
 ```
-  </TabsContent>
-  
-  <TabsContent value="pnpm">
-```bash
-pnpm add -g @elide/cli
-```
+
   </TabsContent>
   
   <TabsContent value="homebrew">
+
+### Homebrew (macOS and Linux)
+
+For macOS users, Homebrew is the recommended installation method:
+
 ```bash
+# Add the Elide tap
+brew tap elide-dev/elide
+
+# Install Elide
 brew install elide
 ```
+
+Update Elide:
+
+```bash
+brew upgrade elide
+```
+
+Uninstall:
+
+```bash
+brew uninstall elide
+```
+
+  </TabsContent>
+  
+  <TabsContent value="docker">
+
+### Docker
+
+Run Elide in a container without installing locally:
+
+```bash
+# Run Elide CLI
+docker run --rm -it ghcr.io/elide-dev/elide
+
+# Run a script
+docker run --rm -v $(pwd):/app ghcr.io/elide-dev/elide run /app/server.js
+
+# Interactive shell
+docker run --rm -it ghcr.io/elide-dev/elide repl
+```
+
+**Available images:**
+
+- `ghcr.io/elide-dev/elide:latest` - Latest stable release
+- `ghcr.io/elide-dev/elide:beta` - Latest beta
+- `ghcr.io/elide-dev/elide:1.0.0-beta10` - Specific version
+
+  </TabsContent>
+  
+  <TabsContent value="github">
+
+### GitHub Actions
+
+Use Elide in your CI/CD pipeline:
+
+```yaml
+name: Build with Elide
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      # Setup Elide
+      - name: Setup Elide
+        uses: elide-dev/setup-elide@v2
+        with:
+          version: '1.0.0-beta10'  # or 'latest'
+      
+      # Use Elide
+      - name: Run tests
+        run: elide run tests/all.ts
+      
+      - name: Build native binary
+        run: elide build --native app.js
+      
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: app-binary
+          path: ./app
+```
+
   </TabsContent>
 </Tabs>
 
-### Direct Download
+## Manual Installation
+
+### Download Pre-built Binary
 
 Download the latest release for your platform:
 
-- [macOS (Apple Silicon)](https://github.com/elide-dev/elide/releases)
-- [macOS (Intel)](https://github.com/elide-dev/elide/releases)
-- [Linux (x64)](https://github.com/elide-dev/elide/releases)
-- [Windows (x64)](https://github.com/elide-dev/elide/releases)
+1. Visit [github.com/elide-dev/elide/releases](https://github.com/elide-dev/elide/releases)
+2. Download the archive for your OS:
+   - **macOS (Apple Silicon)**: `elide-macos-aarch64.tar.gz`
+   - **macOS (Intel)**: `elide-macos-x86_64.tar.gz`
+   - **Linux (x64)**: `elide-linux-x86_64.tar.gz`
+   - **Linux (arm64)**: `elide-linux-aarch64.tar.gz`
+   - **Windows (x64)**: `elide-windows-x86_64.zip`
 
-After downloading, add the binary to your PATH:
+3. Extract the archive:
 
 ```bash
 # macOS/Linux
-export PATH="$PATH:/path/to/elide/bin"
+tar -xzf elide-*.tar.gz
 
-# Windows
-set PATH=%PATH%;C:\path\to\elide\bin
+# Move to PATH
+sudo mv elide /usr/local/bin/
+sudo chmod +x /usr/local/bin/elide
 ```
 
-### Build from Source
+```powershell
+# Windows
+Expand-Archive elide-windows-x86_64.zip
+Move-Item elide.exe C:\Windows\System32\
+```
 
-For the latest features, build from source:
+## Platform-Specific Instructions
+
+### macOS
+
+#### Install via Homebrew (Recommended)
 
 ```bash
-git clone https://github.com/elide-dev/elide.git
-cd elide
-./gradlew build
+brew tap elide-dev/elide
+brew install elide
 ```
 
-<Alert>
-  <strong>Note:</strong> Building from source requires Java 21+ and Gradle 8+
-</Alert>
+#### Install via Install Script
 
-## Verify Installation
+```bash
+curl -sSL https://elide.sh | bash -s -
+```
 
-After installation, verify it works:
+#### Verify Installation
 
 ```bash
 elide --version
+elide info
 ```
 
-You should see output like:
+#### Troubleshooting macOS
 
-```
-Elide 1.0.0
-Runtime: GraalVM 23.1.0
-```
-
-## Project Setup
-
-Create a new project to test your installation:
+**"elide cannot be opened because the developer cannot be verified"**
 
 ```bash
-elide create hello-world
-cd hello-world
-elide dev
+# Allow the binary to run
+xattr -d com.apple.quarantine /usr/local/bin/elide
 ```
 
-## IDE Support
+**Permission denied**
+
+```bash
+# Make executable
+chmod +x /usr/local/bin/elide
+```
+
+### Linux
+
+#### Ubuntu/Debian
+
+Download and install the `.deb` package:
+
+```bash
+# Download
+curl -LO https://github.com/elide-dev/elide/releases/latest/download/elide_amd64.deb
+
+# Install
+sudo dpkg -i elide_amd64.deb
+
+# Fix dependencies if needed
+sudo apt-get install -f
+```
+
+#### Red Hat/Fedora/CentOS
+
+Download and install the `.rpm` package:
+
+```bash
+# Download
+curl -LO https://github.com/elide-dev/elide/releases/latest/download/elide_x86_64.rpm
+
+# Install
+sudo rpm -i elide_x86_64.rpm
+```
+
+#### Alpine Linux
+
+```bash
+# Using the install script
+wget -O - https://elide.sh | sh -s -
+```
+
+#### Arch Linux
+
+```bash
+# Using AUR helper (e.g., yay)
+yay -S elide-bin
+```
+
+### Windows
+
+#### Install via Scoop
+
+```powershell
+# Add bucket
+scoop bucket add elide https://github.com/elide-dev/scoop-elide
+
+# Install
+scoop install elide
+```
+
+#### Manual Installation
+
+1. Download `elide-windows-x86_64.zip`
+2. Extract to `C:\Program Files\Elide\`
+3. Add to PATH:
+
+```powershell
+[Environment]::SetEnvironmentVariable(
+    "Path",
+    $env:Path + ";C:\Program Files\Elide",
+    "Machine"
+)
+```
+
+4. Verify:
+
+```powershell
+elide --version
+```
+
+## Building from Source
+
+For the latest features, build from source:
+
+### Prerequisites
+
+- **Java 21+** (GraalVM recommended)
+- **Gradle 8+**
+- **Git**
+
+### Clone and Build
+
+```bash
+# Clone repository
+git clone https://github.com/elide-dev/elide.git
+cd elide
+
+# Build with Gradle
+./gradlew build
+
+# Build native image
+./gradlew nativeCompile
+
+# Binary will be in packages/cli/build/native/nativeCompile/
+```
+
+### Add to PATH
+
+```bash
+# Add to ~/.bashrc or ~/.zshrc
+export PATH="$PATH:/path/to/elide/packages/cli/build/native/nativeCompile"
+
+# Reload shell
+source ~/.bashrc  # or ~/.zshrc
+```
+
+## Verify Installation
+
+After installation, verify everything works:
+
+```bash
+# Check version
+elide --version
+# Output: Elide 1.0.0-beta10
+
+# Show system information
+elide info
+
+# Run a simple script
+echo 'console.log("Hello from Elide!")' > hello.js
+elide run hello.js
+
+# Test native compilation (if GraalVM is installed)
+elide build --native hello.js
+./hello
+```
+
+## IDE Setup
 
 ### Visual Studio Code
 
-Install the official Elide extension:
+Install the Elide extension from the marketplace:
 
 1. Open VS Code
-2. Go to Extensions (Cmd+Shift+X)
+2. Go to Extensions (`Cmd+Shift+X` / `Ctrl+Shift+X`)
 3. Search for "Elide"
 4. Click Install
+
+Features:
+- Syntax highlighting
+- IntelliSense for Elide APIs
+- Run and debug support
+- TypeScript integration
 
 ### IntelliJ IDEA
 
 Install the Elide plugin:
 
-1. Open IntelliJ IDEA
-2. Go to Settings > Plugins
-3. Search for "Elide"
-4. Click Install
+1. Open Settings > Plugins
+2. Search for "Elide"
+3. Click Install and restart
+
+Features:
+- Full IDE support for Kotlin/Java
+- Run configurations
+- Debugging
+- Native image build integration
+
+### Cursor / Other Editors
+
+Use the Language Server Protocol (LSP):
+
+```bash
+# Start Elide LSP server
+elide lsp --stdio
+```
+
+Configure your editor to use the Elide LSP server for `.js`, `.ts`, `.py` files in Elide projects.
+
+## GraalVM Installation (Optional)
+
+For native image compilation, you need GraalVM:
+
+### macOS
+
+```bash
+# Install via Homebrew
+brew install --cask graalvm/tap/graalvm-ce-java21
+
+# Set JAVA_HOME
+export JAVA_HOME=/Library/Java/JavaVirtualMachines/graalvm-ce-java21-XX.X.X/Contents/Home
+
+# Install native-image
+$JAVA_HOME/bin/gu install native-image
+```
+
+### Linux
+
+```bash
+# Download GraalVM
+curl -L https://github.com/graalvm/graalvm-ce-builds/releases/download/vm-21.3.0/graalvm-ce-java21-linux-amd64-21.3.0.tar.gz -o graalvm.tar.gz
+
+# Extract
+tar -xzf graalvm.tar.gz
+sudo mv graalvm-ce-java21-21.3.0 /opt/graalvm
+
+# Set JAVA_HOME
+export JAVA_HOME=/opt/graalvm
+export PATH=$JAVA_HOME/bin:$PATH
+
+# Install native-image
+gu install native-image
+```
+
+### Verify GraalVM
+
+```bash
+java -version
+native-image --version
+```
+
+## Updating Elide
+
+### Homebrew
+
+```bash
+brew upgrade elide
+```
+
+### Install Script
+
+Re-run the install script:
+
+```bash
+curl -sSL https://elide.sh | bash -s -
+```
+
+### Manual Update
+
+Download the latest release and replace your existing binary.
+
+## Uninstalling Elide
+
+### Homebrew
+
+```bash
+brew uninstall elide
+brew untap elide-dev/elide
+```
+
+### Manual Uninstall
+
+```bash
+# Remove binary
+sudo rm /usr/local/bin/elide
+
+# Remove configuration (optional)
+rm -rf ~/.elide
+```
+
+## Next Steps
+
+Now that Elide is installed:
+
+1. **[Quick Start Guide](/docs/quick-start)** - Build your first app
+2. **[Architecture](/docs/architecture)** - Understand how Elide works
+3. **[JavaScript Guide](/docs/javascript)** - Learn the JavaScript runtime
 
 ## Troubleshooting
 
 ### Command Not Found
 
-If you get "command not found" after installation:
+If `elide` command is not found after installation:
 
-1. Check your PATH variable
-2. Restart your terminal
-3. Try reinstalling with admin privileges
+1. **Check PATH:**
+   ```bash
+   echo $PATH
+   ```
+
+2. **Add to PATH manually:**
+   ```bash
+   export PATH="$PATH:/usr/local/bin"
+   ```
+
+3. **Restart terminal** and try again
 
 ### Permission Denied
 
-On macOS/Linux, you may need to make the binary executable:
+```bash
+# macOS/Linux
+chmod +x /usr/local/bin/elide
+```
+
+### Native Image Build Fails
+
+Ensure GraalVM and native-image are installed:
 
 ```bash
-chmod +x /path/to/elide
+native-image --version
 ```
+
+If not installed, see [GraalVM Installation](#graalvm-installation-optional) above.
 
 ### Version Conflicts
 
-If you have multiple versions installed:
+If you have multiple versions:
 
 ```bash
-# List all versions
-elide versions
+# List all installed versions
+brew list --versions elide
 
-# Switch to specific version
-elide use 1.0.0
+# Use specific version
+brew switch elide 1.0.0-beta10
 ```
 
-## Next Steps
+## Getting Help
 
-- [Quick Start](/docs/quick-start) - Build your first app
-- [Configuration](/docs/configuration) - Configure your environment
-- [Architecture](/docs/architecture) - Understand how Elide works
-
+- **GitHub Issues**: [Report bugs](https://github.com/elide-dev/elide/issues)
+- **Documentation**: [docs.elide.dev](https://docs.elide.dev)
+- **Community**: Join discussions on GitHub

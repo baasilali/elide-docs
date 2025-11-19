@@ -1,393 +1,388 @@
 ---
 title: "Server API"
-description: "Server-side APIs and utilities"
-date: "2025-11-18"
+description: "HTTP server APIs and web application development"
+date: "2025-11-19"
 ---
+
+import { Alert } from '@/components/ui/alert'
 
 # Server API Reference
 
-The `@elide/server` package provides APIs for building HTTP servers and web applications.
+The Elide HTTP server is a high-performance, Netty-based web server with HTTP/1.1, HTTP/2, and HTTP/3 support.
 
-## Getting Started
+## Quick Start
 
 Create a basic server:
 
-```typescript
-import { serve } from '@elide/server'
+```javascript
+const app = Elide.http
 
-serve({
-  port: 3000,
-  handler: (req) => {
-    return new Response('Hello, Elide!')
-  }
+app.router.handle("GET", "/", (request, response) => {
+  response.send(200, "Hello, Elide!")
 })
+
+console.log("Server running on http://localhost:8080")
 ```
 
 ## Request Handling
 
 ### Request Object
 
-```typescript
-serve({
-  handler: (req) => {
-    // URL information
-    console.log(req.url)
-    console.log(req.method)
-    console.log(req.headers)
-    
-    // Query parameters
-    const url = new URL(req.url)
-    const name = url.searchParams.get('name')
-    
-    // Body
-    const body = await req.json()
-    
-    return new Response('OK')
-  }
+```javascript
+app.router.handle("GET", "/users/:id", (request, response) => {
+  // URL parameters
+  const userId = request.params.id
+  
+  // Query parameters
+  const page = request.query.page || 1
+  
+  // Headers
+  const auth = request.headers['authorization']
+  
+  // Request info
+  console.log(request.method)  // GET
+  console.log(request.url)     // /users/123?page=1
+  console.log(request.path)    // /users/123
+  
+  response.json({ userId, page })
 })
 ```
 
-### Request Methods
+### Request Body
 
-```typescript
-serve({
-  handler: async (req) => {
-    // Read text body
-    const text = await req.text()
-    
-    // Read JSON body
-    const json = await req.json()
-    
-    // Read form data
-    const form = await req.formData()
-    const file = form.get('file')
-    
-    // Read blob
-    const blob = await req.blob()
-    
-    // Read array buffer
-    const buffer = await req.arrayBuffer()
-    
-    return new Response('OK')
-  }
+```javascript
+// JSON body
+app.router.handle("POST", "/users", (request, response) => {
+  const userData = request.body
+  
+  console.log(userData.name, userData.email)
+  
+  response.json({ created: true, user: userData })
+})
+
+// Form data
+app.router.handle("POST", "/upload", (request, response) => {
+  const { file, description } = request.body
+  
+  // file is a Buffer or Blob
+  response.send(200, "Uploaded")
 })
 ```
 
-## Response Building
+## Response Methods
 
 ### Basic Responses
 
-```typescript
+```javascript
 // Text response
-return new Response('Hello, world!')
+response.send(200, "Hello, World!")
 
 // JSON response
-return Response.json({ message: 'Success' })
-
-// HTML response
-return new Response('<h1>Hello</h1>', {
-  headers: { 'Content-Type': 'text/html' }
+response.json({
+  message: "Success",
+  data: { id: 123 }
 })
 
-// Custom status
-return new Response('Not Found', { status: 404 })
+// Status code
+response.status(404).send("Not Found")
 
-// With headers
-return new Response('OK', {
-  headers: {
-    'Content-Type': 'application/json',
-    'X-Custom-Header': 'value'
-  }
+// Custom headers
+response.setHeader("Content-Type", "text/html")
+response.setHeader("X-Custom", "value")
+response.send(200, "<h1>HTML</h1>")
+
+// Multiple headers
+response.headers({
+  "Content-Type": "application/json",
+  "Cache-Control": "no-cache",
+  "X-Request-ID": requestId
 })
 ```
 
-### Streaming Responses
+### File Responses
 
-```typescript
-serve({
-  handler: (req) => {
-    const stream = new ReadableStream({
-      async start(controller) {
-        for (let i = 0; i < 10; i++) {
-          controller.enqueue(`Data chunk ${i}\n`)
-          await new Promise(resolve => setTimeout(resolve, 100))
-        }
-        controller.close()
-      }
-    })
-    
-    return new Response(stream)
-  }
+```javascript
+// Send file
+app.router.handle("GET", "/download", (request, response) => {
+  response.sendFile("./files/document.pdf")
 })
+
+// Stream file
+app.router.handle("GET", "/video", async (request, response) => {
+  const stream = await Elide.fs.createReadStream("./video.mp4")
+  response.stream(stream, {
+    "Content-Type": "video/mp4"
+  })
+})
+```
+
+### Redirects
+
+```javascript
+// Temporary redirect (302)
+response.redirect("/new-location")
+
+// Permanent redirect (301)
+response.redirect(301, "/new-location")
 ```
 
 ## Routing
 
-### Route Handler
+### Route Patterns
 
-```typescript
-import { Router } from '@elide/server'
+```javascript
+// Static routes
+app.router.handle("GET", "/", handler)
+app.router.handle("GET", "/about", handler)
 
-const router = new Router()
+// URL parameters
+app.router.handle("GET", "/users/:id", handler)
+app.router.handle("GET", "/posts/:postId/comments/:commentId", handler)
 
-// Define routes
-router.get('/users', async (req) => {
-  const users = await db.users.findAll()
-  return Response.json(users)
-})
+// Wildcard
+app.router.handle("GET", "/files/*", handler)
 
-router.post('/users', async (req) => {
-  const data = await req.json()
-  const user = await db.users.create(data)
-  return Response.json(user, { status: 201 })
-})
-
-router.get('/users/:id', async (req, { params }) => {
-  const user = await db.users.findById(params.id)
-  if (!user) {
-    return new Response('Not Found', { status: 404 })
-  }
-  return Response.json(user)
-})
-
-router.put('/users/:id', async (req, { params }) => {
-  const data = await req.json()
-  const user = await db.users.update(params.id, data)
-  return Response.json(user)
-})
-
-router.delete('/users/:id', async (req, { params }) => {
-  await db.users.delete(params.id)
-  return new Response('', { status: 204 })
-})
-
-// Start server
-serve({ port: 3000, handler: router.handler })
+// Optional parameters
+app.router.handle("GET", "/docs/:section?/:page?", handler)
 ```
 
-### Route Parameters
+### HTTP Methods
 
-```typescript
-// Path parameters
-router.get('/posts/:postId/comments/:commentId', (req, { params }) => {
-  const { postId, commentId } = params
-  return Response.json({ postId, commentId })
-})
+```javascript
+// GET
+app.router.handle("GET", "/users", getUsers)
 
-// Query parameters
-router.get('/search', (req) => {
-  const url = new URL(req.url)
-  const query = url.searchParams.get('q')
-  const page = url.searchParams.get('page') ?? '1'
-  
-  return Response.json({ query, page })
-})
+// POST
+app.router.handle("POST", "/users", createUser)
 
-// Wildcard routes
-router.get('/files/*', (req, { params }) => {
-  const filePath = params['*']
-  return serveFile(filePath)
-})
+// PUT
+app.router.handle("PUT", "/users/:id", updateUser)
+
+// DELETE
+app.router.handle("DELETE", "/users/:id", deleteUser)
+
+// PATCH
+app.router.handle("PATCH", "/users/:id", patchUser)
+
+// Multiple methods
+app.router.handle("GET|POST", "/data", handler)
+```
+
+### Router Groups
+
+```javascript
+// API routes
+const apiRoutes = (router) => {
+  router.handle("GET", "/users", getUsers)
+  router.handle("POST", "/users", createUser)
+  router.handle("GET", "/posts", getPosts)
+}
+
+app.router.group("/api/v1", apiRoutes)
+
+// Results in:
+// GET /api/v1/users
+// POST /api/v1/users
+// GET /api/v1/posts
 ```
 
 ## Middleware
 
-### Using Middleware
-
-```typescript
-import { Router, logger, cors, rateLimit } from '@elide/server'
-
-const router = new Router()
-
-// Global middleware
-router.use(logger())
-router.use(cors())
-router.use(rateLimit({ max: 100 }))
-
-// Route-specific middleware
-router.get('/api/*', authenticate)
-router.get('/api/data', handler)
-```
-
 ### Creating Middleware
 
-```typescript
-function authenticate(req: Request, context: Context, next: () => Response) {
-  const token = req.headers.get('Authorization')
+```javascript
+// Logger middleware
+function logger(request, response, next) {
+  const start = Date.now()
   
-  if (!token) {
-    return new Response('Unauthorized', { status: 401 })
-  }
+  // Call next handler
+  next()
   
-  // Validate token
-  const user = validateToken(token)
-  if (!user) {
-    return new Response('Unauthorized', { status: 401 })
-  }
-  
-  // Add user to context
-  context.user = user
-  
-  // Continue to next middleware/handler
-  return next()
+  const duration = Date.now() - start
+  console.log(`${request.method} ${request.path} - ${duration}ms`)
 }
+
+// Apply middleware
+app.router.use(logger)
 ```
 
 ### Built-in Middleware
 
-```typescript
-import { 
-  logger,
-  cors,
-  rateLimit,
-  compress,
-  timeout,
-  bodyParser
-} from '@elide/server'
+```javascript
+// CORS
+app.router.use((req, res, next) => {
+  res.setHeader("Access-Control-Allow-Origin", "*")
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE")
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type")
+  next()
+})
 
-router.use(logger({ format: 'combined' }))
+// Body parser (built-in)
+// JSON and form data parsed automatically
 
-router.use(cors({
-  origin: 'https://example.com',
-  methods: ['GET', 'POST'],
-  credentials: true
-}))
+// Rate limiting
+const limiter = createRateLimiter({
+  windowMs: 60000, // 1 minute
+  max: 100         // 100 requests per window
+})
 
-router.use(rateLimit({
-  max: 100,
-  window: 60000  // 1 minute
-}))
-
-router.use(compress({
-  threshold: 1024
-}))
-
-router.use(timeout({ ms: 5000 }))
-
-router.use(bodyParser({
-  maxSize: '1MB'
-}))
+app.router.use(limiter)
 ```
 
-## Static Files
+### Error Handling
 
-```typescript
-import { serveStatic } from '@elide/server'
+```javascript
+// Error middleware
+app.router.use((error, request, response, next) => {
+  console.error('Error:', error)
+  
+  response.status(500).json({
+    error: error.message,
+    stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+  })
+})
 
-// Serve static directory
-router.use('/static', serveStatic('./public'))
-
-// With options
-router.use('/assets', serveStatic('./assets', {
-  maxAge: 3600,
-  index: 'index.html',
-  extensions: ['.html', '.htm']
-}))
+// Async error handling
+app.router.handle("GET", "/data", async (request, response) => {
+  try {
+    const data = await fetchData()
+    response.json(data)
+  } catch (error) {
+    response.status(500).json({ error: error.message })
+  }
+})
 ```
 
 ## WebSockets
 
-```typescript
-import { serve } from '@elide/server'
-
-serve({
-  port: 3000,
-  websocket: {
-    open(ws) {
-      console.log('WebSocket opened')
-    },
-    message(ws, message) {
-      console.log('Received:', message)
-      ws.send(`Echo: ${message}`)
-    },
-    close(ws, code, reason) {
-      console.log('WebSocket closed:', code, reason)
-    },
-    error(ws, error) {
-      console.error('WebSocket error:', error)
-    }
-  }
-})
-```
-
-## Server-Sent Events
-
-```typescript
-router.get('/events', (req) => {
-  const stream = new ReadableStream({
-    start(controller) {
-      const encoder = new TextEncoder()
-      
-      const interval = setInterval(() => {
-        const data = `data: ${JSON.stringify({ time: Date.now() })}\n\n`
-        controller.enqueue(encoder.encode(data))
-      }, 1000)
-      
-      // Cleanup on close
-      req.signal.addEventListener('abort', () => {
-        clearInterval(interval)
-        controller.close()
-      })
-    }
-  })
-  
-  return new Response(stream, {
-    headers: {
-      'Content-Type': 'text/event-stream',
-      'Cache-Control': 'no-cache',
-      'Connection': 'keep-alive'
-    }
-  })
-})
-```
-
-## Error Handling
-
-```typescript
-import { ErrorHandler } from '@elide/server'
-
-// Custom error handler
-router.use((error, req, context) => {
-  console.error('Error:', error)
-  
-  if (error instanceof ValidationError) {
-    return Response.json({
-      error: 'Validation failed',
-      details: error.details
-    }, { status: 400 })
-  }
-  
-  return Response.json({
-    error: 'Internal server error'
-  }, { status: 500 })
-})
-
-// Or use built-in handler
-router.use(ErrorHandler({
-  logging: true,
-  includeStack: process.env.NODE_ENV === 'development'
-}))
-```
-
-## HTTPS
-
-```typescript
-import { serve } from '@elide/server'
-import { readFileSync } from 'fs'
-
-serve({
-  port: 443,
-  tls: {
-    cert: readFileSync('./cert.pem', 'utf8'),
-    key: readFileSync('./key.pem', 'utf8')
+```javascript
+// WebSocket endpoint
+app.router.ws("/chat", {
+  onOpen(socket) {
+    console.log("Client connected")
+    socket.send("Welcome!")
   },
-  handler: router.handler
+  
+  onMessage(socket, message) {
+    console.log("Received:", message)
+    
+    // Echo back
+    socket.send(`Echo: ${message}`)
+    
+    // Broadcast to all
+    socket.broadcast(message)
+  },
+  
+  onClose(socket) {
+    console.log("Client disconnected")
+  },
+  
+  onError(socket, error) {
+    console.error("WebSocket error:", error)
+  }
 })
 ```
+
+## Server-Sent Events (SSE)
+
+```javascript
+app.router.handle("GET", "/events", (request, response) => {
+  // Set SSE headers
+  response.setHeader("Content-Type", "text/event-stream")
+  response.setHeader("Cache-Control", "no-cache")
+  response.setHeader("Connection", "keep-alive")
+  
+  // Send events
+  const intervalId = setInterval(() => {
+    response.write(`data: ${JSON.stringify({ time: new Date() })}\n\n`)
+  }, 1000)
+  
+  // Clean up on disconnect
+  request.on('close', () => {
+    clearInterval(intervalId)
+  })
+})
+```
+
+## Configuration
+
+### Server Options
+
+```javascript
+// Configure server
+Elide.http.configure({
+  port: 8080,
+  host: '0.0.0.0',
+  
+  // HTTP/2 support
+  http2: true,
+  
+  // TLS/SSL
+  tls: {
+    cert: './cert.pem',
+    key: './key.pem'
+  },
+  
+  // Timeouts
+  requestTimeout: 30000,    // 30 seconds
+  keepAliveTimeout: 60000,  // 60 seconds
+  
+  // Limits
+  maxHeaderSize: 16384,     // 16KB
+  maxBodySize: 10485760,    // 10MB
+  
+  // Compression
+  compression: true,
+  
+  // Static files
+  static: {
+    root: './public',
+    index: 'index.html',
+    cache: 3600 // 1 hour
+  }
+})
+```
+
+## Static Files
+
+```javascript
+// Serve static files
+app.router.static("/assets", "./public/assets")
+
+// With options
+app.router.static("/files", "./uploads", {
+  index: false,           // Don't serve index.html
+  dotfiles: 'ignore',     // Ignore dotfiles
+  maxAge: 86400,          // Cache for 1 day
+  immutable: true         // Aggressive caching
+})
+```
+
+## Performance
+
+The Elide HTTP server delivers exceptional performance:
+
+| Metric | Value |
+|--------|-------|
+| **Throughput** | 800K+ req/s |
+| **Latency (p50)** | < 1ms |
+| **Latency (p99)** | < 5ms |
+| **Concurrent Connections** | 100K+ |
+
+Tips for maximum performance:
+
+- Use native compilation for production
+- Enable HTTP/2 or HTTP/3
+- Use streaming for large responses
+- Enable compression
+- Set appropriate caching headers
 
 ## Next Steps
 
-- [Database API](/docs/api-database) - Database access
-- [Security](/docs/security) - Security best practices
-- [Deployment](/docs/deployment) - Deploy your app
+- **[Configuration](/docs/configuration)** - Configure your server
+- **[Deployment](/docs/deployment)** - Deploy to production
+- **[Security](/docs/security)** - Secure your application
 
+<Alert>
+  <strong>Pro Tip:</strong> The Elide HTTP server is built on Netty, the same technology powering many high-scale applications. It's battle-tested and production-ready!
+</Alert>

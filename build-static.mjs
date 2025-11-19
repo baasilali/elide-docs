@@ -16,14 +16,101 @@ import { renderToStaticMarkup } from 'react-dom/server'
 import { compile } from '@mdx-js/mdx'
 import matter from 'gray-matter'
 import * as runtime from 'react/jsx-runtime'
-import { docsConfig } from './lib/docs-config.ts'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
+// Docs configuration
+const docsConfig = [
+  {
+    title: 'Getting Started',
+    items: [
+      { title: 'Introduction', href: '/docs/introduction', slug: 'introduction' },
+      { title: 'Quick Start', href: '/docs/quick-start', slug: 'quick-start' },
+      { title: 'Installation', href: '/docs/installation', slug: 'installation' },
+    ],
+  },
+  {
+    title: 'Core Concepts',
+    items: [
+      { title: 'Architecture', href: '/docs/architecture', slug: 'architecture' },
+      { title: 'Runtime', href: '/docs/runtime', slug: 'runtime' },
+      { title: 'Components', href: '/docs/components', slug: 'components' },
+    ],
+  },
+  {
+    title: 'Language Support',
+    items: [
+      { title: 'JavaScript', href: '/docs/javascript', slug: 'javascript' },
+      { title: 'TypeScript', href: '/docs/typescript', slug: 'typescript' },
+      { title: 'Python', href: '/docs/python', slug: 'python' },
+    ],
+  },
+  {
+    title: 'API Reference',
+    items: [
+      { title: 'Core API', href: '/docs/api-core', slug: 'api-core' },
+      { title: 'Server API', href: '/docs/api-server', slug: 'api-server' },
+      { title: 'Database', href: '/docs/api-database', slug: 'api-database' },
+    ],
+  },
+  {
+    title: 'Advanced',
+    items: [
+      { title: 'Security', href: '/docs/security', slug: 'security' },
+      { title: 'Configuration', href: '/docs/configuration', slug: 'configuration' },
+      { title: 'Deployment', href: '/docs/deployment', slug: 'deployment' },
+    ],
+  },
+]
+
 const CONTENT_DIR = path.join(__dirname, 'content/docs')
 const DIST_DIR = path.join(__dirname, 'dist')
 const PUBLIC_DIR = path.join(__dirname, 'public')
+
+// Simple syntax highlighter for code blocks
+function highlightCode(code, language) {
+  if (!language || language === 'text' || language === 'plain') {
+    return code
+  }
+  
+  let highlighted = code
+  
+  // JavaScript/TypeScript
+  if (language === 'javascript' || language === 'js' || language === 'typescript' || language === 'ts') {
+    // Keywords
+    highlighted = highlighted.replace(/\b(const|let|var|function|async|await|return|if|else|for|while|class|extends|import|export|from|default|new|try|catch|throw|typeof|instanceof)\b/g, '<span class="keyword">$1</span>')
+    // Strings
+    highlighted = highlighted.replace(/(['"`])(.*?)\1/g, '<span class="string">$1$2$1</span>')
+    // Comments
+    highlighted = highlighted.replace(/\/\/(.*?)$/gm, '<span class="comment">//$1</span>')
+    highlighted = highlighted.replace(/\/\*(.*?)\*\//gs, '<span class="comment">/*$1*/</span>')
+    // Numbers
+    highlighted = highlighted.replace(/\b(\d+)\b/g, '<span class="number">$1</span>')
+  }
+  
+  // Bash/Shell
+  if (language === 'bash' || language === 'sh' || language === 'shell') {
+    // Comments
+    highlighted = highlighted.replace(/#(.*?)$/gm, '<span class="comment">#$1</span>')
+    // Strings
+    highlighted = highlighted.replace(/(['"`])(.*?)\1/g, '<span class="string">$1$2$1</span>')
+    // Commands
+    highlighted = highlighted.replace(/^([a-z\-]+)/gm, '<span class="function">$1</span>')
+  }
+  
+  // Python
+  if (language === 'python' || language === 'py') {
+    // Keywords
+    highlighted = highlighted.replace(/\b(def|class|import|from|return|if|elif|else|for|while|try|except|with|as|async|await)\b/g, '<span class="keyword">$1</span>')
+    // Strings
+    highlighted = highlighted.replace(/(['"`])(.*?)\1/g, '<span class="string">$1$2$1</span>')
+    // Comments
+    highlighted = highlighted.replace(/#(.*?)$/gm, '<span class="comment">#$1</span>')
+  }
+  
+  return highlighted
+}
 
 // Clean and create dist directory
 async function setup() {
@@ -265,8 +352,8 @@ function generateHTMLPage(title, content, slug) {
 
         <!-- Main Content -->
         <main class="flex-1 lg:ml-64 lg:mr-64">
-          <div class="container max-w-4xl mx-auto px-6 py-16">
-            <article class="prose prose-invert max-w-none">
+          <div class="w-full px-8 py-16">
+            <article class="mdx-content max-w-3xl">
               ${content}
             </article>
           </div>
@@ -308,17 +395,75 @@ async function processMDXFile(slug) {
     development: false,
   })
   
+  // Custom MDX components
+  const Alert = ({ children, variant = 'default', ...props }) => {
+    const variants = {
+      default: 'bg-gradient-to-br from-primary-50/80 to-pink-50/60 border border-primary-200/50 dark:from-primary-950/30 dark:to-pink-950/20 dark:border-primary-800/30',
+      info: 'bg-gradient-to-br from-blue-50/80 to-sky-50/60 border border-blue-200/50 dark:from-blue-950/30 dark:to-sky-950/20 dark:border-blue-800/30',
+      warning: 'bg-gradient-to-br from-yellow-50/80 to-orange-50/60 border border-yellow-200/50 dark:from-yellow-950/30 dark:to-orange-950/20 dark:border-yellow-800/30',
+      destructive: 'bg-gradient-to-br from-red-50/80 to-pink-50/60 border border-red-200/50 dark:from-red-950/30 dark:to-pink-950/20 dark:border-red-800/30'
+    }
+    
+    const borderColors = {
+      default: 'from-primary-500 to-pink-500 dark:from-primary-400 dark:to-pink-400',
+      info: 'from-blue-500 to-sky-500 dark:from-blue-400 dark:to-sky-400',
+      warning: 'from-yellow-500 to-orange-500 dark:from-yellow-400 dark:to-orange-400',
+      destructive: 'from-red-500 to-pink-500 dark:from-red-400 dark:to-pink-400'
+    }
+    
+    return React.createElement('div', {
+      role: 'alert',
+      className: `alert relative w-full rounded-xl px-5 py-4 my-6 shadow-sm ${variants[variant] || variants.default}`,
+      ...props
+    }, [
+      React.createElement('div', {
+        key: 'border',
+        className: `absolute left-0 top-0 bottom-0 w-1 rounded-l-xl bg-gradient-to-b ${borderColors[variant] || borderColors.default}`
+      }),
+      React.createElement('div', {
+        key: 'content',
+        className: 'relative z-10 text-sm leading-relaxed [&>strong]:block [&>strong]:mb-2 [&>strong]:font-bold [&>strong]:text-foreground'
+      }, children)
+    ])
+  }
+
   // Create a function from the compiled code
   const { default: MDXContent } = await evaluateSync(compiled, {
     ...runtime,
     baseUrl: import.meta.url,
     useMDXComponents: () => ({
-      // Add any custom MDX components here
+      Alert,
+      // Tabs components would go here too if needed
     })
   })
   
   // Render to HTML string
-  const contentHTML = renderToStaticMarkup(React.createElement(MDXContent))
+  let contentHTML = renderToStaticMarkup(React.createElement(MDXContent))
+  
+  // Post-process HTML to add syntax highlighting to code blocks
+  contentHTML = contentHTML.replace(
+    /<pre><code class="language-(\w+)">(.*?)<\/code><\/pre>/gs,
+    (match, language, code) => {
+      // Decode HTML entities
+      const decoded = code
+        .replace(/&lt;/g, '<')
+        .replace(/&gt;/g, '>')
+        .replace(/&amp;/g, '&')
+        .replace(/&quot;/g, '"')
+        .replace(/&#x27;/g, "'")
+      
+      // Apply syntax highlighting
+      const highlighted = highlightCode(decoded, language)
+      
+      return `<pre><code class="language-${language}">${highlighted}</code></pre>`
+    }
+  )
+  
+  // Also handle className format from React
+  contentHTML = contentHTML.replace(
+    /<code className="language-(\w+)">/g,
+    '<code class="language-$1">'
+  )
   
   const title = frontmatter.title || slug
   const html = generateHTMLPage(title, contentHTML, slug)

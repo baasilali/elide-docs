@@ -1,50 +1,97 @@
 ---
-title: "Database API"
-description: "Database access and ORM"
-date: "2025-11-18"
+title: "Database"
+description: "Database access and ORM capabilities"
+date: "2025-11-19"
 ---
 
-# Database API Reference
+# Database API
 
-The `@elide/database` package provides a powerful ORM and database access layer.
+Elide provides database access through standard APIs and ORM integration.
 
-## Connecting to Databases
+## Supported Databases
 
-```typescript
-import { connect } from '@elide/database'
+- **PostgreSQL**
+- **MySQL/MariaDB**
+- **SQLite**
+- **MongoDB**
+- **Redis**
 
-const db = await connect('postgresql://localhost/mydb')
+## SQL Database Access
 
-// Or with options
-const db = await connect({
-  type: 'postgresql',
-  host: 'localhost',
-  port: 5432,
-  database: 'mydb',
-  username: 'user',
-  password: 'pass'
+### Using SQL
+
+```javascript
+// Connect to database
+const db = await Elide.db.connect('postgresql://localhost/mydb')
+
+// Execute query
+const users = await db.query('SELECT * FROM users WHERE age > $1', [18])
+
+// Parameterized queries
+const user = await db.queryOne(
+  'SELECT * FROM users WHERE id = $1',
+  [userId]
+)
+
+// Insert
+await db.execute(
+  'INSERT INTO users (name, email) VALUES ($1, $2)',
+  [name, email]
+)
+
+// Transactions
+await db.transaction(async (tx) => {
+  await tx.execute('INSERT INTO accounts (balance) VALUES ($1)', [1000])
+  await tx.execute('INSERT INTO audit_log (action) VALUES ($1)', ['created'])
 })
 ```
 
-## Querying Data
+## ORM Integration
+
+### Entity Definition
 
 ```typescript
-// Find all
-const users = await db.users.findMany()
+import { Entity, Column, PrimaryKey } from '@elide/orm'
 
-// Find by ID
-const user = await db.users.findById('123')
-
-// Find with conditions
-const activeUsers = await db.users.findMany({
-  where: { active: true }
-})
-
-// Find one
-const user = await db.users.findOne({
-  where: { email: 'alice@example.com' }
-})
+@Entity('users')
+class User {
+  @PrimaryKey()
+  id: number
+  
+  @Column()
+  name: string
+  
+  @Column({ unique: true })
+  email: string
+  
+  @Column({ default: () => new Date() })
+  createdAt: Date
+}
 ```
 
-For complete database documentation, see the [Core API](/docs/api-core).
+### CRUD Operations
 
+```typescript
+// Create
+const user = new User()
+user.name = 'Alice'
+user.email = 'alice@example.com'
+await user.save()
+
+// Read
+const user = await User.findById(123)
+const users = await User.findAll()
+const active = await User.find({ active: true })
+
+// Update
+user.name = 'Alice Smith'
+await user.save()
+
+// Delete
+await user.delete()
+```
+
+## Next Steps
+
+- **[Server API](/docs/api-server)** - Build APIs
+- **[Configuration](/docs/configuration)** - Database config

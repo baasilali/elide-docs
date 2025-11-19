@@ -1,7 +1,7 @@
 ---
 title: "Introduction to Elide"
-description: "Learn about Elide and what it can do for your applications"
-date: "2025-11-18"
+description: "Learn about Elide - a high-performance polyglot runtime for modern applications"
+date: "2025-11-19"
 ---
 
 import { Alert } from '@/components/ui/alert'
@@ -10,79 +10,219 @@ import { Badge } from '@/components/ui/badge'
 
 # Welcome to Elide
 
-Elide is a modern, high-performance runtime designed for building scalable applications. It combines the best features of multiple programming languages and runtimes into a unified platform.
+Elide is a high-performance polyglot runtime built on GraalVM that lets you run JavaScript, TypeScript, Python, and JVM languages in a single application with native-image compilation for instant startup times and minimal memory footprint.
 
 <Alert>
-  <strong>Getting Started:</strong> This documentation will guide you through everything you need to know about Elide.
+  <strong>What makes Elide special?</strong> Unlike traditional runtimes, Elide can compile your entire application—including dependencies—into a single native binary that starts in milliseconds and uses a fraction of the memory.
 </Alert>
 
 ## What is Elide?
 
-Elide is a polyglot runtime that supports multiple programming languages including JavaScript, TypeScript, Python, and more. It provides:
+Elide combines the best of multiple worlds:
 
-- **High Performance**: Built on GraalVM for optimal execution speed
-- **Polyglot Support**: Run multiple languages in the same application
-- **Modern APIs**: Clean, intuitive APIs for common tasks
-- **Security First**: Built-in security features and sandboxing
+- **Polyglot Runtime**: Run multiple languages in a single application with seamless interoperability
+- **Native Compilation**: Compile to native binaries for instant startup (< 10ms) and low memory usage
+- **Built-in HTTP Server**: High-performance server powered by Netty (800K+ req/s on Linux)
+- **Modern APIs**: Clean, standards-based APIs similar to Deno and Bun
+- **GraalVM Foundation**: Built on battle-tested GraalVM technology for optimal performance
 
 ## Key Features
 
 <div className="grid gap-4 md:grid-cols-2 mt-6 not-prose">
   <Card>
     <CardHeader>
-      <CardTitle>Fast Startup</CardTitle>
+      <CardTitle>Lightning Fast Startup</CardTitle>
       <CardDescription>
-        Native image compilation for instant startup times
+        Native image compilation delivers < 10ms cold start times vs 500ms+ for traditional JVM
       </CardDescription>
     </CardHeader>
   </Card>
   
   <Card>
     <CardHeader>
-      <CardTitle>Low Memory Usage</CardTitle>
+      <CardTitle>Minimal Memory</CardTitle>
       <CardDescription>
-        Optimized memory footprint for efficient resource usage
+        Optimized memory footprint - run hundreds of functions in less memory than a single Node.js process
       </CardDescription>
     </CardHeader>
   </Card>
   
   <Card>
     <CardHeader>
-      <CardTitle>Full Stack</CardTitle>
+      <CardTitle>Polyglot Power</CardTitle>
       <CardDescription>
-        Build frontend and backend with the same runtime
+        Use JavaScript for business logic, Python for data science, and Java libraries - all in one app
       </CardDescription>
     </CardHeader>
   </Card>
   
   <Card>
     <CardHeader>
-      <CardTitle>Developer Experience</CardTitle>
+      <CardTitle>Production Ready</CardTitle>
       <CardDescription>
-        Excellent tooling and debugging support
+        Built on GraalVM with enterprise-grade security, performance, and reliability
       </CardDescription>
     </CardHeader>
   </Card>
 </div>
 
+## Quick Example
+
+Here's a simple HTTP server in Elide:
+
+```javascript
+// server.js
+const app = Elide.http
+
+app.router.handle("GET", "/", (request, response) => {
+  response.send(200, "Hello, Elide!")
+})
+
+app.router.handle("GET", "/api/data", (request, response) => {
+  response.json({
+    message: "Fast polyglot runtime",
+    timestamp: Date.now()
+  })
+})
+```
+
+Run it:
+
+```bash
+elide run server.js
+```
+
+Compile to native binary:
+
+```bash
+elide build --native
+# Creates a standalone binary with no runtime dependencies!
+```
+
+## Performance Characteristics
+
+| Metric | Elide (Native) | Node.js | Deno |
+|--------|----------------|---------|------|
+| **Cold Start** | ~5ms | ~500ms | ~100ms |
+| **Memory (Hello World)** | ~10MB | ~50MB | ~40MB |
+| **HTTP Throughput** | 800K+ req/s | 200K req/s | 300K req/s |
+| **Binary Size** | ~15MB | N/A | ~90MB |
+
 ## Why Choose Elide?
 
-Traditional runtimes force you to choose between performance, developer experience, and language flexibility. Elide provides all three:
+### For Web Applications
+- Ultra-fast server-side rendering (SSR)
+- Minimal resource usage for cost savings
+- Single binary deployment
+- Built-in HTTP/2 and HTTP/3 support
 
-1. **Performance**: Native compilation and advanced optimizations
-2. **Flexibility**: Use the best language for each task
-3. **Simplicity**: Clean APIs and excellent documentation
+### For Microservices
+- Instant startup for serverless/FaaS
+- High throughput HTTP server
+- Native image packaging
+- Cross-language service composition
+
+### For CLI Tools
+- Fast startup makes CLI tools snappy
+- No runtime installation required
+- Single binary distribution
+- Cross-platform support
+
+### For Serverless Functions
+- Sub-10ms cold starts eliminate warmup
+- Minimal memory reduces costs
+- Native binaries work everywhere
+- No container overhead
+
+## Elide as a Framework
+
+Elide isn't just a runtime—it's also a modern framework with modular components:
+
+| Module | Description | Platforms |
+|--------|-------------|-----------|
+| `core` | Essential utilities and APIs | JVM, JavaScript, Native, WASM |
+| `base` | Extended functionality | JVM, JavaScript, Native |
+| `server` | HTTP server and routing | JVM, Native Image |
+| `ssr` | Server-side rendering | JVM, JavaScript |
+| `graalvm` | GraalVM integration | JVM, Native Image |
+
+Choose only the modules you need—everything works together seamlessly.
+
+## Language Support
+
+### JavaScript/TypeScript
+- **Full ES2024+ support** with modern features
+- **V8-compatible** APIs for familiarity
+- **TypeScript** with type checking and compilation
+- **Top-level await** and modern module system
+
+### Python
+- **Native Python execution** via GraalVM
+- **NumPy, Pandas** and scientific computing libraries
+- **Seamless JS-Python interop** - call Python from JavaScript
+- **Full CPython compatibility**
+
+### JVM Languages
+- **Java, Kotlin, Scala** first-class support
+- **Full Java ecosystem** - use any JVM library
+- **Interop with guest languages**
+- **Native image compilation**
+
+## Project Philosophy
+
+Elide is designed around three core principles:
+
+1. **Performance First**: Native compilation, advanced JIT, zero-copy operations
+2. **Developer Experience**: Clean APIs, excellent tooling, great documentation
+3. **Flexibility**: Use the best language for each task, compose seamlessly
 
 ## Use Cases
 
-Elide is perfect for:
+Elide excels at:
 
-- **Web Applications**: Build fast, responsive web apps
-- **APIs and Microservices**: Create efficient backend services
-- **Serverless Functions**: Deploy with minimal cold start times
-- **CLI Tools**: Build fast command-line applications
+- **High-Performance APIs**: Low latency, high throughput web services
+- **Serverless Functions**: Instant cold starts, minimal memory
+- **Full-Stack Applications**: SSR, API, database—all in one runtime
+- **CLI Tools**: Fast, distributable command-line applications
+- **Microservices**: Efficient resource usage for dense deployments
+- **Edge Computing**: Small footprint for edge/CDN deployment
+
+## What's Included
+
+Out of the box, Elide provides:
+
+- **HTTP Server**: High-performance Netty-based server
+- **Module System**: ES modules, CommonJS, native imports
+- **File System**: Standards-based file operations
+- **Crypto**: Built-in cryptographic primitives
+- **Fetch API**: Standard HTTP client
+- **Console & Logging**: Structured logging support
+- **Environment**: Access to env vars and system info
+
+## Getting Started
+
+Ready to build with Elide? Here's your path:
+
+1. **[Installation](/docs/installation)** - Install Elide on your system
+2. **[Quick Start](/docs/quick-start)** - Build your first Elide app
+3. **[Architecture](/docs/architecture)** - Understand how Elide works
+4. **[API Reference](/docs/api-server)** - Explore available APIs
+
+## Community & Support
+
+- **GitHub**: [github.com/elide-dev/elide](https://github.com/elide-dev/elide)
+- **Documentation**: [docs.elide.dev](https://docs.elide.dev)
+- **Website**: [elide.dev](https://elide.dev)
+- **Issues**: Report bugs and request features on GitHub
 
 ## Next Steps
 
-Ready to get started? Check out the [Quick Start](/docs/quick-start) guide to build your first Elide application.
+Choose your path:
 
+- New to Elide? Start with the [Quick Start Guide](/docs/quick-start)
+- Want to understand the internals? Check out the [Architecture Guide](/docs/architecture)
+- Ready to build? Jump into the [Server API Reference](/docs/api-server)
+
+<Alert>
+  <strong>Coming from Node.js or Deno?</strong> Elide uses familiar Web APIs, so you'll feel right at home. The main difference is instant startup and dramatically lower memory usage thanks to native compilation.
+</Alert>

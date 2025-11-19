@@ -4,13 +4,14 @@ import { cva, type VariantProps } from 'class-variance-authority'
 import { cn } from '@/lib/utils'
 
 const alertVariants = cva(
-  'relative w-full rounded-lg border px-4 py-3 text-sm grid has-[>svg]:grid-cols-[calc(var(--spacing)*4)_1fr] grid-cols-[0_1fr] has-[>svg]:gap-x-3 gap-y-0.5 items-start [&>svg]:size-4 [&>svg]:translate-y-0.5 [&>svg]:text-current',
+  'alert relative w-full rounded-xl px-5 py-4 text-sm [&>strong]:block [&>strong]:mb-2 [&>strong]:font-bold [&>strong]:text-primary-600 dark:[&>strong]:text-primary-400',
   {
     variants: {
       variant: {
-        default: 'bg-card text-card-foreground',
-        destructive:
-          'text-destructive bg-card [&>svg]:text-current *:data-[slot=alert-description]:text-destructive/90',
+        default: 'bg-gradient-to-br from-primary-50/80 to-pink-50/60 border border-primary-200/50 shadow-sm shadow-primary-100/50 dark:from-primary-950/30 dark:to-pink-950/20 dark:border-primary-800/30 dark:shadow-primary-900/20',
+        info: 'bg-gradient-to-br from-blue-50/80 to-sky-50/60 border border-blue-200/50 shadow-sm shadow-blue-100/50 dark:from-blue-950/30 dark:to-sky-950/20 dark:border-blue-800/30 dark:shadow-blue-900/20',
+        warning: 'bg-gradient-to-br from-yellow-50/80 to-orange-50/60 border border-yellow-200/50 shadow-sm shadow-yellow-100/50 dark:from-yellow-950/30 dark:to-orange-950/20 dark:border-yellow-800/30 dark:shadow-yellow-900/20',
+        destructive: 'bg-gradient-to-br from-red-50/80 to-pink-50/60 border border-red-200/50 shadow-sm shadow-red-100/50 dark:from-red-950/30 dark:to-pink-950/20 dark:border-red-800/30 dark:shadow-red-900/20',
       },
     },
     defaultVariants: {
@@ -22,6 +23,7 @@ const alertVariants = cva(
 function Alert({
   className,
   variant,
+  children,
   ...props
 }: React.ComponentProps<'div'> & VariantProps<typeof alertVariants>) {
   return (
@@ -30,7 +32,10 @@ function Alert({
       role="alert"
       className={cn(alertVariants({ variant }), className)}
       {...props}
-    />
+    >
+      <div className="absolute left-0 top-0 bottom-0 w-1 rounded-l-xl bg-gradient-to-b from-primary-500 to-pink-500 dark:from-primary-400 dark:to-pink-400" />
+      <div className="relative z-10">{children}</div>
+    </div>
   )
 }
 
@@ -39,7 +44,7 @@ function AlertTitle({ className, ...props }: React.ComponentProps<'div'>) {
     <div
       data-slot="alert-title"
       className={cn(
-        'col-start-2 line-clamp-1 min-h-4 font-medium tracking-tight',
+        'mb-2 font-bold text-base tracking-tight text-foreground',
         className,
       )}
       {...props}
@@ -55,7 +60,7 @@ function AlertDescription({
     <div
       data-slot="alert-description"
       className={cn(
-        'text-muted-foreground col-start-2 grid justify-items-start gap-1 text-sm [&_p]:leading-relaxed',
+        'text-sm leading-relaxed text-foreground/80 [&_p]:leading-relaxed',
         className,
       )}
       {...props}
