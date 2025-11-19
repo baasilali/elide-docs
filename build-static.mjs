@@ -133,9 +133,15 @@ function generateNavBarHTML() {
 
             <!-- Right Secondary Links -->
             <div class="flex items-center gap-1">
-              <a href="https://github.com/elide-dev/elide" class="flex items-center gap-2 px-4 py-3 text-sm font-medium text-muted-foreground hover:text-foreground transition-all duration-200">
+              <a href="/blog" class="flex items-center gap-2 px-4 py-3 text-sm font-medium text-muted-foreground hover:text-foreground transition-all duration-200">
                 <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                </svg>
+                <span>Blog</span>
+              </a>
+              <a href="https://github.com/elide-dev/elide" class="flex items-center gap-2 px-4 py-3 text-sm font-medium text-muted-foreground hover:text-foreground transition-all duration-200">
+                <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 18l6-6-6-6M8 6l-6 6 6 6" />
                 </svg>
                 <span>Examples</span>
               </a>
@@ -152,10 +158,6 @@ function generateSidebarHTML(currentSlug) {
   let sidebarHTML = `
     <aside class="fixed top-28 left-0 z-40 h-[calc(100vh-7rem)] w-64 border-r border-border bg-card/30 backdrop-blur-md hidden lg:block">
       <div class="flex flex-col h-full p-6 overflow-y-auto">
-        <div class="mb-8">
-          <h2 class="text-xl font-bold text-foreground mb-1">Documentation</h2>
-          <p class="text-sm text-muted-foreground">Technical reference & guides</p>
-        </div>
         <nav class="space-y-8 flex-1">
   `
   
@@ -202,24 +204,22 @@ function generateSidebarHTML(currentSlug) {
 // Generate static table of contents
 function generateTocHTML() {
   return `
-    <aside class="hidden lg:block fixed top-28 right-0 w-64 h-[calc(100vh-7rem)] border-l border-border bg-card/30 backdrop-blur-md overflow-y-auto">
+    <aside class="hidden lg:block fixed top-28 right-0 w-64 h-[calc(100vh-7rem)] overflow-y-auto">
       <div class="p-6">
-        <div class="border-none">
-          <div class="text-sm font-semibold text-foreground py-2">
-            On this page
-          </div>
-          <nav class="space-y-1 mt-2">
-            <a href="#overview" class="block py-2 px-3 text-sm text-muted-foreground hover:text-foreground hover:bg-accent hover:shadow-[0_0_12px_rgba(236,72,153,0.3)] rounded-md transition-all duration-200">
-              Overview
-            </a>
-            <a href="#getting-started" class="block py-2 px-3 text-sm text-muted-foreground hover:text-foreground hover:bg-accent hover:shadow-[0_0_12px_rgba(236,72,153,0.3)] rounded-md transition-all duration-200">
-              Getting Started
-            </a>
-            <a href="#api-reference" class="block py-2 px-3 text-sm text-muted-foreground hover:text-foreground hover:bg-accent hover:shadow-[0_0_12px_rgba(236,72,153,0.3)] rounded-md transition-all duration-200">
-              API Reference
-            </a>
-          </nav>
+        <div class="text-sm font-semibold text-foreground mb-4">
+          On this page
         </div>
+        <nav class="space-y-1 border-l-2 border-border">
+          <a href="#overview" class="block py-2 px-4 text-sm text-primary border-l-2 border-primary -ml-[2px] transition-colors duration-200">
+            Overview
+          </a>
+          <a href="#getting-started" class="block py-2 px-4 text-sm text-muted-foreground hover:text-foreground border-l-2 border-transparent -ml-[2px] transition-colors duration-200">
+            Getting Started
+          </a>
+          <a href="#api-reference" class="block py-2 px-4 text-sm text-muted-foreground hover:text-foreground border-l-2 border-transparent -ml-[2px] transition-colors duration-200">
+            API Reference
+          </a>
+        </nav>
       </div>
     </aside>
   `
