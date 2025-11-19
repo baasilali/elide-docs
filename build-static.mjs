@@ -386,29 +386,72 @@ async function simpleProcessMDXFile(slug) {
 
 // Generate index/home page
 async function generateIndex() {
-  console.log('🏠 Generating index redirect...')
+  console.log('🏠 Generating index page...')
   
-  // Simple redirect to introduction page
   const html = `<!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
   <meta charset="UTF-8">
-  <meta http-equiv="refresh" content="0; url=/docs/introduction.html">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Elide Docs - Redirecting...</title>
+  <title>Elide Documentation</title>
+  <meta name="description" content="Official documentation for Elide - A fast, polyglot runtime">
+  <link rel="stylesheet" href="/assets/styles.css">
   <link rel="icon" href="/assets/icon.svg" type="image/svg+xml">
-  <script>
-    window.location.href = '/docs/introduction.html';
-  </script>
+  <link rel="icon" href="/assets/icon-light-32x32.png" media="(prefers-color-scheme: light)">
+  <link rel="icon" href="/assets/icon-dark-32x32.png" media="(prefers-color-scheme: dark)">
+  <link rel="apple-touch-icon" href="/assets/apple-icon.png">
 </head>
-<body>
-  <p>Redirecting to <a href="/docs/introduction.html">documentation</a>...</p>
+<body class="bg-background text-foreground">
+  <div class="glow-bg min-h-screen flex items-center justify-center px-4">
+    <div class="text-center max-w-2xl mx-auto">
+      <!-- Logo -->
+      <div class="mb-8 flex justify-center">
+        <img src="/assets/light.svg" alt="Elide" class="h-24 w-auto" />
+      </div>
+      
+      <!-- Title -->
+      <h1 class="text-5xl font-bold mb-4 bg-gradient-to-r from-primary to-pink-500 bg-clip-text text-transparent">
+        Elide Documentation
+      </h1>
+      
+      <!-- Description -->
+      <p class="text-xl text-muted-foreground mb-12">
+        Fast, polyglot runtime for JavaScript, TypeScript, Python, and more
+      </p>
+      
+      <!-- Button -->
+      <a 
+        href="/docs/introduction.html" 
+        class="inline-flex items-center px-8 py-4 bg-primary text-primary-foreground hover:bg-primary/90 hover:shadow-[0_0_30px_rgba(168,85,247,0.5)] transition-all duration-300 rounded-lg text-lg font-semibold"
+      >
+        View Documentation
+        <svg class="ml-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+        </svg>
+      </a>
+      
+      <!-- Optional: Quick links -->
+      <div class="mt-16 flex justify-center gap-6 text-sm">
+        <a href="https://github.com/elide-dev/elide" class="text-muted-foreground hover:text-foreground transition-colors">
+          GitHub
+        </a>
+        <span class="text-muted-foreground">·</span>
+        <a href="/docs/quick-start.html" class="text-muted-foreground hover:text-foreground transition-colors">
+          Quick Start
+        </a>
+        <span class="text-muted-foreground">·</span>
+        <a href="/docs/installation.html" class="text-muted-foreground hover:text-foreground transition-colors">
+          Installation
+        </a>
+      </div>
+    </div>
+  </div>
 </body>
 </html>`
   
   await fs.writeFile(path.join(DIST_DIR, 'index.html'), html, 'utf8')
   
-  console.log('  ✓ Generated index.html (redirect to introduction)')
+  console.log('  ✓ Generated index.html (landing page)')
 }
 
 // Get all doc slugs from config
@@ -444,6 +487,9 @@ async function build() {
         console.error(`  ✗ Error processing ${slug}:`, err.message)
       }
     }
+    
+    // Generate index page
+    await generateIndex()
     
     console.log('\n✅ Build complete! Files in dist/')
     console.log('\n📖 To view the docs, run:')
