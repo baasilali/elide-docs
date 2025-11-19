@@ -1,0 +1,38 @@
+#!/bin/bash
+#
+# Pre-push hook to ensure build-static.mjs is updated before pushing
+# This prevents pushing dist/ changes without updating the source file
+#
+# To install: cp .githooks/pre-push .git/hooks/pre-push && chmod +x .git/hooks/pre-push
+#
+
+echo "Checking documentation build status..."
+
+# Check if build-static.mjs has been modified in the current branch
+if git diff --name-only HEAD@{upstream}...HEAD 2>/dev/null | grep -q "build-static.mjs"; then
+  echo "✓ build-static.mjs has been updated"
+  exit 0
+fi
+
+# Check if there are any uncommitted changes to build-static.mjs
+if git diff --name-only | grep -q "build-static.mjs"; then
+  echo ""
+  echo "WARNING: You have uncommitted changes to build-static.mjs"
+  echo "Please commit your changes before pushing."
+  echo ""
+  exit 1
+fi
+
+# Check if dist/ folder exists and has changes (even though it's gitignored)
+if [ -d "dist" ]; then
+  echo ""
+  echo "NOTE: Remember to rebuild the dist folder after pulling:"
+  echo "  $ node build-static.mjs"
+  echo ""
+fi
+
+# If we're here, build-static.mjs hasn't changed this push
+# This is fine - just a reminder
+echo "✓ Pre-push check complete"
+exit 0
+

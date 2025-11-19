@@ -88,6 +88,11 @@ For UI changes (navbar, sidebar, layout):
 
 A pre-push git hook will verify that `build-static.mjs` changes are committed before pushing.
 
+To install the git hook (first-time setup):
+```bash
+cp .githooks/pre-push .git/hooks/pre-push && chmod +x .git/hooks/pre-push
+```
+
 ## Project Structure
 
 ```
