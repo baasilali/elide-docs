@@ -76,6 +76,18 @@ elide serve dist --port 3000
 cd dist && python3 -m http.server 3000
 ```
 
+### Making UI Changes
+
+**IMPORTANT**: The `dist/` folder is auto-generated and gitignored. Never edit HTML files in `dist/` directly!
+
+For UI changes (navbar, sidebar, layout):
+1. Edit `build-static.mjs` (the source file)
+2. Rebuild with `node build-static.mjs`
+3. Test your changes
+4. Commit `build-static.mjs` (NOT `dist/`)
+
+A pre-push git hook will verify that `build-static.mjs` changes are committed before pushing.
+
 ## Project Structure
 
 ```
