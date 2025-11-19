@@ -232,7 +232,7 @@ function generateHTMLPage(title, content, slug) {
   const toc = generateTocHTML()
   
   return `<!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -444,10 +444,6 @@ async function build() {
         console.error(`  ✗ Error processing ${slug}:`, err.message)
       }
     }
-    
-    // Generate index
-    console.log('')
-    await generateIndex()
     
     console.log('\n✅ Build complete! Files in dist/')
     console.log('\n📖 To view the docs, run:')

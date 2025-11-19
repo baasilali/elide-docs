@@ -1,9 +1,12 @@
 #!/usr/bin/env node
-import { readFile, writeFile, mkdir } from 'fs/promises'
-import { join } from 'path'
+import { exec } from 'child_process'
+import { promisify } from 'util'
+import { mkdir } from 'fs/promises'
 import { existsSync } from 'fs'
 
-// Simple CSS build script
+const execAsync = promisify(exec)
+
+// Build CSS using Tailwind CLI
 async function buildCSS() {
   console.log('📦 Building CSS...')
   
@@ -12,14 +15,14 @@ async function buildCSS() {
     await mkdir('public', { recursive: true })
   }
   
-  // Read the globals.css
-  const css = await readFile('styles/globals.css', 'utf-8')
-  
-  // For now, copy as-is (Tailwind v4 supports this)
-  // In production, you'd want to run through PostCSS/Tailwind CLI
-  await writeFile('public/styles.css', css)
-  
-  console.log('✓ CSS built to public/styles.css')
+  // Run Tailwind CLI to compile CSS
+  try {
+    await execAsync('npx @tailwindcss/cli@latest -i styles/globals.css -o public/styles.css --minify')
+    console.log('✓ CSS built to public/styles.css')
+  } catch (error) {
+    console.error('❌ CSS build failed:', error.message)
+    throw error
+  }
 }
 
 buildCSS().catch(console.error)
