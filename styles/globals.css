@@ -431,92 +431,108 @@ html.dark {
   );
 }
 
-/* Syntax Highlighting - VSCode-like colors */
+/* Syntax Highlighting - Enhanced IDE-like colors */
 .mdx-content pre code {
-  color: #d4d4d4;
+  color: #e8e8e8;
+  font-weight: 400;
 }
 
-/* Keywords */
+/* Keywords - Purple/Pink for control flow */
 .mdx-content pre code .keyword,
 .mdx-content pre code .token.keyword {
   color: #c586c0;
-  font-weight: normal;
+  font-weight: 500;
 }
 
-/* Strings */
+/* Strings - Orange/Salmon for text */
 .mdx-content pre code .string,
 .mdx-content pre code .token.string {
   color: #ce9178;
+  font-weight: 400;
 }
 
-/* Comments */
+/* Comments - Green, muted */
 .mdx-content pre code .comment,
 .mdx-content pre code .token.comment {
   color: #6a9955;
   font-style: italic;
+  opacity: 0.9;
 }
 
-/* Functions */
+/* Functions - Yellow for function names */
 .mdx-content pre code .function,
 .mdx-content pre code .token.function {
   color: #dcdcaa;
+  font-weight: 500;
 }
 
-/* Variables */
+/* Variables - Light blue */
 .mdx-content pre code .variable,
 .mdx-content pre code .token.variable {
   color: #9cdcfe;
 }
 
-/* Numbers */
+/* Properties - Light blue */
+.mdx-content pre code .property,
+.mdx-content pre code .token.property {
+  color: #9cdcfe;
+  font-weight: 400;
+}
+
+/* Numbers - Light green */
 .mdx-content pre code .number,
 .mdx-content pre code .token.number {
   color: #b5cea8;
+  font-weight: 500;
 }
 
-/* Operators */
+/* Operators - White */
 .mdx-content pre code .operator,
 .mdx-content pre code .token.operator {
   color: #d4d4d4;
 }
 
-/* Punctuation */
+/* Punctuation - Light gray */
 .mdx-content pre code .punctuation,
 .mdx-content pre code .token.punctuation {
   color: #d4d4d4;
 }
 
-/* Classes */
+/* Classes - Teal/Cyan */
 .mdx-content pre code .class-name,
 .mdx-content pre code .token.class-name {
   color: #4ec9b0;
+  font-weight: 500;
 }
 
-/* Attributes */
+/* Attributes - Light blue */
 .mdx-content pre code .attr-name,
 .mdx-content pre code .token.attr-name {
   color: #9cdcfe;
 }
 
-/* Tags */
+/* Tags - Blue */
 .mdx-content pre code .tag,
 .mdx-content pre code .token.tag {
   color: #569cd6;
+  font-weight: 500;
 }
 
-/* Booleans */
+/* Booleans - Bright blue */
 .mdx-content pre code .boolean,
 .mdx-content pre code .token.boolean {
   color: #569cd6;
+  font-weight: 600;
 }
 
-/* Constants */
+/* Constants - Bright blue */
 .mdx-content pre code .constant,
 .mdx-content pre code .token.constant {
   color: #4fc1ff;
+  font-weight: 500;
 }
 
-/* Regex */
+/* Regex - Red */
 .mdx-content pre code .regex,
 .mdx-content pre code .token.regex {
   color: #d16969;
@@ -526,4 +542,31 @@ html.dark {
 .mdx-content pre code .shell-symbol {
   color: #6a9955;
   user-select: none;
+}
+
+/* Shell flags/options - Cyan */
+.mdx-content pre code .flag,
+.mdx-content pre code .token.flag {
+  color: #4ec9b0;
+  font-weight: 500;
+}
+
+/* Module/Package names - Teal */
+.mdx-content pre code .module,
+.mdx-content pre code .token.module {
+  color: #4ec9b0;
+}
+
+/* Decorators - Yellow */
+.mdx-content pre code .decorator,
+.mdx-content pre code .token.decorator {
+  color: #dcdcaa;
+  font-style: italic;
+}
+
+/* Parameters - Light blue */
+.mdx-content pre code .parameter,
+.mdx-content pre code .token.parameter {
+  color: #9cdcfe;
+  font-style: italic;
 }

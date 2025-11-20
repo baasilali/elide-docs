@@ -68,45 +68,116 @@ const CONTENT_DIR = path.join(__dirname, 'content/docs')
 const DIST_DIR = path.join(__dirname, 'dist')
 const PUBLIC_DIR = path.join(__dirname, 'public')
 
-// Simple syntax highlighter for code blocks
+// Comprehensive syntax highlighter for code blocks
 function highlightCode(code, language) {
   if (!language || language === 'text' || language === 'plain') {
     return code
   }
   
   let highlighted = code
+  const tokens = []
+  let tokenIndex = 0
+  
+  // Helper to create a unique token
+  const createToken = (className, content) => {
+    const token = `__TOKEN_${tokenIndex}__`
+    tokens.push({ token, html: `<span class="${className}">${content}</span>` })
+    tokenIndex++
+    return token
+  }
   
   // JavaScript/TypeScript
-  if (language === 'javascript' || language === 'js' || language === 'typescript' || language === 'ts') {
+  if (language === 'javascript' || language === 'js' || language === 'typescript' || language === 'ts' || language === 'jsx' || language === 'tsx') {
+    // Comments first (so they don't get overwritten)
+    highlighted = highlighted.replace(/\/\/(.*?)$/gm, (match, content) => createToken('comment', '//' + content))
+    highlighted = highlighted.replace(/\/\*([\s\S]*?)\*\//g, (match, content) => createToken('comment', '/*' + content + '*/'))
+    
+    // Strings (must come before other patterns)
+    highlighted = highlighted.replace(/(["'`])((?:\\.|(?!\1)[^\\])*?)\1/g, (match) => createToken('string', match))
+    
     // Keywords
-    highlighted = highlighted.replace(/\b(const|let|var|function|async|await|return|if|else|for|while|class|extends|import|export|from|default|new|try|catch|throw|typeof|instanceof)\b/g, '<span class="keyword">$1</span>')
-    // Strings
-    highlighted = highlighted.replace(/(['"`])(.*?)\1/g, '<span class="string">$1$2$1</span>')
-    // Comments
-    highlighted = highlighted.replace(/\/\/(.*?)$/gm, '<span class="comment">//$1</span>')
-    highlighted = highlighted.replace(/\/\*(.*?)\*\//gs, '<span class="comment">/*$1*/</span>')
+    highlighted = highlighted.replace(/\b(const|let|var|function|async|await|return|if|else|for|while|do|switch|case|break|continue|class|extends|implements|interface|type|enum|namespace|module|import|export|from|default|new|try|catch|finally|throw|typeof|instanceof|void|null|undefined|this|super|static|public|private|protected|readonly)\b/g, (match) => createToken('keyword', match))
+    
+    // Booleans
+    highlighted = highlighted.replace(/\b(true|false)\b/g, (match) => createToken('boolean', match))
+    
     // Numbers
-    highlighted = highlighted.replace(/\b(\d+)\b/g, '<span class="number">$1</span>')
+    highlighted = highlighted.replace(/\b(\d+\.?\d*)\b/g, (match) => createToken('number', match))
+    
+    // Method calls (property followed by function call) - do this before standalone functions
+    highlighted = highlighted.replace(/\.([a-zA-Z_$][\w$]*)\s*(?=\()/g, (match, name) => '.' + createToken('function', name))
+    
+    // Standalone function calls
+    highlighted = highlighted.replace(/(?<![.\w])([a-zA-Z_$][\w$]*)\s*(?=\()/g, (match, name) => {
+      // Don't match if it's after a dot (already handled above)
+      return createToken('function', name)
+    })
+    
+    // Properties (non-function)
+    highlighted = highlighted.replace(/\.([a-zA-Z_$][\w$]*)(?!\s*\()/g, (match, prop) => {
+      // Skip if it's a token
+      if (prop.startsWith('__TOKEN_')) return match
+      return '.' + createToken('property', prop)
+    })
   }
   
   // Bash/Shell
   if (language === 'bash' || language === 'sh' || language === 'shell') {
     // Comments
-    highlighted = highlighted.replace(/#(.*?)$/gm, '<span class="comment">#$1</span>')
+    highlighted = highlighted.replace(/#(.*?)$/gm, (match, content) => createToken('comment', '#' + content))
+    
     // Strings
-    highlighted = highlighted.replace(/(['"`])(.*?)\1/g, '<span class="string">$1$2$1</span>')
-    // Commands
-    highlighted = highlighted.replace(/^([a-z\-]+)/gm, '<span class="function">$1</span>')
+    highlighted = highlighted.replace(/(["'])((?:\\.|(?!\1)[^\\])*?)\1/g, (match) => createToken('string', match))
+    
+    // Shell keywords
+    highlighted = highlighted.replace(/\b(if|then|else|elif|fi|for|while|do|done|case|esac|function|return|exit|export|source)\b/g, (match) => createToken('keyword', match))
+    
+    // Commands at start of line or after pipe/semicolon
+    highlighted = highlighted.replace(/(^|\||;)\s*([a-z\-]+)/gm, (match, prefix, cmd) => prefix + ' ' + createToken('function', cmd))
+    
+    // Flags
+    highlighted = highlighted.replace(/\s(--?[a-zA-Z][\w-]*)/g, (match, flag) => ' ' + createToken('flag', flag))
   }
   
   // Python
   if (language === 'python' || language === 'py') {
-    // Keywords
-    highlighted = highlighted.replace(/\b(def|class|import|from|return|if|elif|else|for|while|try|except|with|as|async|await)\b/g, '<span class="keyword">$1</span>')
-    // Strings
-    highlighted = highlighted.replace(/(['"`])(.*?)\1/g, '<span class="string">$1$2$1</span>')
     // Comments
-    highlighted = highlighted.replace(/#(.*?)$/gm, '<span class="comment">#$1</span>')
+    highlighted = highlighted.replace(/#(.*?)$/gm, (match, content) => createToken('comment', '#' + content))
+    
+    // Strings (including multiline)
+    highlighted = highlighted.replace(/("""[\s\S]*?""")|("(?:[^"\\]|\\.)*")|('(?:[^'\\]|\\.)*')/g, (match) => createToken('string', match))
+    
+    // Keywords
+    highlighted = highlighted.replace(/\b(def|class|import|from|as|return|if|elif|else|for|while|in|not|and|or|is|try|except|finally|with|raise|yield|lambda|pass|break|continue|global|nonlocal|async|await|True|False|None)\b/g, (match) => createToken('keyword', match))
+    
+    // Function definitions (must come after keyword replacement)
+    highlighted = highlighted.replace(new RegExp(`(${tokens[tokens.length-1]?.token || '__TOKEN_\\d+__'})\\s+([a-zA-Z_]\\w*)`, 'g'), (match, defToken, name) => {
+      // Check if defToken is 'def'
+      return defToken + ' ' + createToken('function', name)
+    })
+    
+    // Function calls
+    highlighted = highlighted.replace(/\b([a-zA-Z_]\w*)\s*(?=\()/g, (match) => createToken('function', match))
+    
+    // Numbers
+    highlighted = highlighted.replace(/\b(\d+\.?\d*)\b/g, (match) => createToken('number', match))
+  }
+  
+  // JSON
+  if (language === 'json') {
+    // Strings (including keys)
+    highlighted = highlighted.replace(/"([^"\\]*(\\.[^"\\]*)*)"/g, (match) => createToken('string', match))
+    
+    // Numbers
+    highlighted = highlighted.replace(/:\s*(\d+\.?\d*)/g, (match, num) => ': ' + createToken('number', num))
+    
+    // Booleans
+    highlighted = highlighted.replace(/\b(true|false|null)\b/g, (match) => createToken('boolean', match))
+  }
+  
+  // Replace all tokens with their HTML
+  for (const { token, html } of tokens) {
+    highlighted = highlighted.replace(new RegExp(token, 'g'), html)
   }
   
   return highlighted
@@ -493,6 +564,16 @@ async function simpleProcessMDXFile(slug) {
   let html = mdxContent
     // Remove imports
     .replace(/^import\s+.+$/gm, '')
+  
+  // Process code blocks with syntax highlighting FIRST
+  html = html.replace(/```(\w+)?\n([\s\S]+?)```/g, (match, language, code) => {
+    const trimmedCode = code.trim()
+    const highlighted = highlightCode(trimmedCode, language || '')
+    return `<pre><code class="language-${language || 'text'}">${highlighted}</code></pre>`
+  })
+  
+  // Continue with other conversions
+  html = html
     // Headers
     .replace(/^#### (.+)$/gm, '<h4>$1</h4>')
     .replace(/^### (.+)$/gm, '<h3>$1</h3>')
@@ -501,8 +582,6 @@ async function simpleProcessMDXFile(slug) {
     // Bold and italic
     .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
     .replace(/\*(.+?)\*/g, '<em>$1</em>')
-    // Code blocks
-    .replace(/```(\w+)?\n([\s\S]+?)```/g, '<pre><code class="language-$1">$2</code></pre>')
     // Inline code
     .replace(/`([^`]+)`/g, '<code>$1</code>')
     // Links
