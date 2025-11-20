@@ -32,9 +32,11 @@ export function DocsLayout({ children }: { children: React.ReactNode }) {
         <DocsSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
         {/* Main Content */}
-        <main className="flex-1 lg:ml-64 lg:mr-64">
-          <div className="container max-w-4xl mx-auto px-6 py-16">
-            {children}
+        <main className="flex-1 lg:ml-64 lg:mr-64 min-w-0">
+          <div className="container mx-auto px-6 py-16 max-w-full lg:max-w-5xl xl:max-w-6xl 2xl:max-w-7xl">
+            <div className="w-full">
+              {children}
+            </div>
           </div>
         </main>
 
