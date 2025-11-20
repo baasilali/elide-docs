@@ -351,11 +351,13 @@ function generateHTMLPage(title, content, slug) {
         ${sidebar}
 
         <!-- Main Content -->
-        <main class="flex-1 lg:ml-64 lg:mr-64">
-          <div class="w-full px-8 py-16">
-            <article class="mdx-content max-w-3xl">
-              ${content}
-            </article>
+        <main class="flex-1 lg:ml-64 lg:mr-64 min-w-0">
+          <div class="container mx-auto px-6 py-16 max-w-full lg:max-w-5xl xl:max-w-6xl 2xl:max-w-7xl">
+            <div class="w-full">
+              <article class="mdx-content">
+                ${content}
+              </article>
+            </div>
           </div>
         </main>
 
