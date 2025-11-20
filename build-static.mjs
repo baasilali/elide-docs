@@ -572,6 +572,38 @@ async function simpleProcessMDXFile(slug) {
     return `<pre><code class="language-${language || 'text'}">${highlighted}</code></pre>`
   })
   
+  // Process markdown tables
+  html = html.replace(/\n\|(.+)\|\n\|[-:\s|]+\|\n((?:\|.+\|\n?)+)/g, (match, headerRow, bodyRows) => {
+    const headers = headerRow.split('|').map(h => h.trim()).filter(h => h)
+    const rows = bodyRows.trim().split('\n').map(row => 
+      row.split('|').map(cell => cell.trim()).filter(cell => cell)
+    )
+    
+    let tableHTML = '<div class="overflow-x-auto my-8"><table class="w-full"><thead><tr>'
+    headers.forEach(header => {
+      tableHTML += `<th class="text-left py-4 px-6">${header}</th>`
+    })
+    tableHTML += '</tr></thead><tbody>'
+    
+    rows.forEach((row, idx) => {
+      tableHTML += '<tr>'
+      row.forEach((cell, cellIdx) => {
+        // Check if this is the first column
+        const isFirstCol = cellIdx === 0
+        // Check if this is the second column (Elide column) and make it green
+        const isElideCol = cellIdx === 1
+        const cellClass = isFirstCol ? 'py-4 px-6 font-semibold' : 
+                         isElideCol ? 'py-4 px-6 text-green-400 font-mono' : 
+                         'py-4 px-6 text-muted-foreground font-mono'
+        tableHTML += `<td class="${cellClass}">${cell}</td>`
+      })
+      tableHTML += '</tr>'
+    })
+    
+    tableHTML += '</tbody></table></div>'
+    return tableHTML
+  })
+  
   // Continue with other conversions
   html = html
     // Headers
