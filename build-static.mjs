@@ -470,35 +470,90 @@ function generateSidebarHTML(currentSlug) {
   return sidebarHTML
 }
 
-// Generate static table of contents
-function generateTocHTML() {
+// Extract headings from HTML content for TOC
+function extractHeadings(html) {
+  const headings = []
+  const headingRegex = /<h([2-3])(?:[^>]*)>(.*?)<\/h[2-3]>/gi
+  let match
+  
+  while ((match = headingRegex.exec(html)) !== null) {
+    const level = parseInt(match[1])
+    const text = match[2].replace(/<[^>]*>/g, '').trim() // Remove any HTML tags
+    const id = text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
+    
+    headings.push({ level, text, id })
+  }
+  
+  return headings
+}
+
+// Generate dynamic table of contents based on page content
+function generateTocHTML(content) {
+  const headings = extractHeadings(content)
+  
+  if (headings.length === 0) {
+    return `
+      <aside class="hidden lg:block fixed top-28 right-0 w-64 h-[calc(100vh-7rem)] overflow-y-auto">
+        <div class="p-6">
+          <div class="text-sm font-semibold text-foreground mb-4">
+            On this page
+          </div>
+          <nav class="space-y-1 border-l-2 border-border">
+            <p class="block py-2 px-4 text-sm text-muted-foreground">No sections found</p>
+          </nav>
+        </div>
+      </aside>
+    `
+  }
+  
+  const tocItems = headings.map((heading, index) => {
+    const isFirstItem = index === 0
+    const indent = heading.level === 3 ? 'pl-8' : 'pl-4'
+    // First item is active by default
+    const activeClass = isFirstItem ? 'text-primary border-primary' : 'text-muted-foreground border-transparent'
+    return `
+      <a 
+        href="#${heading.id}" 
+        data-toc-id="${heading.id}"
+        class="toc-link block py-2 ${indent} text-sm ${activeClass} hover:border-l-[3px] border-l-2 -ml-[2px] transition-all duration-200"
+        style="border-left-color: ${isFirstItem ? 'rgb(168, 85, 247)' : 'transparent'};"
+      >
+        ${heading.text}
+      </a>
+    `
+  }).join('')
+  
   return `
     <aside class="hidden lg:block fixed top-28 right-0 w-64 h-[calc(100vh-7rem)] overflow-y-auto">
       <div class="p-6">
         <div class="text-sm font-semibold text-foreground mb-4">
           On this page
         </div>
-        <nav class="space-y-1 border-l-2 border-border">
-          <a href="#overview" class="block py-2 px-4 text-sm text-primary border-l-2 border-primary -ml-[2px] transition-colors duration-200">
-            Overview
-          </a>
-          <a href="#getting-started" class="block py-2 px-4 text-sm text-muted-foreground hover:text-foreground border-l-2 border-transparent -ml-[2px] transition-colors duration-200">
-            Getting Started
-          </a>
-          <a href="#api-reference" class="block py-2 px-4 text-sm text-muted-foreground hover:text-foreground border-l-2 border-transparent -ml-[2px] transition-colors duration-200">
-            API Reference
-          </a>
+        <nav id="toc-nav" class="space-y-1 border-l-2 border-border">
+          ${tocItems}
         </nav>
       </div>
     </aside>
   `
 }
 
+// Add IDs to headings in HTML content
+function addHeadingIds(html) {
+  return html.replace(/<h([2-3])>(.*?)<\/h[2-3]>/gi, (match, level, text) => {
+    const cleanText = text.replace(/<[^>]*>/g, '').trim()
+    const id = cleanText.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
+    return `<h${level} id="${id}">${text}</h${level}>`
+  })
+}
+
 // Generate complete HTML page using components
 function generateHTMLPage(title, content, slug) {
+  // Add IDs to headings for TOC navigation
+  const contentWithIds = addHeadingIds(content)
+  
   const navbar = generateNavBarHTML(slug)
   const sidebar = generateSidebarHTML(slug)
-  const toc = generateTocHTML()
+  const toc = generateTocHTML(contentWithIds)
   
   return `<!DOCTYPE html>
 <html lang="en" class="dark">
@@ -537,7 +592,7 @@ function generateHTMLPage(title, content, slug) {
           <div class="container mx-auto px-6 py-16 max-w-full lg:max-w-5xl xl:max-w-6xl 2xl:max-w-7xl">
             <div class="w-full">
               <article class="mdx-content">
-                ${content}
+                ${contentWithIds}
               </article>
             </div>
           </div>
@@ -558,6 +613,122 @@ function generateHTMLPage(title, content, slug) {
         console.log('Mobile menu toggle');
       });
     }
+
+    // Table of Contents scroll tracking with pink/purple highlighting
+    (function() {
+      const tocLinks = document.querySelectorAll('.toc-link');
+      if (tocLinks.length === 0) return;
+
+      // Purple/pink color
+      const activeColor = 'rgb(168, 85, 247)';
+      const activeBorderWidth = '3px';
+      const inactiveBorderWidth = '2px';
+
+      // Get all headings that have IDs
+      const headings = Array.from(document.querySelectorAll('h2[id], h3[id]'));
+      
+      // Function to update active TOC link with pink/purple styling
+      function updateActiveTocLink() {
+        // Get current scroll position (reduced offset for earlier detection)
+        const scrollPosition = window.scrollY + 150; // Earlier detection
+        
+        // Find the current heading (default to first if at top of page)
+        let currentHeading = headings[0]; // Always default to first
+        
+        for (let i = headings.length - 1; i >= 0; i--) {
+          if (headings[i].offsetTop <= scrollPosition) {
+            currentHeading = headings[i];
+            break;
+          }
+        }
+        
+        // Update TOC links - ensure there's always an active one
+        tocLinks.forEach(link => {
+          const tocId = link.getAttribute('data-toc-id');
+          const isActive = currentHeading && currentHeading.id === tocId;
+          
+          if (isActive) {
+            // Active state: pink/purple border and text with explicit styling
+            link.classList.remove('text-muted-foreground', 'border-transparent');
+            link.classList.add('text-primary');
+            link.style.borderLeftColor = activeColor;
+            link.style.borderLeftWidth = activeBorderWidth;
+            link.style.color = activeColor;
+          } else {
+            // Inactive state
+            link.classList.remove('text-primary');
+            link.classList.add('text-muted-foreground');
+            link.style.borderLeftColor = 'transparent';
+            link.style.borderLeftWidth = inactiveBorderWidth;
+            link.style.color = '';
+          }
+        });
+      }
+      
+      // Add hover effects
+      tocLinks.forEach(link => {
+        // Hover in
+        link.addEventListener('mouseenter', () => {
+          link.style.borderLeftColor = activeColor;
+          link.style.borderLeftWidth = activeBorderWidth;
+          link.style.color = activeColor;
+        });
+        
+        // Hover out - restore state
+        link.addEventListener('mouseleave', () => {
+          const tocId = link.getAttribute('data-toc-id');
+          const scrollPosition = window.scrollY + 150;
+          let currentHeading = headings[0];
+          
+          for (let i = headings.length - 1; i >= 0; i--) {
+            if (headings[i].offsetTop <= scrollPosition) {
+              currentHeading = headings[i];
+              break;
+            }
+          }
+          
+          const isActive = currentHeading && currentHeading.id === tocId;
+          
+          if (!isActive) {
+            link.style.borderLeftColor = 'transparent';
+            link.style.borderLeftWidth = inactiveBorderWidth;
+            link.style.color = '';
+          }
+        });
+        
+        // Click handler for smooth scroll
+        link.addEventListener('click', (e) => {
+          e.preventDefault();
+          const targetId = link.getAttribute('data-toc-id');
+          const targetElement = document.getElementById(targetId);
+          if (targetElement) {
+            const offset = 120; // Account for fixed navbar
+            const targetPosition = targetElement.offsetTop - offset;
+            window.scrollTo({
+              top: targetPosition,
+              behavior: 'smooth'
+            });
+            // Update immediately
+            setTimeout(updateActiveTocLink, 100);
+          }
+        });
+      });
+      
+      // Update on scroll (throttled for performance)
+      let ticking = false;
+      window.addEventListener('scroll', () => {
+        if (!ticking) {
+          window.requestAnimationFrame(() => {
+            updateActiveTocLink();
+            ticking = false;
+          });
+          ticking = true;
+        }
+      });
+      
+      // Initial update
+      updateActiveTocLink();
+    })();
   </script>
 </body>
 </html>`
