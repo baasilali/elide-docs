@@ -256,17 +256,35 @@ async function setup() {
 async function copyAssets() {
   console.log('📦 Copying static assets...')
   
+  async function copyRecursive(src, dest) {
+    const stat = await fs.stat(src)
+    
+    if (stat.isFile()) {
+      await fs.copyFile(src, dest)
+      return
+    }
+    
+    if (stat.isDirectory()) {
+      await fs.mkdir(dest, { recursive: true })
+      const entries = await fs.readdir(src)
+      
+      for (const entry of entries) {
+        await copyRecursive(
+          path.join(src, entry),
+          path.join(dest, entry)
+        )
+      }
+    }
+  }
+  
   try {
     const files = await fs.readdir(PUBLIC_DIR)
     for (const file of files) {
       const src = path.join(PUBLIC_DIR, file)
       const dest = path.join(DIST_DIR, 'assets', file)
-      const stat = await fs.stat(src)
       
-      if (stat.isFile()) {
-        await fs.copyFile(src, dest)
-        console.log(`  ✓ Copied ${file}`)
-      }
+      await copyRecursive(src, dest)
+      console.log(`  ✓ Copied ${file}`)
     }
   } catch (err) {
     console.warn('  ⚠ Could not copy public assets:', err.message)
