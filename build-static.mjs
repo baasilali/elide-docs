@@ -425,13 +425,16 @@ function generateSidebarHTML(currentSlug) {
           <h2 class="text-xl font-bold text-foreground mb-1">${currentNavSection.title}</h2>
           <p class="text-sm text-muted-foreground">Technical reference & guides</p>
         </div>
-        <nav class="space-y-8 flex-1">
+        <nav class="flex-1 space-y-8">
   `
   
   // Only show sections from the current navbar section
-  for (const section of currentNavSection.sections) {
+  const totalSections = currentNavSection.sections.length
+  currentNavSection.sections.forEach((section, sectionIndex) => {
+    const isLastSection = sectionIndex === totalSections - 1
+    
     sidebarHTML += `
-          <div>
+          <div class="relative">
             <h3 class="mb-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
               ${section.title}
             </h3>
@@ -457,9 +460,19 @@ function generateSidebarHTML(currentSlug) {
     
     sidebarHTML += `
             </ul>
+    `
+    
+    // Add separator line after each section except the last
+    if (!isLastSection) {
+      sidebarHTML += `
+            <div class="mt-6 pt-6 border-t border-border/40 ml-3 mr-0"></div>
+      `
+    }
+    
+    sidebarHTML += `
           </div>
     `
-  }
+  })
   
   sidebarHTML += `
         </nav>
