@@ -477,12 +477,14 @@ function generateSidebarHTML(currentSlug) {
     
     for (const item of section.items) {
       const isActive = item.slug === currentSlug
-      const activeClass = isActive ? 'bg-accent text-accent-foreground shadow-[0_0_15px_rgba(168,85,247,0.3)]' : ''
+      const activeClass = isActive ? 'shadow-[0_0_15px_rgba(168,85,247,0.3)]' : ''
+      const activeBg = isActive ? 'background: rgba(168, 85, 247, 0.15);' : ''
       sidebarHTML += `
               <li>
                 <a 
                   href="/docs/${item.slug}.html" 
                   class="block px-5 py-3 rounded-md text-lg text-foreground hover:bg-accent hover:text-accent-foreground hover:shadow-[0_0_15px_rgba(168,85,247,0.3)] transition-all duration-200 ${activeClass}"
+                  style="${activeBg}"
                 >
                   ${item.title}
                 </a>
