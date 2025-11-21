@@ -567,6 +567,13 @@ function generateHTMLPage(title, content, slug) {
   <link rel="icon" href="/assets/icon-light-32x32.png" media="(prefers-color-scheme: light)">
   <link rel="icon" href="/assets/icon-dark-32x32.png" media="(prefers-color-scheme: dark)">
   <link rel="apple-touch-icon" href="/assets/apple-icon.png">
+  <style>
+    /* Disable overscroll bounce/rubber band effect */
+    html, body {
+      overscroll-behavior: none;
+      overscroll-behavior-y: none;
+    }
+  </style>
 </head>
 <body>
   <div id="app">
@@ -988,6 +995,13 @@ async function generateIndex() {
   <link rel="icon" href="/assets/icon-light-32x32.png" media="(prefers-color-scheme: light)">
   <link rel="icon" href="/assets/icon-dark-32x32.png" media="(prefers-color-scheme: dark)">
   <link rel="apple-touch-icon" href="/assets/apple-icon.png">
+  <style>
+    /* Disable overscroll bounce/rubber band effect */
+    html, body {
+      overscroll-behavior: none;
+      overscroll-behavior-y: none;
+    }
+  </style>
 </head>
 <body class="bg-background text-foreground">
   <div class="glow-bg min-h-screen flex items-center justify-center px-4">
