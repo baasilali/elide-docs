@@ -310,13 +310,13 @@ function generateNavBarHTML(currentSlug) {
   
   // Icon mapping for navbar sections
   const navIcons = {
-    'runtime': '<svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" /></svg>',
-    'polyglot-101': '<svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>',
-    'guides-by-language': '<svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" /></svg>',
-    'architecture': '<svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>',
-    'releases': '<svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" /></svg>',
-    'blog': '<svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>',
-    'examples': '<svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>'
+    'runtime': '<svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" /></svg>',
+    'polyglot-101': '<svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>',
+    'guides-by-language': '<svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" /></svg>',
+    'architecture': '<svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>',
+    'releases': '<svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" /></svg>',
+    'blog': '<svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>',
+    'examples': '<svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>'
   }
   
   // Generate left navbar sections (Runtime, Polyglot 101, Guides by Language, Architecture)
@@ -326,7 +326,7 @@ function generateNavBarHTML(currentSlug) {
     const firstSlug = nav.sections[0]?.items[0]?.slug || 'introduction'
     const icon = navIcons[nav.id] || ''
     return `
-      <a href="/docs/${firstSlug}.html" class="flex items-center gap-2 px-3 lg:px-4 py-2 text-sm font-medium transition-all duration-200 relative ${isActive ? 'text-primary' : 'text-muted-foreground hover:text-foreground'}">
+      <a href="/docs/${firstSlug}.html" class="flex items-center gap-2.5 px-4 lg:px-5 py-4 text-base font-medium transition-all duration-200 relative ${isActive ? 'text-primary' : 'text-muted-foreground hover:text-foreground'}">
         ${icon}
         <span>${nav.title}</span>
         ${isActive ? '<span class="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full shadow-[0_0_8px_rgba(168,85,247,0.6)]"></span>' : ''}
@@ -341,25 +341,25 @@ function generateNavBarHTML(currentSlug) {
     <nav class="fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-card/80 backdrop-blur-md border-b border-border shadow-lg">
       <!-- Top Row - Logo, Search, Install -->
       <div class="border-b border-border/50">
-        <div class="max-w-[1920px] mx-auto px-6 lg:px-8 xl:px-12">
-          <div class="flex justify-between items-center h-16">
+        <div class="max-w-[1920px] mx-auto px-8 lg:px-10 xl:px-14">
+          <div class="flex justify-between items-center h-20">
             <!-- Logo (Far Left) -->
             <a href="/" class="flex items-center gap-2 hover:opacity-80 transition-opacity">
-              <img src="/assets/light.svg" alt="Elide" class="h-8 w-auto" />
+              <img src="/assets/light.svg" alt="Elide" class="h-10 w-auto" />
             </a>
 
             <!-- Search Bar - Desktop (Center) -->
-            <div class="hidden md:flex flex-1 max-w-md mx-8 lg:mx-12 xl:mx-16">
+            <div class="hidden md:flex flex-1 max-w-md mx-10 lg:mx-14 xl:mx-20">
               <div class="relative w-full">
-                <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg class="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
                 <input
                   type="text"
                   placeholder="Search..."
-                  class="w-full pl-10 pr-4 py-2 bg-background/50 border border-border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
+                  class="w-full pl-12 pr-5 py-3 bg-background/50 border border-border rounded-md text-base focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
                 />
-                <kbd class="absolute right-3 top-1/2 transform -translate-y-1/2 px-2 py-0.5 text-xs bg-muted rounded border border-border">
+                <kbd class="absolute right-4 top-1/2 transform -translate-y-1/2 px-2.5 py-1 text-sm bg-muted rounded border border-border">
                   ⌘K
                 </kbd>
               </div>
@@ -367,8 +367,8 @@ function generateNavBarHTML(currentSlug) {
 
             <!-- Install Button - Desktop -->
             <div class="hidden md:block">
-              <a href="https://github.com/elide-dev/elide" class="inline-flex items-center px-4 py-2 text-white font-medium rounded-md transition-all duration-300 hover:shadow-[0_0_25px_rgba(168,85,247,0.6)]" style="background: linear-gradient(135deg, rgb(168, 85, 247) 0%, rgb(219, 39, 119) 100%);">
-                <svg class="h-4 w-4 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <a href="https://github.com/elide-dev/elide" class="inline-flex items-center px-5 py-2.5 text-white font-medium rounded-md transition-all duration-300 hover:shadow-[0_0_25px_rgba(168,85,247,0.6)]" style="background: linear-gradient(135deg, rgb(168, 85, 247) 0%, rgb(219, 39, 119) 100%);">
+                <svg class="h-5 w-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                 </svg>
                 Install Elide
@@ -377,7 +377,7 @@ function generateNavBarHTML(currentSlug) {
 
             <!-- Mobile menu button -->
             <button class="md:hidden p-2" id="mobile-menu-btn">
-              <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
               </svg>
             </button>
@@ -387,26 +387,26 @@ function generateNavBarHTML(currentSlug) {
 
       <!-- Bottom Row - Navigation (Aligned with Logo) -->
       <div class="hidden md:block">
-        <div class="max-w-[1920px] mx-auto px-6 lg:px-8 xl:px-12">
+        <div class="max-w-[1920px] mx-auto px-8 lg:px-10 xl:px-14">
           <div class="flex justify-between items-center">
             <!-- Left Navigation - Aligned with Logo above -->
-            <div class="flex items-center gap-2 lg:gap-4 xl:gap-6">
+            <div class="flex items-center gap-3 lg:gap-5 xl:gap-7">
               ${leftNavHTML}
             </div>
 
             <!-- Right Secondary Links -->
-            <div class="flex items-center gap-2 lg:gap-4 xl:gap-6">
-              <a href="/docs/releases.html" class="flex items-center gap-2 px-3 lg:px-4 py-3 text-sm font-medium transition-all duration-200 relative ${releasesActive ? 'text-primary' : 'text-muted-foreground hover:text-foreground'}">
-                <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" /></svg>
+            <div class="flex items-center gap-3 lg:gap-5 xl:gap-7">
+              <a href="/docs/releases.html" class="flex items-center gap-2.5 px-4 lg:px-5 py-4 text-base font-medium transition-all duration-200 relative ${releasesActive ? 'text-primary' : 'text-muted-foreground hover:text-foreground'}">
+                <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" /></svg>
                 <span>Releases</span>
                 ${releasesActive ? '<span class="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full shadow-[0_0_8px_rgba(168,85,247,0.6)]"></span>' : ''}
               </a>
-              <a href="/blog" class="flex items-center gap-2 px-3 lg:px-4 py-3 text-sm font-medium text-muted-foreground hover:text-foreground transition-all duration-200">
-                <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
+              <a href="/blog" class="flex items-center gap-2.5 px-4 lg:px-5 py-4 text-base font-medium text-muted-foreground hover:text-foreground transition-all duration-200">
+                <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
                 <span>Blog</span>
               </a>
-              <a href="/examples" class="flex items-center gap-2 px-3 lg:px-4 py-3 text-sm font-medium text-muted-foreground hover:text-foreground transition-all duration-200">
-                <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+              <a href="/examples" class="flex items-center gap-2.5 px-4 lg:px-5 py-4 text-base font-medium text-muted-foreground hover:text-foreground transition-all duration-200">
+                <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
                 <span>Examples</span>
               </a>
             </div>
@@ -437,42 +437,42 @@ function generateSidebarHTML(currentSlug) {
   }
   
   let sidebarHTML = `
-    <aside class="fixed top-28 left-0 z-40 h-[calc(100vh-7rem)] w-72 border-r border-border bg-card/30 backdrop-blur-md hidden lg:block">
-      <div class="flex flex-col h-full p-6 overflow-y-auto">
-        <div class="mb-8">
-          <h2 class="text-2xl font-bold text-foreground mb-1">${currentNavSection.title}</h2>
-          <p class="text-base text-muted-foreground">Technical reference & guides</p>
+    <aside class="fixed top-36 left-0 z-40 h-[calc(100vh-9rem)] w-[416px] border-r border-border bg-card/30 backdrop-blur-md hidden lg:block">
+      <div class="flex flex-col h-full p-8 overflow-y-auto">
+        <div class="mb-10">
+          <h2 class="text-3xl font-bold text-foreground mb-2">${currentNavSection.title}</h2>
+          <p class="text-lg text-muted-foreground">Technical reference & guides</p>
         </div>
         <nav class="flex-1 space-y-8">
   `
   
   // Icon mapping for section headers
   const sectionIcons = {
-    'Getting Started': '<svg class="h-5 w-5 text-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>',
-    'Documentation': '<svg class="h-5 w-5 text-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>',
-    'Community': '<svg class="h-5 w-5 text-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>',
-    'Fundamentals': '<svg class="h-5 w-5 text-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>',
-    'Advanced': '<svg class="h-5 w-5 text-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>',
-    'Overview': '<svg class="h-5 w-5 text-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>',
-    'Supported Languages': '<svg class="h-5 w-5 text-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" /></svg>',
-    'Additional Languages': '<svg class="h-5 w-5 text-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>',
-    'Core Topics': '<svg class="h-5 w-5 text-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>',
-    'Version History': '<svg class="h-5 w-5 text-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>'
+    'Getting Started': '<svg class="h-6 w-6 text-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>',
+    'Documentation': '<svg class="h-6 w-6 text-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>',
+    'Community': '<svg class="h-6 w-6 text-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>',
+    'Fundamentals': '<svg class="h-6 w-6 text-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>',
+    'Advanced': '<svg class="h-6 w-6 text-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>',
+    'Overview': '<svg class="h-6 w-6 text-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>',
+    'Supported Languages': '<svg class="h-6 w-6 text-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" /></svg>',
+    'Additional Languages': '<svg class="h-6 w-6 text-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>',
+    'Core Topics': '<svg class="h-6 w-6 text-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>',
+    'Version History': '<svg class="h-6 w-6 text-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>'
   }
   
   // Only show sections from the current navbar section
   const totalSections = currentNavSection.sections.length
   currentNavSection.sections.forEach((section, sectionIndex) => {
     const isLastSection = sectionIndex === totalSections - 1
-    const sectionIcon = sectionIcons[section.title] || '<svg class="h-5 w-5 text-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" /></svg>'
+    const sectionIcon = sectionIcons[section.title] || '<svg class="h-6 w-6 text-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" /></svg>'
     
     sidebarHTML += `
           <div class="relative">
-            <h3 class="mb-4 text-sm font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-2">
+            <h3 class="mb-5 text-base font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-2">
               ${sectionIcon}
               ${section.title}
             </h3>
-            <ul class="space-y-1.5">
+            <ul class="space-y-2">
     `
     
     for (const item of section.items) {
@@ -482,7 +482,7 @@ function generateSidebarHTML(currentSlug) {
               <li>
                 <a 
                   href="/docs/${item.slug}.html" 
-                  class="block px-4 py-2.5 rounded-md text-base text-foreground hover:bg-accent hover:text-accent-foreground hover:shadow-[0_0_15px_rgba(168,85,247,0.3)] transition-all duration-200 ${activeClass}"
+                  class="block px-5 py-3 rounded-md text-lg text-foreground hover:bg-accent hover:text-accent-foreground hover:shadow-[0_0_15px_rgba(168,85,247,0.3)] transition-all duration-200 ${activeClass}"
                 >
                   ${item.title}
                 </a>
@@ -538,9 +538,9 @@ function generateTocHTML(content) {
   
   if (headings.length === 0) {
     return `
-      <aside class="hidden lg:block fixed top-28 right-0 w-64 h-[calc(100vh-7rem)] overflow-y-auto">
-        <div class="p-6">
-          <div class="text-sm font-semibold text-foreground mb-4">
+      <aside class="hidden lg:block fixed top-36 right-0 w-[374px] h-[calc(100vh-9rem)] overflow-y-auto">
+        <div class="p-8">
+          <div class="text-base font-semibold text-foreground mb-5">
             On this page
           </div>
           <nav class="space-y-1 border-l-2 border-border">
@@ -560,7 +560,7 @@ function generateTocHTML(content) {
       <a 
         href="#${heading.id}" 
         data-toc-id="${heading.id}"
-        class="toc-link block py-2 ${indent} text-sm ${activeClass} hover:border-l-[3px] border-l-2 -ml-[2px] transition-all duration-200"
+        class="toc-link block py-2.5 ${indent} text-base ${activeClass} hover:border-l-[3px] border-l-2 -ml-[2px] transition-all duration-200"
         style="border-left-color: ${isFirstItem ? 'rgb(168, 85, 247)' : 'transparent'};"
       >
         ${heading.text}
@@ -569,12 +569,15 @@ function generateTocHTML(content) {
   }).join('')
   
   return `
-    <aside id="toc-sidebar" class="hidden lg:block fixed top-28 right-0 w-64 h-[calc(100vh-7rem)] overflow-y-auto scroll-smooth">
-      <div class="p-6">
-        <div class="text-sm font-semibold text-foreground mb-4">
+    <aside id="toc-sidebar" class="hidden lg:block fixed top-36 right-0 w-[374px] h-[calc(100vh-9rem)] overflow-y-auto scroll-smooth">
+      <div class="p-8">
+        <div class="text-base font-semibold text-foreground mb-5 flex items-center gap-2">
+          <svg class="h-5 w-5 text-purple-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7" />
+          </svg>
           On this page
         </div>
-        <nav id="toc-nav" class="space-y-1 border-l-2 border-border">
+        <nav id="toc-nav" class="space-y-1.5 border-l-2 border-border">
           ${tocItems}
         </nav>
       </div>
@@ -640,8 +643,8 @@ function generateHTMLPage(title, content, slug) {
         ${sidebar}
 
         <!-- Main Content -->
-        <main class="flex-1 lg:ml-72 lg:mr-64 min-w-0">
-          <div class="container mx-auto px-6 py-16 max-w-full lg:max-w-5xl xl:max-w-6xl 2xl:max-w-7xl">
+        <main class="flex-1 lg:ml-[416px] lg:mr-[374px] min-w-0">
+          <div class="container mx-auto px-8 py-20 max-w-full lg:max-w-5xl xl:max-w-6xl 2xl:max-w-7xl">
             <div class="w-full">
               <article class="mdx-content">
                 ${contentWithIds}
