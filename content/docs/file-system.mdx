@@ -1,0 +1,139 @@
+---
+title: "File System"
+description: "Working with files and directories in Elide"
+date: "2025-11-20"
+---
+
+# File System
+
+Learn how to read, write, and manage files in Elide across different languages.
+
+## JavaScript/TypeScript
+
+### Reading Files
+
+```javascript
+// Read file as string
+const content = await Elide.readFile('data.txt')
+
+// Read as JSON
+const data = JSON.parse(await Elide.readFile('config.json'))
+
+// Read binary
+const buffer = await Elide.readFile('image.png', { encoding: null })
+```
+
+### Writing Files
+
+```javascript
+// Write string
+await Elide.writeFile('output.txt', 'Hello, World!')
+
+// Write JSON
+await Elide.writeFile('data.json', JSON.stringify(data, null, 2))
+
+// Append to file
+await Elide.appendFile('log.txt', 'New log entry\n')
+```
+
+### Directory Operations
+
+```javascript
+// List directory
+const files = await Elide.readDir('/path/to/dir')
+
+// Create directory
+await Elide.mkdir('/path/to/new/dir', { recursive: true })
+
+// Check if exists
+const exists = await Elide.exists('/path/to/file')
+
+// Get file info
+const stats = await Elide.stat('/path/to/file')
+console.log(stats.size, stats.mtime)
+```
+
+## Python
+
+### Reading Files
+
+```python
+# Read file
+with open('data.txt', 'r') as f:
+    content = f.read()
+
+# Read lines
+with open('data.txt', 'r') as f:
+    lines = f.readlines()
+
+# Read JSON
+import json
+with open('config.json', 'r') as f:
+    data = json.load(f)
+```
+
+### Writing Files
+
+```python
+# Write file
+with open('output.txt', 'w') as f:
+    f.write('Hello, World!')
+
+# Write JSON
+import json
+with open('data.json', 'w') as f:
+    json.dump(data, f, indent=2)
+```
+
+## Path Operations
+
+### JavaScript
+
+```javascript
+import { join, dirname, basename } from 'path'
+
+const fullPath = join('/home', 'user', 'file.txt')
+const dir = dirname(fullPath)
+const name = basename(fullPath)
+```
+
+### Python
+
+```python
+import os
+
+full_path = os.path.join('/home', 'user', 'file.txt')
+dir_path = os.path.dirname(full_path)
+file_name = os.path.basename(full_path)
+```
+
+## Temporary Files
+
+```javascript
+// Create temp file
+const tmpFile = await Elide.makeTempFile()
+await Elide.writeFile(tmpFile, 'temporary data')
+
+// Cleanup
+await Elide.remove(tmpFile)
+```
+
+## File Watching
+
+```javascript
+// Watch for changes
+const watcher = Elide.watch('/path/to/dir', (event, filename) => {
+  console.log(`${event}: ${filename}`)
+})
+
+// Stop watching
+watcher.close()
+```
+
+## Best Practices
+
+1. **Always close files** - Use `try/finally` or context managers
+2. **Handle errors** - Check if file exists before reading
+3. **Use absolute paths** - Or be explicit about working directory
+4. **Watch permissions** - Ensure proper file permissions
+

@@ -20,49 +20,109 @@ import * as runtime from 'react/jsx-runtime'
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
-// Docs configuration
-const docsConfig = [
+// Docs configuration - updated structure
+const navbarSections = [
   {
-    title: 'Getting Started',
-    items: [
-      { title: 'Introduction', href: '/docs/introduction', slug: 'introduction' },
-      { title: 'Quick Start', href: '/docs/quick-start', slug: 'quick-start' },
-      { title: 'Installation', href: '/docs/installation', slug: 'installation' },
+    id: 'runtime',
+    title: 'Runtime',
+    sections: [
+      {
+        title: 'Getting Started',
+        items: [
+          { title: 'Introduction', href: '/docs/introduction', slug: 'introduction' },
+          { title: 'Getting Started', href: '/docs/getting-started', slug: 'getting-started' },
+          { title: 'Elide Runtime', href: '/docs/runtime', slug: 'runtime' },
+        ],
+      },
+      {
+        title: 'Documentation',
+        items: [
+          { title: 'CLI References', href: '/docs/cli-references', slug: 'cli-references' },
+          { title: 'Contributors', href: '/docs/contributors', slug: 'contributors' },
+          { title: 'Acknowledgements', href: '/docs/acknowledgements', slug: 'acknowledgements' },
+        ],
+      },
     ],
   },
   {
-    title: 'Core Concepts',
-    items: [
-      { title: 'Architecture', href: '/docs/architecture', slug: 'architecture' },
-      { title: 'Runtime', href: '/docs/runtime', slug: 'runtime' },
-      { title: 'Components', href: '/docs/components', slug: 'components' },
+    id: 'polyglot-101',
+    title: 'Polyglot 101',
+    sections: [
+      {
+        title: 'Fundamentals',
+        items: [
+          { title: 'Environment Variables', href: '/docs/env-variables', slug: 'env-variables' },
+          { title: 'File System', href: '/docs/file-system', slug: 'file-system' },
+          { title: 'Debugging', href: '/docs/debugging', slug: 'debugging' },
+        ],
+      },
+      {
+        title: 'Advanced',
+        items: [
+          { title: 'Interop', href: '/docs/interop', slug: 'interop' },
+          { title: 'Servers', href: '/docs/servers', slug: 'servers' },
+        ],
+      },
     ],
   },
   {
-    title: 'Language Support',
-    items: [
-      { title: 'JavaScript', href: '/docs/javascript', slug: 'javascript' },
-      { title: 'TypeScript', href: '/docs/typescript', slug: 'typescript' },
-      { title: 'Python', href: '/docs/python', slug: 'python' },
+    id: 'guides-by-language',
+    title: 'Guides by Language',
+    sections: [
+      {
+        title: 'Overview',
+        items: [
+          { title: 'Compatibility', href: '/docs/compatibility', slug: 'compatibility' },
+        ],
+      },
+      {
+        title: 'Supported Languages',
+        items: [
+          { title: 'JavaScript', href: '/docs/javascript', slug: 'javascript' },
+          { title: 'TypeScript', href: '/docs/typescript', slug: 'typescript' },
+          { title: 'Python', href: '/docs/python', slug: 'python' },
+          { title: 'Ruby', href: '/docs/ruby', slug: 'ruby' },
+        ],
+      },
+      {
+        title: 'Additional Languages',
+        items: [
+          { title: 'WebAssembly', href: '/docs/webassembly', slug: 'webassembly' },
+          { title: 'Pkl', href: '/docs/pkl', slug: 'pkl' },
+          { title: 'Experimental Engines', href: '/docs/experimental-engines', slug: 'experimental-engines' },
+        ],
+      },
     ],
   },
   {
-    title: 'API Reference',
-    items: [
-      { title: 'Core API', href: '/docs/api-core', slug: 'api-core' },
-      { title: 'Server API', href: '/docs/api-server', slug: 'api-server' },
-      { title: 'Database', href: '/docs/api-database', slug: 'api-database' },
+    id: 'architecture',
+    title: 'Architecture',
+    sections: [
+      {
+        title: 'Core Topics',
+        items: [
+          { title: 'Security', href: '/docs/security', slug: 'security' },
+          { title: 'Performance', href: '/docs/performance', slug: 'performance' },
+        ],
+      },
     ],
   },
   {
-    title: 'Advanced',
-    items: [
-      { title: 'Security', href: '/docs/security', slug: 'security' },
-      { title: 'Configuration', href: '/docs/configuration', slug: 'configuration' },
-      { title: 'Deployment', href: '/docs/deployment', slug: 'deployment' },
+    id: 'releases',
+    title: 'Releases',
+    sections: [
+      {
+        title: 'Version History',
+        items: [
+          { title: '1.0.0-beta10', href: '/docs/releases', slug: 'releases' },
+        ],
+      },
     ],
   },
 ]
+
+// Flatten to get all docs
+const docsConfig = navbarSections.flatMap(nav => nav.sections)
 
 const CONTENT_DIR = path.join(__dirname, 'content/docs')
 const DIST_DIR = path.join(__dirname, 'dist')
@@ -213,8 +273,39 @@ async function copyAssets() {
   }
 }
 
-// Generate static navbar HTML
-function generateNavBarHTML() {
+// Generate static navbar HTML with active state
+function generateNavBarHTML(currentSlug) {
+  // Find which navbar section the current slug belongs to
+  let activeNavId = null
+  for (const nav of navbarSections) {
+    for (const section of nav.sections) {
+      if (section.items.some(item => item.slug === currentSlug)) {
+        activeNavId = nav.id
+        break
+      }
+    }
+    if (activeNavId) break
+  }
+  
+  // Helper to check if a nav item is active
+  const isNavActive = (navId) => navId === activeNavId
+  
+  // Generate left navbar sections (Runtime, Polyglot 101, Guides by Language, Architecture)
+  const leftNavSections = navbarSections.filter(nav => nav.id !== 'releases')
+  const leftNavHTML = leftNavSections.map(nav => {
+    const isActive = isNavActive(nav.id)
+    const firstSlug = nav.sections[0]?.items[0]?.slug || 'introduction'
+    return `
+      <a href="/docs/${firstSlug}.html" class="flex items-center gap-2 px-4 py-3 text-sm font-medium transition-all duration-200 relative ${isActive ? 'text-primary' : 'text-muted-foreground hover:text-foreground'}">
+        <span>${nav.title}</span>
+        ${isActive ? '<span class="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full shadow-[0_0_8px_rgba(168,85,247,0.6)]"></span>' : ''}
+      </a>
+    `
+  }).join('')
+  
+  // Releases and other right sections
+  const releasesActive = activeNavId === 'releases'
+  
   return `
     <nav class="fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-card/80 backdrop-blur-md border-b border-border shadow-lg">
       <!-- Top Row -->
@@ -269,38 +360,19 @@ function generateNavBarHTML() {
           <div class="flex justify-between items-center">
             <!-- Left Navigation -->
             <div class="flex items-center gap-1">
-              <a href="/docs/introduction.html" class="flex items-center gap-2 px-4 py-3 text-sm font-medium text-muted-foreground hover:text-foreground transition-all duration-200">
-                <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
-                <span>Runtime</span>
-              </a>
-              <a href="/docs/javascript.html" class="flex items-center gap-2 px-4 py-3 text-sm font-medium text-muted-foreground hover:text-foreground transition-all duration-200">
-                <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
-                </svg>
-                <span>Language Guides</span>
-              </a>
-              <a href="/docs/architecture.html" class="flex items-center gap-2 px-4 py-3 text-sm font-medium text-muted-foreground hover:text-foreground transition-all duration-200">
-                <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-                </svg>
-                <span>Architecture</span>
-              </a>
+              ${leftNavHTML}
             </div>
 
             <!-- Right Secondary Links -->
             <div class="flex items-center gap-1">
+              <a href="/docs/releases.html" class="flex items-center gap-2 px-4 py-3 text-sm font-medium transition-all duration-200 relative ${releasesActive ? 'text-primary' : 'text-muted-foreground hover:text-foreground'}">
+                <span>Releases</span>
+                ${releasesActive ? '<span class="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full shadow-[0_0_8px_rgba(168,85,247,0.6)]"></span>' : ''}
+              </a>
               <a href="/blog" class="flex items-center gap-2 px-4 py-3 text-sm font-medium text-muted-foreground hover:text-foreground transition-all duration-200">
-                <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                </svg>
                 <span>Blog</span>
               </a>
-              <a href="https://github.com/elide-dev/elide" class="flex items-center gap-2 px-4 py-3 text-sm font-medium text-muted-foreground hover:text-foreground transition-all duration-200">
-                <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 18l6-6-6-6M8 6l-6 6 6 6" />
-                </svg>
+              <a href="/examples" class="flex items-center gap-2 px-4 py-3 text-sm font-medium text-muted-foreground hover:text-foreground transition-all duration-200">
                 <span>Examples</span>
               </a>
             </div>
@@ -311,15 +383,37 @@ function generateNavBarHTML() {
   `
 }
 
-// Generate static sidebar HTML from docs-config
+// Generate static sidebar HTML from docs-config - filtered by navbar section
 function generateSidebarHTML(currentSlug) {
+  // Find which navbar section this slug belongs to
+  let currentNavSection = null
+  for (const nav of navbarSections) {
+    for (const section of nav.sections) {
+      if (section.items.some(item => item.slug === currentSlug)) {
+        currentNavSection = nav
+        break
+      }
+    }
+    if (currentNavSection) break
+  }
+  
+  // Default to first navbar section if not found
+  if (!currentNavSection) {
+    currentNavSection = navbarSections[0]
+  }
+  
   let sidebarHTML = `
     <aside class="fixed top-28 left-0 z-40 h-[calc(100vh-7rem)] w-64 border-r border-border bg-card/30 backdrop-blur-md hidden lg:block">
       <div class="flex flex-col h-full p-6 overflow-y-auto">
+        <div class="mb-8">
+          <h2 class="text-xl font-bold text-foreground mb-1">${currentNavSection.title}</h2>
+          <p class="text-sm text-muted-foreground">Technical reference & guides</p>
+        </div>
         <nav class="space-y-8 flex-1">
   `
   
-  for (const section of docsConfig) {
+  // Only show sections from the current navbar section
+  for (const section of currentNavSection.sections) {
     sidebarHTML += `
           <div>
             <h3 class="mb-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
@@ -330,14 +424,15 @@ function generateSidebarHTML(currentSlug) {
     
     for (const item of section.items) {
       const isActive = item.slug === currentSlug
-      const activeClass = isActive ? 'bg-accent text-accent-foreground' : ''
+      const activeClass = isActive ? 'bg-accent text-accent-foreground shadow-[0_0_15px_rgba(168,85,247,0.3)]' : ''
+      const textColor = isActive ? 'text-primary' : 'text-muted-foreground group-hover:text-primary'
       sidebarHTML += `
               <li>
                 <a 
                   href="/docs/${item.slug}.html" 
                   class="flex items-center gap-3 px-3 py-2 rounded-md text-sm text-foreground hover:bg-accent hover:text-accent-foreground hover:shadow-[0_0_15px_rgba(168,85,247,0.3)] transition-all duration-200 group ${activeClass}"
                 >
-                  <span class="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors">•</span>
+                  <span class="h-4 w-4 ${textColor} transition-colors">•</span>
                   ${item.title}
                 </a>
               </li>
@@ -385,7 +480,7 @@ function generateTocHTML() {
 
 // Generate complete HTML page using components
 function generateHTMLPage(title, content, slug) {
-  const navbar = generateNavBarHTML()
+  const navbar = generateNavBarHTML(slug)
   const sidebar = generateSidebarHTML(slug)
   const toc = generateTocHTML()
   
@@ -714,8 +809,10 @@ async function generateIndex() {
 
 // Get all doc slugs from config
 function getAllDocSlugs() {
-  return docsConfig.flatMap(section => 
-    section.items.map(item => item.slug)
+  return navbarSections.flatMap(nav =>
+    nav.sections.flatMap(section =>
+      section.items.map(item => item.slug)
+    )
   )
 }
 

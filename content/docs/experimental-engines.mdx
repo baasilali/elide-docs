@@ -1,0 +1,279 @@
+---
+title: "Experimental Engines"
+description: "Cutting-edge language support in development"
+date: "2025-11-20"
+---
+
+# Experimental Engines
+
+Explore experimental language engines currently in development for Elide.
+
+⚠️ **Warning**: These engines are experimental and may have limited functionality, bugs, or breaking changes.
+
+## Lua
+
+### Status: Alpha
+
+Basic Lua support is available:
+
+```lua
+-- hello.lua
+print("Hello from Lua!")
+
+function factorial(n)
+  if n == 0 then
+    return 1
+  else
+    return n * factorial(n - 1)
+  end
+end
+
+print(factorial(5)) -- 120
+```
+
+Run it:
+
+```bash
+elide run --experimental hello.lua
+```
+
+### Limitations
+
+- Limited standard library
+- No C modules
+- Performance not optimized
+
+## R
+
+### Status: Early Alpha
+
+Statistical computing with R:
+
+```r
+# stats.r
+x <- c(1, 2, 3, 4, 5)
+mean(x)
+
+# Data frames
+df <- data.frame(
+  name = c("Alice", "Bob"),
+  age = c(30, 25)
+)
+
+print(df)
+```
+
+### Limitations
+
+- Basic R functions only
+- No CRAN packages yet
+- Limited plotting support
+
+## LLVM Bitcode
+
+### Status: Experimental
+
+Run LLVM bitcode directly:
+
+```bash
+# Compile to bitcode
+clang -emit-llvm -c program.c -o program.bc
+
+# Run in Elide
+elide run --experimental program.bc
+```
+
+### Use Cases
+
+- Running optimized C/C++ code
+- Cross-platform binaries
+- Performance-critical code
+
+## Espresso (Java)
+
+### Status: Preview
+
+Run Java bytecode:
+
+```java
+// Hello.java
+public class Hello {
+    public static void main(String[] args) {
+        System.out.println("Hello from Java!");
+    }
+}
+```
+
+```bash
+# Compile
+javac Hello.java
+
+# Run
+elide run --experimental Hello.class
+```
+
+### Polyglot Java
+
+```javascript
+// Call Java from JavaScript
+const ArrayList = Java.type('java.util.ArrayList')
+const list = new ArrayList()
+list.add("Hello")
+list.add("World")
+
+console.log(list.toString())
+```
+
+## Kotlin
+
+### Status: Preview
+
+Kotlin support through Java interop:
+
+```kotlin
+// hello.kt
+fun main() {
+    println("Hello from Kotlin!")
+    
+    val numbers = listOf(1, 2, 3, 4, 5)
+    val doubled = numbers.map { it * 2 }
+    println(doubled)
+}
+```
+
+## Scala
+
+### Status: Experimental
+
+Basic Scala support:
+
+```scala
+// hello.scala
+object Hello {
+  def main(args: Array[String]): Unit = {
+    println("Hello from Scala!")
+    
+    val numbers = List(1, 2, 3, 4, 5)
+    val doubled = numbers.map(_ * 2)
+    println(doubled)
+  }
+}
+```
+
+## GraalPython Extensions
+
+### Status: Experimental
+
+Advanced Python features:
+
+```python
+# Native performance with @numba-like JIT
+from graalpy import jit
+
+@jit
+def compute(n):
+    result = 0
+    for i in range(n):
+        result += i * i
+    return result
+
+print(compute(1000000))  # Fast!
+```
+
+## Enabling Experimental Features
+
+### Command Line
+
+```bash
+# Enable specific engine
+elide run --experimental --engine=lua script.lua
+
+# Enable all experimental features
+elide run --experimental-all script.js
+```
+
+### Configuration
+
+```pkl
+// elide.pkl
+experimental {
+  engines = List("lua", "r", "llvm")
+  features = List("advanced-jit", "experimental-apis")
+}
+```
+
+## Roadmap
+
+### Short Term (Next 3-6 months)
+
+- ✅ Lua: Standard library completion
+- ✅ R: CRAN package support
+- ✅ Espresso: Full Java 11+ support
+
+### Medium Term (6-12 months)
+
+- 🔄 PHP engine
+- 🔄 Go (via WASM)
+- 🔄 Perl engine
+
+### Long Term (12+ months)
+
+- 🔄 Swift support
+- 🔄 C# / .NET runtime
+- 🔄 Zig engine
+
+## Contributing
+
+Help develop experimental engines:
+
+1. **Test and report issues**
+2. **Contribute patches**
+3. **Write documentation**
+4. **Create examples**
+
+See [Contributors Guide](/docs/contributors) for details.
+
+## Feedback
+
+Your feedback shapes the future of Elide!
+
+- [GitHub Discussions](https://github.com/elide-dev/elide/discussions)
+- [Feature Requests](https://github.com/elide-dev/elide/issues/new?template=feature_request.md)
+- [Bug Reports](https://github.com/elide-dev/elide/issues/new?template=bug_report.md)
+
+## Stability Levels
+
+| Level | Description | Use in Production? |
+|-------|-------------|-------------------|
+| **Stable** | Fully tested, backwards compatible | ✅ Yes |
+| **Beta** | Feature complete, minor bugs possible | ⚠️ Caution |
+| **Alpha** | Working but incomplete | ❌ No |
+| **Experimental** | Proof of concept | ❌ No |
+
+## Disclaimer
+
+Experimental features:
+
+- ⚠️ May have breaking changes
+- ⚠️ Limited or no documentation
+- ⚠️ Performance not optimized
+- ⚠️ May be removed in future versions
+
+Use at your own risk in production!
+
+## Success Stories
+
+When experimental features graduate to stable:
+
+- **WebAssembly**: Started experimental, now fully supported
+- **TypeScript**: Native support after successful beta
+- **Python 3.11**: Graduated from experimental to stable
+
+## Stay Updated
+
+Follow development:
+
+- [GitHub Releases](https://github.com/elide-dev/elide/releases)
+- [Changelog](https://github.com/elide-dev/elide/blob/main/CHANGELOG.md)
+- [Blog](/blog) - Feature announcements
+

@@ -2,11 +2,6 @@ import { useState, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { cn } from '@/lib/utils'
 import { 
-  Cpu, 
-  Code2, 
-  Network, 
-  FileText, 
-  GitPullRequest,
   Menu,
   X,
   Search,
@@ -15,35 +10,9 @@ import {
   Code
 } from 'lucide-react'
 import { Button } from './ui/button'
+import { leftNavbarSections, rightNavbarSections } from '@/lib/docs-config'
 
-const navigation = [
-  { 
-    name: 'Runtime', 
-    href: '/runtime', 
-    icon: Cpu 
-  },
-  { 
-    name: 'Language Guides', 
-    href: '/guides', 
-    icon: Code2 
-  },
-  { 
-    name: 'Architecture', 
-    href: '/architecture', 
-    icon: Network 
-  },
-  { 
-    name: 'Release Notes', 
-    href: '/releases', 
-    icon: FileText 
-  },
-  { 
-    name: 'Contributing', 
-    href: '/contributing', 
-    icon: GitPullRequest 
-  },
-]
-
+// Static secondary links
 const secondaryLinks = [
   {
     name: 'Blog',
@@ -72,8 +41,8 @@ export function NavBar() {
   }, [])
 
   const isActive = (href: string) => {
-    // Homepage defaults to Runtime
-    if (pathname === '/' && href === '/runtime') {
+    // Homepage defaults to first item
+    if (pathname === '/' && href === '/docs/introduction') {
       return true
     }
     return pathname === href || pathname.startsWith(href + '/')
@@ -152,14 +121,13 @@ export function NavBar() {
           <div className="flex justify-between items-center">
             {/* Left Navigation */}
             <div className="flex items-center gap-1">
-              {navigation.map((item) => {
-                const Icon = item.icon
-                const active = isActive(item.href)
+              {leftNavbarSections.map((section) => {
+                const active = section.href && isActive(section.href)
                 
                 return (
                   <Link
-                    key={item.name}
-                    href={item.href}
+                    key={section.id}
+                    href={section.href || '#'}
                     className={cn(
                       'flex items-center gap-2 px-4 py-3 text-sm font-medium transition-all duration-200 relative group',
                       active
@@ -167,11 +135,7 @@ export function NavBar() {
                         : 'text-muted-foreground hover:text-foreground'
                     )}
                   >
-                    <Icon className={cn(
-                      'h-4 w-4 transition-colors',
-                      active ? 'text-primary' : 'text-muted-foreground group-hover:text-foreground'
-                    )} />
-                    <span>{item.name}</span>
+                    <span>{section.title}</span>
                     
                     {/* Active underline indicator */}
                     {active && (
@@ -182,8 +146,31 @@ export function NavBar() {
               })}
             </div>
 
-            {/* Right Secondary Links */}
+            {/* Right Navigation */}
             <div className="flex items-center gap-1">
+              {rightNavbarSections.map((section) => {
+                const active = section.href && isActive(section.href)
+                
+                return (
+                  <Link
+                    key={section.id}
+                    href={section.href || '#'}
+                    className={cn(
+                      'flex items-center gap-2 px-4 py-3 text-sm font-medium transition-all duration-200 relative group',
+                      active
+                        ? 'text-primary'
+                        : 'text-muted-foreground hover:text-foreground'
+                    )}
+                  >
+                    <span>{section.title}</span>
+                    
+                    {/* Active underline indicator */}
+                    {active && (
+                      <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary rounded-full shadow-[0_0_8px_rgba(168,85,247,0.6)]" />
+                    )}
+                  </Link>
+                )
+              })}
               {secondaryLinks.map((item) => {
                 const Icon = item.icon
                 const active = isActive(item.href)
@@ -242,7 +229,50 @@ export function NavBar() {
 
           {/* Mobile Menu Items */}
           <div className="flex flex-col gap-1 px-4">
-            {[...navigation, ...secondaryLinks].map((item) => {
+            {/* Left navbar sections */}
+            {leftNavbarSections.map((section) => {
+              const active = section.href && isActive(section.href)
+              
+              return (
+                <Link
+                  key={section.id}
+                  href={section.href || '#'}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={cn(
+                    'flex items-center gap-3 px-4 py-3 rounded-md text-sm font-medium transition-all duration-200 relative',
+                    active
+                      ? 'text-primary bg-accent/50 border-l-2 border-primary'
+                      : 'text-muted-foreground hover:text-foreground hover:bg-accent/30'
+                  )}
+                >
+                  <span>{section.title}</span>
+                </Link>
+              )
+            })}
+            
+            {/* Right navbar sections */}
+            {rightNavbarSections.map((section) => {
+              const active = section.href && isActive(section.href)
+              
+              return (
+                <Link
+                  key={section.id}
+                  href={section.href || '#'}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={cn(
+                    'flex items-center gap-3 px-4 py-3 rounded-md text-sm font-medium transition-all duration-200 relative',
+                    active
+                      ? 'text-primary bg-accent/50 border-l-2 border-primary'
+                      : 'text-muted-foreground hover:text-foreground hover:bg-accent/30'
+                  )}
+                >
+                  <span>{section.title}</span>
+                </Link>
+              )
+            })}
+            
+            {/* Secondary links */}
+            {secondaryLinks.map((item) => {
               const Icon = item.icon
               const active = isActive(item.href)
               

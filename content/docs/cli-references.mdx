@@ -1,0 +1,103 @@
+---
+title: "CLI References"
+description: "Complete reference for Elide command-line interface"
+date: "2025-11-20"
+---
+
+# CLI References
+
+Complete guide to the Elide command-line interface.
+
+## Commands
+
+### elide run
+
+Run a script file:
+
+```bash
+elide run [options] <file>
+```
+
+**Options:**
+- `--inspect` - Enable debugger
+- `--watch` - Watch for file changes
+- `--env <file>` - Load environment variables
+
+**Examples:**
+
+```bash
+# Run a JavaScript file
+elide run app.js
+
+# Run with debugging
+elide run --inspect app.js
+
+# Run with environment file
+elide run --env .env app.js
+```
+
+### elide build
+
+Build your application:
+
+```bash
+elide build [options]
+```
+
+**Options:**
+- `--native` - Build native binary
+- `--output <path>` - Output directory
+- `--optimize` - Enable optimizations
+
+**Examples:**
+
+```bash
+# Build native binary
+elide build --native
+
+# Build with optimization
+elide build --native --optimize
+```
+
+### elide test
+
+Run tests:
+
+```bash
+elide test [pattern]
+```
+
+### elide repl
+
+Start interactive REPL:
+
+```bash
+elide repl
+```
+
+## Configuration
+
+Create `elide.pkl` for project configuration:
+
+```pkl
+module elide
+
+build {
+  target = "native"
+  optimize = true
+}
+
+runtime {
+  maxMemory = "2G"
+  threads = 4
+}
+```
+
+## Environment Variables
+
+| Variable | Description |
+|----------|-------------|
+| `ELIDE_HOME` | Elide installation directory |
+| `ELIDE_DEBUG` | Enable debug logging |
+| `ELIDE_CACHE` | Cache directory location |
+

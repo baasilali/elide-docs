@@ -1,0 +1,218 @@
+---
+title: "Compatibility"
+description: "Language compatibility and standards support in Elide"
+date: "2025-11-20"
+---
+
+# Compatibility
+
+Overview of language compatibility and standards supported by Elide.
+
+## JavaScript/TypeScript
+
+### ECMAScript Support
+
+Elide supports ES2024+ with the following features:
+
+- ✅ Classes and modules
+- ✅ Async/await
+- ✅ Destructuring
+- ✅ Template literals
+- ✅ Arrow functions
+- ✅ Promises
+- ✅ Generators
+- ✅ Proxies and Reflect
+- ✅ BigInt
+- ✅ Optional chaining (`?.`)
+- ✅ Nullish coalescing (`??`)
+- ✅ Top-level await
+
+### TypeScript
+
+- **Version**: 5.0+
+- **Features**: All TypeScript language features
+- **Compilation**: Native TypeScript support
+
+### Node.js APIs
+
+| API | Status |
+|-----|--------|
+| `fs` | ✅ Supported |
+| `path` | ✅ Supported |
+| `http` | ✅ Supported |
+| `crypto` | ✅ Supported |
+| `buffer` | ✅ Supported |
+| `stream` | ✅ Supported |
+| `process` | ✅ Supported |
+| `console` | ✅ Supported |
+
+### Web APIs
+
+| API | Status |
+|-----|--------|
+| `fetch` | ✅ Supported |
+| `URL` | ✅ Supported |
+| `URLSearchParams` | ✅ Supported |
+| `TextEncoder/Decoder` | ✅ Supported |
+| `WebSocket` | ✅ Supported |
+| `FormData` | ✅ Supported |
+| `Headers` | ✅ Supported |
+| `Request/Response` | ✅ Supported |
+
+## Python
+
+### Version Support
+
+- **Python 3.11+**
+- **CPython-compatible**
+
+### Standard Library
+
+Most of the Python standard library is supported:
+
+- ✅ `os`, `sys`, `pathlib`
+- ✅ `json`, `csv`, `xml`
+- ✅ `re`, `datetime`, `time`
+- ✅ `collections`, `itertools`
+- ✅ `math`, `random`, `statistics`
+- ✅ `urllib`, `http.client`
+- ⚠️ Limited: `threading`, `multiprocessing`
+
+### Popular Packages
+
+| Package | Status |
+|---------|--------|
+| NumPy | ✅ Supported |
+| Pandas | ✅ Supported |
+| Requests | ✅ Supported |
+| Flask | ⚠️ Partial |
+| Django | ❌ Not yet |
+
+## Ruby
+
+### Version Support
+
+- **Ruby 3.2+**
+- **MRI-compatible**
+
+### Standard Library
+
+- ✅ Core classes (String, Array, Hash)
+- ✅ File I/O
+- ✅ JSON, YAML
+- ✅ Regular expressions
+- ⚠️ Limited C extensions
+
+## WebAssembly
+
+### WASI Support
+
+- ✅ WASI preview 1
+- ✅ Memory management
+- ✅ File system access
+- ✅ Environment variables
+
+### Languages
+
+Any language that compiles to WASM:
+
+- ✅ Rust
+- ✅ C/C++
+- ✅ AssemblyScript
+- ✅ Go (TinyGo)
+
+## Pkl
+
+Full support for Pkl configuration language:
+
+- ✅ All Pkl language features
+- ✅ Native integration
+- ✅ Type checking
+- ✅ Modules and imports
+
+## Compatibility Matrix
+
+| Feature | JavaScript | Python | Ruby | WASM |
+|---------|-----------|--------|------|------|
+| **File I/O** | ✅ | ✅ | ✅ | ✅ |
+| **HTTP Client** | ✅ | ✅ | ✅ | ⚠️ |
+| **HTTP Server** | ✅ | ✅ | ✅ | ❌ |
+| **Async/Await** | ✅ | ✅ | ⚠️ | ⚠️ |
+| **Polyglot Calls** | ✅ | ✅ | ✅ | ⚠️ |
+| **Native Extensions** | ⚠️ | ⚠️ | ⚠️ | N/A |
+
+Legend:
+- ✅ Fully supported
+- ⚠️ Partially supported
+- ❌ Not supported
+- N/A Not applicable
+
+## Known Limitations
+
+### All Languages
+
+- **Native extensions**: Limited support for C/C++ extensions
+- **Threading**: Some threading features may have limitations
+- **JNI**: Java Native Interface not available in native image
+
+### JavaScript
+
+- **npm packages**: Some packages with native dependencies may not work
+- **Specific modules**: `child_process`, `cluster` have limitations
+
+### Python
+
+- **C extensions**: Pure Python preferred
+- **Threading**: GIL may affect multi-threaded code
+- **pip packages**: Some packages require additional configuration
+
+## Testing Compatibility
+
+Test your code for compatibility:
+
+```javascript
+// Check feature availability
+if (typeof fetch === 'function') {
+  // Fetch API available
+}
+
+if (typeof Worker === 'function') {
+  // Web Workers available
+}
+```
+
+## Migration Tips
+
+### From Node.js
+
+Most Node.js code works with minimal changes:
+
+```javascript
+// Node.js
+const fs = require('fs')
+
+// Elide (use ES modules)
+import fs from 'fs'
+```
+
+### From CPython
+
+Most Python code works as-is:
+
+```python
+# Same code works in Elide
+import json
+
+data = {'key': 'value'}
+print(json.dumps(data))
+```
+
+## Reporting Issues
+
+Found a compatibility issue? Please report it:
+
+- [GitHub Issues](https://github.com/elide-dev/elide/issues)
+- Include runtime version
+- Provide minimal reproduction
+- Specify language and package versions
+

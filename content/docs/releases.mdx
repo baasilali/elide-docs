@@ -1,0 +1,241 @@
+---
+title: "Releases"
+description: "Elide release notes and changelog"
+date: "2025-11-20"
+---
+
+# Releases
+
+Track Elide releases, new features, and changes.
+
+## Latest Release
+
+### 1.0.0-beta10 (Current)
+
+**Release Date**: November 15, 2025
+
+#### What's New
+
+**Performance Improvements**
+- 🚀 30% faster HTTP server throughput
+- ⚡ Reduced native image startup time to < 5ms
+- 💾 20% lower memory footprint
+
+**New Features**
+- ✨ Full Pkl configuration language support
+- ✨ WebAssembly WASI preview 1 support
+- ✨ Experimental Lua engine
+- ✨ Python 3.11 support via GraalPy
+
+**Developer Experience**
+- 🛠️ Improved error messages
+- 📝 Better TypeScript type definitions
+- 🔍 Enhanced debugging with source maps
+- 📚 Expanded documentation
+
+**Bug Fixes**
+- 🐛 Fixed memory leak in HTTP keep-alive connections
+- 🐛 Resolved polyglot interop edge cases
+- 🐛 Corrected file system path handling on Windows
+
+#### Breaking Changes
+
+⚠️ **Configuration Format**
+```pkl
+// Old
+config {
+  server.port = 8080
+}
+
+// New
+config {
+  server {
+    port = 8080
+  }
+}
+```
+
+⚠️ **HTTP API**
+- `response.send()` now requires status code as first parameter
+- `request.body()` is now async: `await request.json()`
+
+#### Migration Guide
+
+See [Migration Guide](https://github.com/elide-dev/elide/blob/main/MIGRATING.md) for details.
+
+#### Downloads
+
+- [macOS (Apple Silicon)](https://github.com/elide-dev/elide/releases/download/v1.0.0-beta10/elide-darwin-aarch64)
+- [macOS (Intel)](https://github.com/elide-dev/elide/releases/download/v1.0.0-beta10/elide-darwin-x64)
+- [Linux (x86_64)](https://github.com/elide-dev/elide/releases/download/v1.0.0-beta10/elide-linux-x64)
+- [Windows](https://github.com/elide-dev/elide/releases/download/v1.0.0-beta10/elide-windows-x64.exe)
+
+---
+
+## Previous Releases
+
+### 1.0.0-beta9
+
+**Release Date**: October 1, 2025
+
+**Highlights**:
+- Ruby 3.2 support via TruffleRuby
+- Native image size reduction (40% smaller)
+- HTTP/2 and HTTP/3 support
+- Improved polyglot performance
+
+### 1.0.0-beta8
+
+**Release Date**: September 1, 2025
+
+**Highlights**:
+- TypeScript native compilation
+- WebSocket support
+- File system watching API
+- Performance profiling tools
+
+### 1.0.0-beta7
+
+**Release Date**: August 1, 2025
+
+**Highlights**:
+- Python polyglot interop
+- CLI improvements
+- Better error handling
+- Documentation expansion
+
+---
+
+## Release Schedule
+
+We follow a monthly beta release cycle:
+
+| Release | Expected Date | Focus |
+|---------|--------------|-------|
+| **1.0.0-beta11** | December 2025 | Stability & Polish |
+| **1.0.0-rc1** | January 2026 | Release Candidate |
+| **1.0.0** | February 2026 | Stable Release |
+
+---
+
+## Version Support
+
+| Version | Status | Support Until |
+|---------|--------|---------------|
+| **1.0.0-beta10** | Current | - |
+| 1.0.0-beta9 | Maintenance | Dec 2025 |
+| 1.0.0-beta8 | End of Life | - |
+| < beta8 | End of Life | - |
+
+**Support Levels:**
+- **Current**: Full support, all updates
+- **Maintenance**: Security fixes only
+- **End of Life**: No support
+
+---
+
+## Upgrade Guide
+
+### From beta9 to beta10
+
+```bash
+# Backup your project
+git commit -am "Backup before upgrade"
+
+# Update Elide
+curl -fsSL https://elide.dev/install.sh | bash
+
+# Test your application
+elide test
+
+# Update configuration if needed
+# See breaking changes above
+```
+
+### Testing Before Upgrade
+
+```bash
+# Run in a Docker container
+docker run -v $(pwd):/app elide/elide:beta10 elide run /app/server.js
+```
+
+---
+
+## Roadmap
+
+### Short Term (Next 3 months)
+
+- 🎯 Stability improvements
+- 🎯 Performance optimizations
+- 🎯 Documentation completion
+- 🎯 Community feedback integration
+
+### Medium Term (3-6 months)
+
+- 🔄 Additional language engines
+- 🔄 Cloud deployment tools
+- 🔄 IDE plugins (VS Code, IntelliJ)
+- 🔄 Package manager integration
+
+### Long Term (6-12 months)
+
+- 🔮 1.0 stable release
+- 🔮 Enterprise features
+- 🔮 Extended language support
+- 🔮 Advanced tooling
+
+---
+
+## Beta Program
+
+Join our beta program to get early access to new features:
+
+- 🎁 Early access to features
+- 💬 Direct feedback channel
+- 🏆 Recognition in release notes
+- 🎓 Beta-exclusive documentation
+
+[Sign up for beta access](https://elide.dev/beta)
+
+---
+
+## Changelog
+
+Full changelog available at:
+- [GitHub Releases](https://github.com/elide-dev/elide/releases)
+- [CHANGELOG.md](https://github.com/elide-dev/elide/blob/main/CHANGELOG.md)
+
+---
+
+## Release Notes
+
+Subscribe to release notifications:
+
+- **GitHub**: Watch the repository
+- **Twitter**: [@elide_dev](https://twitter.com/elide_dev)
+- **Blog**: [elide.dev/blog](/blog)
+- **RSS**: [elide.dev/blog/feed.xml](/blog/feed.xml)
+
+---
+
+## Feedback
+
+Help shape future releases:
+
+- [Feature Requests](https://github.com/elide-dev/elide/issues/new?template=feature_request.md)
+- [Bug Reports](https://github.com/elide-dev/elide/issues/new?template=bug_report.md)
+- [Discussions](https://github.com/elide-dev/elide/discussions)
+
+---
+
+## Security Updates
+
+Security patches are released as needed. Subscribe to security advisories:
+
+- [GitHub Security Advisories](https://github.com/elide-dev/elide/security/advisories)
+- [security@elide.dev](mailto:security@elide.dev)
+
+---
+
+Last Updated: November 20, 2025
+

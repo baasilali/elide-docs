@@ -1,0 +1,207 @@
+---
+title: "Polyglot Interop"
+description: "Call between languages seamlessly in Elide"
+date: "2025-11-20"
+---
+
+# Polyglot Interop
+
+One of Elide's superpowers is the ability to seamlessly call between different programming languages.
+
+## Overview
+
+Elide's polyglot interop allows you to:
+
+- Call Python from JavaScript
+- Call JavaScript from Python
+- Share data structures between languages
+- Use the best language for each task
+
+## JavaScript ↔ Python
+
+### Calling Python from JavaScript
+
+```javascript
+// Import Python module
+const numpy = await Poly.import('numpy')
+
+// Create array
+const arr = numpy.array([1, 2, 3, 4, 5])
+
+// Call Python functions
+const mean = numpy.mean(arr)
+console.log(`Mean: ${mean}`)
+
+// Use Python libraries
+const pd = await Poly.import('pandas')
+const df = pd.DataFrame({
+  name: ['Alice', 'Bob'],
+  age: [30, 25]
+})
+```
+
+### Calling JavaScript from Python
+
+```python
+import polyglot
+
+# Execute JavaScript
+result = polyglot.eval(language='js', string='[1, 2, 3].map(x => x * 2)')
+print(result)  # [2, 4, 6]
+
+# Import JavaScript module
+fs = polyglot.import_value('fs')
+content = fs.readFileSync('data.txt', 'utf8')
+```
+
+## Data Type Conversion
+
+Data is automatically converted between languages:
+
+| JavaScript | Python | Ruby |
+|------------|--------|------|
+| `number` | `int`/`float` | `Integer`/`Float` |
+| `string` | `str` | `String` |
+| `boolean` | `bool` | `TrueClass`/`FalseClass` |
+| `null` | `None` | `nil` |
+| `Array` | `list` | `Array` |
+| `Object` | `dict` | `Hash` |
+
+## Example: Data Processing Pipeline
+
+Combine JavaScript for web APIs and Python for data analysis:
+
+```javascript
+// fetch-and-analyze.js
+const fetch = Elide.fetch
+const np = await Poly.import('numpy')
+const pd = await Poly.import('pandas')
+
+// Fetch data with JavaScript
+const response = await fetch('https://api.example.com/data')
+const data = await response.json()
+
+// Process with Python
+const df = pd.DataFrame(data)
+const stats = df.describe()
+
+// Calculate with NumPy
+const values = df['values'].values
+const mean = np.mean(values)
+const std = np.std(values)
+
+console.log(`Mean: ${mean}, Std: ${std}`)
+```
+
+## Shared State
+
+Variables can be shared across languages:
+
+```javascript
+// JavaScript sets a value
+globalThis.sharedData = { count: 0 }
+```
+
+```python
+# Python accesses it
+import polyglot
+shared = polyglot.import_value('sharedData')
+shared['count'] += 1
+```
+
+## Performance Considerations
+
+### Zero-Copy Buffers
+
+Large data structures are shared without copying:
+
+```javascript
+const buffer = new Uint8Array(1000000)
+// Pass to Python without copying
+const result = python.process(buffer)
+```
+
+### Function Calls
+
+Function calls across languages have minimal overhead:
+
+| Operation | Overhead |
+|-----------|----------|
+| Same language | ~0ns |
+| Cross-language | ~10-100ns |
+| With type conversion | ~100-1000ns |
+
+## Best Practices
+
+1. **Minimize boundary crossings** - Do bulk operations in one language
+2. **Use appropriate types** - Primitives convert faster than objects
+3. **Cache imports** - Import modules once, reuse them
+4. **Prefer native APIs** - Use language-native APIs when possible
+
+## Example: Machine Learning Pipeline
+
+```javascript
+// ml-pipeline.js
+const tf = await Poly.import('tensorflow')
+const np = await Poly.import('numpy')
+
+// Load data with JavaScript
+const data = await fetch('/api/training-data').then(r => r.json())
+
+// Preprocess with NumPy
+const X = np.array(data.features)
+const y = np.array(data.labels)
+
+// Train with TensorFlow
+const model = tf.keras.Sequential([
+  tf.keras.layers.Dense(128, { activation: 'relu' }),
+  tf.keras.layers.Dense(10, { activation: 'softmax' })
+])
+
+model.compile({
+  optimizer: 'adam',
+  loss: 'sparse_categorical_crossentropy',
+  metrics: ['accuracy']
+})
+
+await model.fit(X, y, { epochs: 10 })
+
+// Predict with JavaScript convenience
+const predictions = model.predict(testData)
+console.log('Predictions:', predictions)
+```
+
+## Advanced: Custom Bindings
+
+Create custom bindings between languages:
+
+```javascript
+// Expose JavaScript function to Python
+globalThis.myFunction = (x) => x * 2
+
+// Expose Python class to JavaScript
+class MyClass {
+  constructor(value) {
+    this.value = value
+  }
+  
+  double() {
+    return this.value * 2
+  }
+}
+```
+
+## Limitations
+
+Some things don't cross language boundaries:
+
+- Native extensions (C modules)
+- Language-specific constructs (generators, decorators)
+- Some advanced types (WeakMap, WeakSet)
+
+## Learn More
+
+- [JavaScript Guide](/docs/javascript)
+- [Python Guide](/docs/python)
+- [Performance](/docs/performance)
+

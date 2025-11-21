@@ -1,0 +1,204 @@
+---
+title: "Debugging"
+description: "Debug your Elide applications effectively"
+date: "2025-11-20"
+---
+
+# Debugging
+
+Learn how to debug Elide applications using modern debugging tools.
+
+## Inspector Protocol
+
+Elide supports the Chrome DevTools Protocol for debugging.
+
+### Starting the Debugger
+
+```bash
+# Enable inspector
+elide run --inspect app.js
+
+# Specify port
+elide run --inspect=9229 app.js
+
+# Wait for debugger to attach
+elide run --inspect-brk app.js
+```
+
+### Connecting
+
+1. **Chrome DevTools**
+   - Open `chrome://inspect`
+   - Click "Configure" and add `localhost:9229`
+   - Click "inspect" on your Elide process
+
+2. **VS Code**
+   ```json
+   {
+     "type": "node",
+     "request": "attach",
+     "name": "Attach to Elide",
+     "port": 9229
+   }
+   ```
+
+3. **IntelliJ IDEA**
+   - Run → Attach to Process
+   - Select Elide process
+
+## Console Debugging
+
+### JavaScript
+
+```javascript
+// Basic logging
+console.log('Debug message')
+console.error('Error message')
+console.warn('Warning')
+
+// Structured logging
+console.table([
+  { name: 'Alice', age: 30 },
+  { name: 'Bob', age: 25 }
+])
+
+// Timing
+console.time('operation')
+// ... code ...
+console.timeEnd('operation')
+
+// Stack traces
+console.trace('Trace point')
+```
+
+### Python
+
+```python
+# Basic logging
+print('Debug message')
+
+# With formatting
+print(f'Value: {value}')
+
+# Debug with locals
+import pdb
+pdb.set_trace()  # Breakpoint
+```
+
+## Breakpoints
+
+### JavaScript
+
+```javascript
+// Programmatic breakpoint
+debugger
+
+// Conditional breakpoint
+if (someCondition) {
+  debugger
+}
+```
+
+### Python
+
+```python
+# Using pdb
+import pdb
+pdb.set_trace()
+
+# Using breakpoint() (Python 3.7+)
+breakpoint()
+```
+
+## Performance Profiling
+
+### CPU Profiling
+
+```bash
+# Profile your application
+elide run --cpuprofile app.js
+```
+
+View the profile:
+1. Open Chrome DevTools
+2. Go to Performance tab
+3. Load the generated `.cpuprofile` file
+
+### Memory Profiling
+
+```bash
+# Track memory usage
+elide run --heapprofile app.js
+```
+
+## Logging Best Practices
+
+### Structured Logging
+
+```javascript
+// Good: Structured logs
+console.log({
+  level: 'info',
+  message: 'User logged in',
+  userId: 123,
+  timestamp: Date.now()
+})
+
+// Avoid: Unstructured logs
+console.log('User 123 logged in')
+```
+
+### Log Levels
+
+```javascript
+const LOG_LEVEL = process.env.LOG_LEVEL || 'info'
+
+const log = {
+  error: (...args) => console.error('[ERROR]', ...args),
+  warn: (...args) => console.warn('[WARN]', ...args),
+  info: (...args) => console.log('[INFO]', ...args),
+  debug: (...args) => LOG_LEVEL === 'debug' && console.log('[DEBUG]', ...args)
+}
+
+log.info('Application started')
+log.debug('Debug information')
+```
+
+## Common Issues
+
+### Async Stack Traces
+
+Enable async stack traces:
+
+```bash
+elide run --async-stack-traces app.js
+```
+
+### Source Maps
+
+For TypeScript:
+
+```json
+{
+  "compilerOptions": {
+    "sourceMap": true
+  }
+}
+```
+
+## Debugging Tools
+
+| Tool | Use Case |
+|------|----------|
+| **Chrome DevTools** | Interactive debugging |
+| **VS Code** | IDE integration |
+| **Console** | Quick debugging |
+| **Profiler** | Performance analysis |
+
+## Tips
+
+1. **Use debugger statement** for quick breakpoints
+2. **Enable source maps** for TypeScript
+3. **Log at boundaries** - Function entry/exit, API calls
+4. **Profile before optimizing** - Measure, don't guess
+

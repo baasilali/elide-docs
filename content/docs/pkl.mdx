@@ -1,0 +1,343 @@
+---
+title: "Pkl"
+description: "Configuration as code with Pkl in Elide"
+date: "2025-11-20"
+---
+
+# Pkl
+
+Elide has native support for Pkl, Apple's configuration-as-code language.
+
+## Overview
+
+Pkl (Pickle) provides:
+
+- Type-safe configuration
+- Code reuse through modules
+- Validation and constraints
+- Multiple output formats (JSON, YAML, XML)
+- IDE support with autocompletion
+
+## Basic Syntax
+
+```pkl
+// config.pkl
+module Config
+
+name = "My App"
+version = "1.0.0"
+port = 8080
+
+database {
+  host = "localhost"
+  port = 5432
+  name = "myapp"
+}
+
+features {
+  authentication = true
+  logging = true
+  caching = false
+}
+```
+
+## Loading Configuration
+
+### JavaScript
+
+```javascript
+// Load Pkl configuration
+const config = await Elide.pkl.load('config.pkl')
+
+console.log(config.name)    // "My App"
+console.log(config.port)    // 8080
+console.log(config.database.host) // "localhost"
+```
+
+### Python
+
+```python
+import elide
+
+# Load configuration
+config = elide.pkl.load('config.pkl')
+
+print(config['name'])  # "My App"
+print(config['port'])  # 8080
+```
+
+## Type Safety
+
+```pkl
+// typed-config.pkl
+module TypedConfig
+
+class DatabaseConfig {
+  host: String
+  port: Int
+  username: String
+  password: String
+  ssl: Boolean = true
+}
+
+database: DatabaseConfig = new {
+  host = "localhost"
+  port = 5432
+  username = "admin"
+  password = "secret"
+}
+```
+
+## Validation
+
+```pkl
+// validated-config.pkl
+module ValidatedConfig
+
+port: Int(this > 1024 && this < 65536)
+
+maxConnections: Int(this > 0 && this <= 10000) = 1000
+
+email: String(this.matches(Regex(#"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"#)))
+```
+
+## Modules and Imports
+
+### Creating a Module
+
+```pkl
+// database.pkl
+module Database
+
+class Config {
+  host: String
+  port: Int
+  database: String
+}
+
+default: Config = new {
+  host = "localhost"
+  port = 5432
+  database = "myapp"
+}
+```
+
+### Importing
+
+```pkl
+// app-config.pkl
+module AppConfig
+
+import "database.pkl"
+
+appName = "My Application"
+
+db = new database.Config {
+  host = "prod-server.example.com"
+  port = 5432
+  database = "production"
+}
+```
+
+## Environment-Specific Config
+
+```pkl
+// base.pkl
+module BaseConfig
+
+appName = "My App"
+debug = false
+
+// dev.pkl
+module DevConfig
+
+extends "base.pkl"
+
+debug = true
+database {
+  host = "localhost"
+}
+
+// prod.pkl
+module ProdConfig
+
+extends "base.pkl"
+
+database {
+  host = "prod-db.example.com"
+  ssl = true
+}
+```
+
+Load based on environment:
+
+```javascript
+const env = process.env.NODE_ENV || 'dev'
+const config = await Elide.pkl.load(`${env}.pkl`)
+```
+
+## Dynamic Values
+
+```pkl
+// dynamic.pkl
+module DynamicConfig
+
+import "pkl:platform"
+
+// Read environment variables
+apiKey = read("env:API_KEY")
+
+// Platform-specific values
+dataDir = if (platform.current.operatingSystem.name == "Windows")
+  then "C:\\Data"
+  else "/var/data"
+
+// Computed values
+baseUrl = "https://api.example.com"
+usersEndpoint = "\(baseUrl)/users"
+postsEndpoint = "\(baseUrl)/posts"
+```
+
+## Collections
+
+```pkl
+// collections.pkl
+module Collections
+
+// Lists
+numbers: List<Int> = List(1, 2, 3, 4, 5)
+
+// Maps
+settings: Map<String, Any> = Map(
+  "theme", "dark",
+  "language", "en",
+  "notifications", true
+)
+
+// Sets
+features: Set<String> = Set("auth", "logging", "caching")
+```
+
+## Output Formats
+
+### JSON Output
+
+```javascript
+const config = await Elide.pkl.load('config.pkl')
+
+// Convert to JSON
+const json = JSON.stringify(config, null, 2)
+console.log(json)
+```
+
+### YAML Output
+
+```pkl
+// Output as YAML
+output {
+  renderer = new YamlRenderer {}
+}
+```
+
+## Complete Example
+
+```pkl
+// elide.pkl
+module ElideConfig
+
+class ServerConfig {
+  host: String = "0.0.0.0"
+  port: Int(this > 0 && this < 65536)
+  ssl: Boolean = false
+}
+
+class DatabaseConfig {
+  host: String
+  port: Int = 5432
+  database: String
+  pool: PoolConfig
+}
+
+class PoolConfig {
+  min: Int(this >= 0) = 2
+  max: Int(this > min) = 10
+  idleTimeout: Duration = 30.s
+}
+
+class LogConfig {
+  level: "debug"|"info"|"warn"|"error" = "info"
+  format: "json"|"text" = "json"
+  output: String = "stdout"
+}
+
+server: ServerConfig = new {
+  port = 8080
+  ssl = true
+}
+
+database: DatabaseConfig = new {
+  host = "localhost"
+  database = "myapp"
+  pool {
+    min = 5
+    max = 20
+  }
+}
+
+logging: LogConfig = new {
+  level = "info"
+  format = "json"
+}
+```
+
+Load and use:
+
+```javascript
+const config = await Elide.pkl.load('elide.pkl')
+
+// Start server with config
+const server = Elide.http.createServer({
+  port: config.server.port,
+  host: config.server.host,
+  ssl: config.server.ssl
+})
+
+// Connect to database
+const db = await connectDatabase({
+  host: config.database.host,
+  port: config.database.port,
+  database: config.database.database,
+  pool: {
+    min: config.database.pool.min,
+    max: config.database.pool.max
+  }
+})
+```
+
+## Best Practices
+
+1. **Use types** - Define classes for structure and validation
+2. **Modularize** - Split config into logical modules
+3. **Validate early** - Add constraints to catch errors
+4. **Document** - Add comments to explain configuration options
+5. **Version control** - Track configuration changes
+6. **Environment separation** - Use inheritance for env-specific config
+
+## IDE Support
+
+Pkl has excellent IDE support:
+
+- **VS Code**: Install Pkl extension
+- **IntelliJ**: Built-in support
+- **Features**: 
+  - Syntax highlighting
+  - Autocompletion
+  - Error checking
+  - Refactoring
+
+## Resources
+
+- [Pkl Documentation](https://pkl-lang.org/)
+- [Pkl Language Tour](https://pkl-lang.org/main/current/language-tutorial/01_introduction.html)
+- [Pkl Examples](https://github.com/apple/pkl/tree/main/examples)
+

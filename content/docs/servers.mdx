@@ -1,0 +1,295 @@
+---
+title: "HTTP Servers"
+description: "Building HTTP servers with Elide"
+date: "2025-11-20"
+---
+
+# HTTP Servers
+
+Build high-performance HTTP servers with Elide's built-in server API.
+
+## Quick Start
+
+```javascript
+// server.js
+const app = Elide.http
+
+app.router.handle("GET", "/", (request, response) => {
+  response.send(200, "Hello, World!")
+})
+
+console.log("Server running on http://localhost:8080")
+```
+
+Run it:
+
+```bash
+elide run server.js
+```
+
+## Routing
+
+### Basic Routes
+
+```javascript
+// GET route
+app.router.handle("GET", "/users", (req, res) => {
+  res.json({ users: ['Alice', 'Bob'] })
+})
+
+// POST route
+app.router.handle("POST", "/users", (req, res) => {
+  const body = await req.json()
+  // Process user creation
+  res.json({ id: 123, ...body })
+})
+
+// PUT route
+app.router.handle("PUT", "/users/:id", (req, res) => {
+  const id = req.params.id
+  res.json({ id, updated: true })
+})
+
+// DELETE route
+app.router.handle("DELETE", "/users/:id", (req, res) => {
+  res.send(204)
+})
+```
+
+### Path Parameters
+
+```javascript
+app.router.handle("GET", "/users/:userId/posts/:postId", (req, res) => {
+  const { userId, postId } = req.params
+  res.json({ userId, postId })
+})
+```
+
+### Query Parameters
+
+```javascript
+app.router.handle("GET", "/search", (req, res) => {
+  const { q, limit = 10 } = req.query
+  res.json({ query: q, limit })
+})
+```
+
+## Request Handling
+
+### Reading Request Body
+
+```javascript
+// JSON body
+app.router.handle("POST", "/api/data", async (req, res) => {
+  const data = await req.json()
+  res.json({ received: data })
+})
+
+// Text body
+app.router.handle("POST", "/api/text", async (req, res) => {
+  const text = await req.text()
+  res.send(200, `Received: ${text}`)
+})
+
+// Form data
+app.router.handle("POST", "/api/form", async (req, res) => {
+  const form = await req.formData()
+  const name = form.get('name')
+  res.json({ name })
+})
+```
+
+### Request Headers
+
+```javascript
+app.router.handle("GET", "/headers", (req, res) => {
+  const authHeader = req.headers.get('Authorization')
+  const userAgent = req.headers.get('User-Agent')
+  
+  res.json({
+    auth: authHeader,
+    userAgent
+  })
+})
+```
+
+## Response Types
+
+### JSON Response
+
+```javascript
+res.json({ message: "Success", data: [1, 2, 3] })
+```
+
+### Text Response
+
+```javascript
+res.send(200, "Hello, World!")
+```
+
+### HTML Response
+
+```javascript
+res.html(`
+  <!DOCTYPE html>
+  <html>
+    <body>
+      <h1>Hello from Elide!</h1>
+    </body>
+  </html>
+`)
+```
+
+### File Response
+
+```javascript
+res.file('/path/to/file.pdf')
+```
+
+### Stream Response
+
+```javascript
+const stream = createReadStream('/large/file.dat')
+res.stream(stream)
+```
+
+## Middleware
+
+```javascript
+// Logging middleware
+app.use((req, res, next) => {
+  console.log(`${req.method} ${req.url}`)
+  next()
+})
+
+// Authentication middleware
+app.use((req, res, next) => {
+  const token = req.headers.get('Authorization')
+  if (!token) {
+    return res.send(401, 'Unauthorized')
+  }
+  next()
+})
+
+// CORS middleware
+app.use((req, res, next) => {
+  res.headers.set('Access-Control-Allow-Origin', '*')
+  next()
+})
+```
+
+## Error Handling
+
+```javascript
+app.router.handle("GET", "/error", (req, res) => {
+  try {
+    // Some operation that might fail
+    throw new Error('Something went wrong')
+  } catch (error) {
+    res.status(500).json({
+      error: error.message
+    })
+  }
+})
+
+// Global error handler
+app.onError((error, req, res) => {
+  console.error(error)
+  res.status(500).json({
+    error: 'Internal Server Error'
+  })
+})
+```
+
+## Static Files
+
+```javascript
+// Serve static files from directory
+app.static('/public', './static')
+
+// Now accessible at:
+// http://localhost:8080/public/style.css
+// http://localhost:8080/public/app.js
+```
+
+## WebSocket Support
+
+```javascript
+app.ws('/chat', {
+  open(ws) {
+    console.log('Client connected')
+  },
+  
+  message(ws, message) {
+    // Echo message back
+    ws.send(`Echo: ${message}`)
+  },
+  
+  close(ws) {
+    console.log('Client disconnected')
+  }
+})
+```
+
+## Performance
+
+| Feature | Benefit |
+|---------|---------|
+| **Async I/O** | Non-blocking operations |
+| **Native HTTP** | Powered by Netty |
+| **Zero-copy** | Efficient data transfer |
+| **Keep-alive** | Connection reuse |
+
+### Benchmarks
+
+| Runtime | Requests/sec |
+|---------|--------------|
+| **Elide** | 800K+ |
+| Express.js | 15K |
+| Fastify | 50K |
+
+## Configuration
+
+```javascript
+const app = Elide.http.createServer({
+  port: 3000,
+  host: '0.0.0.0',
+  backlog: 511,
+  keepAlive: true,
+  maxConnections: 10000
+})
+```
+
+## Production Tips
+
+1. **Enable compression**
+   ```javascript
+   app.use(Elide.http.compression())
+   ```
+
+2. **Set timeouts**
+   ```javascript
+   app.timeout = 30000 // 30 seconds
+   ```
+
+3. **Rate limiting**
+   ```javascript
+   app.use(Elide.http.rateLimit({
+     windowMs: 60000,
+     max: 100
+   }))
+   ```
+
+4. **Health checks**
+   ```javascript
+   app.router.handle("GET", "/health", (req, res) => {
+     res.json({ status: 'ok' })
+   })
+   ```
+
+## Next Steps
+
+- [Polyglot Interop](/docs/interop) - Use Python for data processing
+- [Deployment](/docs/deployment) - Deploy to production
+- [Performance](/docs/performance) - Optimize your server
+

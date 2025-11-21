@@ -1,0 +1,124 @@
+---
+title: "Environment Variables"
+description: "Working with environment variables in Elide"
+date: "2025-11-20"
+---
+
+# Environment Variables
+
+Learn how to use environment variables across different languages in Elide.
+
+## Accessing Environment Variables
+
+### JavaScript
+
+```javascript
+// Read environment variable
+const apiKey = process.env.API_KEY
+
+// Check if variable exists
+if (process.env.NODE_ENV === 'production') {
+  console.log('Running in production')
+}
+
+// Default values
+const port = process.env.PORT || 3000
+```
+
+### Python
+
+```python
+import os
+
+# Read environment variable
+api_key = os.getenv('API_KEY')
+
+# With default value
+port = os.getenv('PORT', '3000')
+
+# Check if exists
+if os.getenv('NODE_ENV') == 'production':
+    print('Running in production')
+```
+
+### TypeScript
+
+```typescript
+// With type safety
+const apiKey: string | undefined = process.env.API_KEY
+
+// With validation
+const port = Number(process.env.PORT) || 3000
+```
+
+## Setting Environment Variables
+
+### Command Line
+
+```bash
+# Inline
+API_KEY=secret elide run app.js
+
+# Export
+export API_KEY=secret
+elide run app.js
+```
+
+### .env Files
+
+Create a `.env` file:
+
+```bash
+API_KEY=your-secret-key
+PORT=3000
+NODE_ENV=development
+DATABASE_URL=postgresql://localhost/mydb
+```
+
+Load it:
+
+```bash
+elide run --env .env app.js
+```
+
+## Best Practices
+
+1. **Never commit secrets** - Use `.gitignore` for `.env`
+2. **Use defaults** - Provide fallback values
+3. **Validate early** - Check required variables at startup
+4. **Document variables** - List all required env vars
+
+## Example: Configuration Module
+
+```javascript
+// config.js
+const config = {
+  apiKey: process.env.API_KEY,
+  port: parseInt(process.env.PORT || '3000'),
+  env: process.env.NODE_ENV || 'development',
+  database: process.env.DATABASE_URL,
+}
+
+// Validate required variables
+if (!config.apiKey) {
+  throw new Error('API_KEY environment variable is required')
+}
+
+export default config
+```
+
+## Cross-Language Access
+
+Environment variables are accessible from all languages:
+
+```javascript
+// JavaScript sets variable
+process.env.SHARED_VALUE = '42'
+```
+
+```python
+# Python can read it
+import os
+value = os.getenv('SHARED_VALUE')  # '42'
+```
+
