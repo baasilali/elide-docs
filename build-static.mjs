@@ -290,13 +290,26 @@ function generateNavBarHTML(currentSlug) {
   // Helper to check if a nav item is active
   const isNavActive = (navId) => navId === activeNavId
   
+  // Icon mapping for navbar sections
+  const navIcons = {
+    'runtime': '<svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" /></svg>',
+    'polyglot-101': '<svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>',
+    'guides-by-language': '<svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" /></svg>',
+    'architecture': '<svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>',
+    'releases': '<svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" /></svg>',
+    'blog': '<svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>',
+    'examples': '<svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>'
+  }
+  
   // Generate left navbar sections (Runtime, Polyglot 101, Guides by Language, Architecture)
   const leftNavSections = navbarSections.filter(nav => nav.id !== 'releases')
   const leftNavHTML = leftNavSections.map(nav => {
     const isActive = isNavActive(nav.id)
     const firstSlug = nav.sections[0]?.items[0]?.slug || 'introduction'
+    const icon = navIcons[nav.id] || ''
     return `
-      <a href="/docs/${firstSlug}.html" class="flex items-center gap-2 px-4 py-3 text-sm font-medium transition-all duration-200 relative ${isActive ? 'text-primary' : 'text-muted-foreground hover:text-foreground'}">
+      <a href="/docs/${firstSlug}.html" class="flex items-center gap-2 px-3 lg:px-4 py-2 text-sm font-medium transition-all duration-200 relative ${isActive ? 'text-primary' : 'text-muted-foreground hover:text-foreground'}">
+        ${icon}
         <span>${nav.title}</span>
         ${isActive ? '<span class="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full shadow-[0_0_8px_rgba(168,85,247,0.6)]"></span>' : ''}
       </a>
@@ -308,17 +321,17 @@ function generateNavBarHTML(currentSlug) {
   
   return `
     <nav class="fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-card/80 backdrop-blur-md border-b border-border shadow-lg">
-      <!-- Top Row -->
+      <!-- Top Row - Logo, Search, Install -->
       <div class="border-b border-border/50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="max-w-[1920px] mx-auto px-6 lg:px-8 xl:px-12">
           <div class="flex justify-between items-center h-16">
-            <!-- Logo -->
+            <!-- Logo (Far Left) -->
             <a href="/" class="flex items-center gap-2 hover:opacity-80 transition-opacity">
               <img src="/assets/light.svg" alt="Elide" class="h-8 w-auto" />
             </a>
 
-            <!-- Search Bar - Desktop -->
-            <div class="hidden md:flex flex-1 max-w-md mx-8">
+            <!-- Search Bar - Desktop (Center) -->
+            <div class="hidden md:flex flex-1 max-w-md mx-8 lg:mx-12 xl:mx-16">
               <div class="relative w-full">
                 <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -354,25 +367,28 @@ function generateNavBarHTML(currentSlug) {
         </div>
       </div>
 
-      <!-- Bottom Row - Desktop Navigation -->
+      <!-- Bottom Row - Navigation (Aligned with Logo) -->
       <div class="hidden md:block">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="max-w-[1920px] mx-auto px-6 lg:px-8 xl:px-12">
           <div class="flex justify-between items-center">
-            <!-- Left Navigation -->
-            <div class="flex items-center gap-1">
+            <!-- Left Navigation - Aligned with Logo above -->
+            <div class="flex items-center gap-2 lg:gap-4 xl:gap-6">
               ${leftNavHTML}
             </div>
 
             <!-- Right Secondary Links -->
-            <div class="flex items-center gap-1">
-              <a href="/docs/releases.html" class="flex items-center gap-2 px-4 py-3 text-sm font-medium transition-all duration-200 relative ${releasesActive ? 'text-primary' : 'text-muted-foreground hover:text-foreground'}">
+            <div class="flex items-center gap-2 lg:gap-4 xl:gap-6">
+              <a href="/docs/releases.html" class="flex items-center gap-2 px-3 lg:px-4 py-3 text-sm font-medium transition-all duration-200 relative ${releasesActive ? 'text-primary' : 'text-muted-foreground hover:text-foreground'}">
+                <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" /></svg>
                 <span>Releases</span>
                 ${releasesActive ? '<span class="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full shadow-[0_0_8px_rgba(168,85,247,0.6)]"></span>' : ''}
               </a>
-              <a href="/blog" class="flex items-center gap-2 px-4 py-3 text-sm font-medium text-muted-foreground hover:text-foreground transition-all duration-200">
+              <a href="/blog" class="flex items-center gap-2 px-3 lg:px-4 py-3 text-sm font-medium text-muted-foreground hover:text-foreground transition-all duration-200">
+                <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
                 <span>Blog</span>
               </a>
-              <a href="/examples" class="flex items-center gap-2 px-4 py-3 text-sm font-medium text-muted-foreground hover:text-foreground transition-all duration-200">
+              <a href="/examples" class="flex items-center gap-2 px-3 lg:px-4 py-3 text-sm font-medium text-muted-foreground hover:text-foreground transition-all duration-200">
+                <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
                 <span>Examples</span>
               </a>
             </div>
