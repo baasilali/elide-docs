@@ -524,7 +524,7 @@ function generateTocHTML(content) {
   }).join('')
   
   return `
-    <aside class="hidden lg:block fixed top-28 right-0 w-64 h-[calc(100vh-7rem)] overflow-y-auto">
+    <aside id="toc-sidebar" class="hidden lg:block fixed top-28 right-0 w-64 h-[calc(100vh-7rem)] overflow-y-auto scroll-smooth">
       <div class="p-6">
         <div class="text-sm font-semibold text-foreground mb-4">
           On this page
@@ -626,6 +626,34 @@ function generateHTMLPage(title, content, slug) {
 
       // Get all headings that have IDs
       const headings = Array.from(document.querySelectorAll('h2[id], h3[id]'));
+      const tocSidebar = document.getElementById('toc-sidebar');
+      
+      // Function to scroll TOC to show active item
+      function scrollTocToActiveItem(activeLink) {
+        if (!tocSidebar || !activeLink) return;
+        
+        const sidebarRect = tocSidebar.getBoundingClientRect();
+        const linkRect = activeLink.getBoundingClientRect();
+        
+        // Check if link is outside visible area
+        const isAboveView = linkRect.top < sidebarRect.top;
+        const isBelowView = linkRect.bottom > sidebarRect.bottom;
+        
+        if (isAboveView || isBelowView) {
+          // Calculate position to center the active item in the sidebar
+          const linkOffsetInSidebar = activeLink.offsetTop;
+          const sidebarHeight = tocSidebar.clientHeight;
+          const linkHeight = activeLink.offsetHeight;
+          
+          // Scroll to center the active item (with some padding)
+          const scrollTo = linkOffsetInSidebar - (sidebarHeight / 2) + (linkHeight / 2);
+          
+          tocSidebar.scrollTo({
+            top: Math.max(0, scrollTo),
+            behavior: 'smooth'
+          });
+        }
+      }
       
       // Function to update active TOC link with pink/purple styling
       function updateActiveTocLink() {
@@ -642,12 +670,15 @@ function generateHTMLPage(title, content, slug) {
           }
         }
         
+        let activeLinkElement = null;
+        
         // Update TOC links - ensure there's always an active one
         tocLinks.forEach(link => {
           const tocId = link.getAttribute('data-toc-id');
           const isActive = currentHeading && currentHeading.id === tocId;
           
           if (isActive) {
+            activeLinkElement = link;
             // Active state: pink/purple border and text with explicit styling
             link.classList.remove('text-muted-foreground', 'border-transparent');
             link.classList.add('text-primary');
@@ -663,6 +694,11 @@ function generateHTMLPage(title, content, slug) {
             link.style.color = '';
           }
         });
+        
+        // Auto-scroll TOC to show active item
+        if (activeLinkElement) {
+          scrollTocToActiveItem(activeLinkElement);
+        }
       }
       
       // Add hover effects
@@ -708,6 +744,10 @@ function generateHTMLPage(title, content, slug) {
               top: targetPosition,
               behavior: 'smooth'
             });
+            
+            // Scroll TOC to show clicked item
+            scrollTocToActiveItem(link);
+            
             // Update immediately
             setTimeout(updateActiveTocLink, 100);
           }
@@ -728,6 +768,14 @@ function generateHTMLPage(title, content, slug) {
       
       // Initial update
       updateActiveTocLink();
+      
+      // Scroll to show first active item on load
+      setTimeout(() => {
+        const firstActiveLink = document.querySelector('.toc-link.text-primary');
+        if (firstActiveLink) {
+          scrollTocToActiveItem(firstActiveLink);
+        }
+      }, 100);
     })();
   </script>
 </body>
