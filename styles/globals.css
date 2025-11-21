@@ -192,8 +192,7 @@ html.dark {
 .glow-bg {
   background: 
     radial-gradient(ellipse 80% 50% at 50% -20%, rgba(168, 85, 247, 0.15), transparent),
-    radial-gradient(ellipse 60% 50% at 0% 100%, rgba(236, 72, 153, 0.1), transparent),
-    radial-gradient(ellipse 60% 50% at 100% 100%, rgba(59, 130, 246, 0.1), transparent);
+    radial-gradient(ellipse 80% 50% at 50% 120%, rgba(236, 72, 153, 0.15), transparent);
 }
 
 /* MDX Content Styles */
