@@ -13,6 +13,7 @@ public/styles.css
 
 # Internal docs (not needed for reproduction)
 references/
+old-docs-references/
 
 # Optional: Uncomment if you don't want to track lock file
 # bun.lock
