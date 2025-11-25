@@ -12,12 +12,7 @@
     "clean": "bun run kill && rm -rf dist node_modules/.cache"
   },
   "dependencies": {
-    "@mdx-js/mdx": "^3.1.0",
-    "gray-matter": "^4.0.3",
-    "lucide-react": "^0.554.0",
-    "marked": "^17.0.0",
-    "react": "^19.2.0",
-    "react-dom": "^19.2.0"
+    "gray-matter": "^4.0.3"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.17",

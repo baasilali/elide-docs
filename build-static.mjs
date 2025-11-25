@@ -11,11 +11,7 @@
 import fs from 'fs/promises'
 import path from 'path'
 import { fileURLToPath } from 'url'
-import React from 'react'
-import { renderToStaticMarkup } from 'react-dom/server'
-import { compile } from '@mdx-js/mdx'
 import matter from 'gray-matter'
-import * as runtime from 'react/jsx-runtime'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -948,106 +944,8 @@ function generateHTMLPage(title, content, slug) {
 </html>`
 }
 
-// Process MDX file and convert to HTML
+// MDX to HTML converter
 async function processMDXFile(slug) {
-  console.log(`  📄 Processing ${slug}...`)
-  
-  const filePath = path.join(CONTENT_DIR, `${slug}.mdx`)
-  const source = await fs.readFile(filePath, 'utf8')
-  
-  // Parse frontmatter
-  const { content: mdxContent, data: frontmatter } = matter(source)
-  
-  // Compile MDX to HTML
-  const compiled = await compile(mdxContent, {
-    outputFormat: 'function-body',
-    development: false,
-  })
-  
-  // Custom MDX components
-  const Alert = ({ children, variant = 'default', ...props }) => {
-    const variants = {
-      default: 'bg-gradient-to-br from-primary-50/80 to-pink-50/60 border border-primary-200/50 dark:from-primary-950/30 dark:to-pink-950/20 dark:border-primary-800/30',
-      info: 'bg-gradient-to-br from-blue-50/80 to-sky-50/60 border border-blue-200/50 dark:from-blue-950/30 dark:to-sky-950/20 dark:border-blue-800/30',
-      warning: 'bg-gradient-to-br from-yellow-50/80 to-orange-50/60 border border-yellow-200/50 dark:from-yellow-950/30 dark:to-orange-950/20 dark:border-yellow-800/30',
-      destructive: 'bg-gradient-to-br from-red-50/80 to-pink-50/60 border border-red-200/50 dark:from-red-950/30 dark:to-pink-950/20 dark:border-red-800/30'
-    }
-    
-    const borderColors = {
-      default: 'from-primary-500 to-pink-500 dark:from-primary-400 dark:to-pink-400',
-      info: 'from-blue-500 to-sky-500 dark:from-blue-400 dark:to-sky-400',
-      warning: 'from-yellow-500 to-orange-500 dark:from-yellow-400 dark:to-orange-400',
-      destructive: 'from-red-500 to-pink-500 dark:from-red-400 dark:to-pink-400'
-    }
-    
-    return React.createElement('div', {
-      role: 'alert',
-      className: `alert relative w-full rounded-xl px-5 py-4 my-6 shadow-sm ${variants[variant] || variants.default}`,
-      ...props
-    }, [
-      React.createElement('div', {
-        key: 'border',
-        className: `absolute left-0 top-0 bottom-0 w-1 rounded-l-xl bg-gradient-to-b ${borderColors[variant] || borderColors.default}`
-      }),
-      React.createElement('div', {
-        key: 'content',
-        className: 'relative z-10 text-sm leading-relaxed [&>strong]:block [&>strong]:mb-2 [&>strong]:font-bold [&>strong]:text-foreground'
-      }, children)
-    ])
-  }
-
-  // Create a function from the compiled code
-  const { default: MDXContent } = await evaluateSync(compiled, {
-    ...runtime,
-    baseUrl: import.meta.url,
-    useMDXComponents: () => ({
-      Alert,
-      // Tabs components would go here too if needed
-    })
-  })
-  
-  // Render to HTML string
-  let contentHTML = renderToStaticMarkup(React.createElement(MDXContent))
-  
-  // Post-process HTML to add syntax highlighting to code blocks
-  contentHTML = contentHTML.replace(
-    /<pre><code class="language-(\w+)">(.*?)<\/code><\/pre>/gs,
-    (match, language, code) => {
-      // Decode HTML entities
-      const decoded = code
-        .replace(/&lt;/g, '<')
-        .replace(/&gt;/g, '>')
-        .replace(/&amp;/g, '&')
-        .replace(/&quot;/g, '"')
-        .replace(/&#x27;/g, "'")
-      
-      // Apply syntax highlighting
-      const highlighted = highlightCode(decoded, language)
-      
-      return `<pre><code class="language-${language}">${highlighted}</code></pre>`
-    }
-  )
-  
-  // Also handle className format from React
-  contentHTML = contentHTML.replace(
-    /<code className="language-(\w+)">/g,
-    '<code class="language-$1">'
-  )
-  
-  const title = frontmatter.title || slug
-  const html = generateHTMLPage(title, contentHTML, slug)
-  
-  // Write the HTML file
-  const outputPath = path.join(DIST_DIR, 'docs', `${slug}.html`)
-  await fs.writeFile(outputPath, html, 'utf8')
-  
-  console.log(`  ✓ Generated ${slug}.html`)
-  
-  return { slug, title, frontmatter }
-}
-
-// Simplified MDX to HTML converter
-async function simpleProcessMDXFile(slug) {
   console.log(`  📄 Processing ${slug}...`)
   
   const filePath = path.join(CONTENT_DIR, `${slug}.mdx`)
@@ -1244,7 +1142,7 @@ async function build() {
     const docs = []
     for (const slug of slugs) {
       try {
-        const doc = await simpleProcessMDXFile(slug)
+        const doc = await processMDXFile(slug)
         docs.push(doc)
       } catch (err) {
         console.error(`  ✗ Error processing ${slug}:`, err.message)
@@ -1263,15 +1161,6 @@ async function build() {
   } catch (error) {
     console.error('❌ Build failed:', error)
     process.exit(1)
-  }
-}
-
-// Helper to evaluate compiled MDX (when needed)
-async function evaluateSync(code, options) {
-  // For now, return a simple component
-  // In production, you'd use @mdx-js/mdx's evaluate
-  return {
-    default: () => null
   }
 }
 
