@@ -1,6 +1,6 @@
 # Elide Documentation
 
-Fast, static documentation site for Elide, served by Elide itself (dogfooding).
+Fast, static documentation site for Elide, served by Elide.
 
 ## Tech Stack
 
