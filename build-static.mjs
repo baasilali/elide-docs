@@ -124,7 +124,13 @@ const navbarSections = [
             title: 'Web & JavaScript APIs', 
             href: '/docs/javascript-web-apis', 
             slug: 'javascript-web-apis',
-            children: [] // Will be populated with specific Web APIs
+            children: [
+              { title: 'Encoding API', slug: 'javascript-web-encoding' },
+              { title: 'Fetch API', slug: 'javascript-web-fetch', comingSoon: true },
+              { title: 'URL API', slug: 'javascript-web-url' },
+              { title: 'Web Crypto API', slug: 'javascript-web-crypto', comingSoon: true },
+              { title: 'Web Streams API', slug: 'javascript-web-streams', comingSoon: true },
+            ]
           },
           { title: 'WinterTC', href: '/docs/javascript-wintertc', slug: 'javascript-wintertc' },
           { title: 'SQLite in JavaScript', href: '/docs/javascript-sqlite', slug: 'javascript-sqlite' },
