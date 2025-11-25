@@ -75,7 +75,62 @@ const navbarSections = [
       {
         title: 'Supported Languages',
     items: [
-      { title: 'JavaScript', href: '/docs/javascript', slug: 'javascript' },
+      { 
+        title: 'JavaScript', 
+        href: '/docs/javascript', 
+        slug: 'javascript',
+        children: [
+          { 
+            title: 'Node API', 
+            href: '/docs/javascript-node-api', 
+            slug: 'javascript-node-api',
+            children: [
+              { title: 'Assertions', href: '/docs/javascript-node-assertions', slug: 'javascript-node-assertions' },
+              { title: 'Async Hooks', href: '/docs/javascript-node-async-hooks', slug: 'javascript-node-async-hooks', comingSoon: true },
+              { title: 'Buffer', href: '/docs/javascript-node-buffer', slug: 'javascript-node-buffer' },
+              { title: 'Child Process', href: '/docs/javascript-node-child-process', slug: 'javascript-node-child-process' },
+              { title: 'Crypto', href: '/docs/javascript-node-crypto', slug: 'javascript-node-crypto', comingSoon: true },
+              { title: 'DNS', href: '/docs/javascript-node-dns', slug: 'javascript-node-dns', comingSoon: true },
+              { title: 'Events', href: '/docs/javascript-node-events', slug: 'javascript-node-events' },
+              { title: 'Filesystem', href: '/docs/javascript-node-filesystem', slug: 'javascript-node-filesystem' },
+              { title: 'HTTP', href: '/docs/javascript-node-http', slug: 'javascript-node-http', comingSoon: true },
+              { title: 'HTTP/2', href: '/docs/javascript-node-http2', slug: 'javascript-node-http2', comingSoon: true },
+              { title: 'HTTPS', href: '/docs/javascript-node-https', slug: 'javascript-node-https', comingSoon: true },
+              { title: 'Inspector', href: '/docs/javascript-node-inspector', slug: 'javascript-node-inspector', comingSoon: true },
+              { title: 'Modules', href: '/docs/javascript-node-modules', slug: 'javascript-node-modules', comingSoon: true },
+              { title: 'Net', href: '/docs/javascript-node-net', slug: 'javascript-node-net', comingSoon: true },
+              { title: 'OS', href: '/docs/javascript-node-os', slug: 'javascript-node-os' },
+              { title: 'Path', href: '/docs/javascript-node-path', slug: 'javascript-node-path' },
+              { title: 'Performance Hooks', href: '/docs/javascript-node-performance-hooks', slug: 'javascript-node-performance-hooks', comingSoon: true },
+              { title: 'Query Strings', href: '/docs/javascript-node-query-strings', slug: 'javascript-node-query-strings', comingSoon: true },
+              { title: 'Readline', href: '/docs/javascript-node-readline', slug: 'javascript-node-readline', comingSoon: true },
+              { title: 'Stream', href: '/docs/javascript-node-stream', slug: 'javascript-node-stream', comingSoon: true },
+              { title: 'String Decoder', href: '/docs/javascript-node-string-decoder', slug: 'javascript-node-string-decoder', comingSoon: true },
+              { title: 'Test Runner', href: '/docs/javascript-node-test-runner', slug: 'javascript-node-test-runner', comingSoon: true },
+              { title: 'Timers', href: '/docs/javascript-node-timers', slug: 'javascript-node-timers', comingSoon: true },
+              { title: 'TLS/SSL', href: '/docs/javascript-node-tls-ssl', slug: 'javascript-node-tls-ssl', comingSoon: true },
+              { title: 'TTY', href: '/docs/javascript-node-tty', slug: 'javascript-node-tty', comingSoon: true },
+              { title: 'UDP/Datagram', href: '/docs/javascript-node-udp-datagram', slug: 'javascript-node-udp-datagram', comingSoon: true },
+              { title: 'URL', href: '/docs/javascript-node-url', slug: 'javascript-node-url' },
+              { title: 'Utilities', href: '/docs/javascript-node-utilities', slug: 'javascript-node-utilities', comingSoon: true },
+              { title: 'V8', href: '/docs/javascript-node-v8', slug: 'javascript-node-v8', comingSoon: true },
+              { title: 'VM', href: '/docs/javascript-node-vm', slug: 'javascript-node-vm', comingSoon: true },
+              { title: 'WASI', href: '/docs/javascript-node-wasi', slug: 'javascript-node-wasi', comingSoon: true },
+              { title: 'Worker Threads', href: '/docs/javascript-node-worker-threads', slug: 'javascript-node-worker-threads', comingSoon: true },
+              { title: 'Zlib', href: '/docs/javascript-node-zlib', slug: 'javascript-node-zlib' },
+            ]
+          },
+          { 
+            title: 'Web & JavaScript APIs', 
+            href: '/docs/javascript-web-apis', 
+            slug: 'javascript-web-apis',
+            children: [] // Will be populated with specific Web APIs
+          },
+          { title: 'WinterTC', href: '/docs/javascript-wintertc', slug: 'javascript-wintertc' },
+          { title: 'SQLite in JavaScript', href: '/docs/javascript-sqlite', slug: 'javascript-sqlite' },
+          { title: 'JavaScript Tools', href: '/docs/javascript-tools', slug: 'javascript-tools' },
+        ]
+      },
       { title: 'TypeScript', href: '/docs/typescript', slug: 'typescript' },
       { title: 'Python', href: '/docs/python', slug: 'python' },
           { title: 'Ruby', href: '/docs/ruby', slug: 'ruby' },
@@ -302,11 +357,20 @@ async function copyAssets() {
 
 // Generate static navbar HTML with active state
 function generateNavBarHTML(currentSlug) {
+  // Helper to check if slug exists anywhere in the tree
+  const containsSlug = (item, targetSlug) => {
+    if (item.slug === targetSlug) return true
+    if (item.children && item.children.length > 0) {
+      return item.children.some(child => containsSlug(child, targetSlug))
+    }
+    return false
+  }
+  
   // Find which navbar section the current slug belongs to
   let activeNavId = null
   for (const nav of navbarSections) {
     for (const section of nav.sections) {
-      if (section.items.some(item => item.slug === currentSlug)) {
+      if (section.items.some(item => containsSlug(item, currentSlug))) {
         activeNavId = nav.id
         break
       }
@@ -433,11 +497,20 @@ function generateNavBarHTML(currentSlug) {
 
 // Generate static sidebar HTML from docs-config - filtered by navbar section
 function generateSidebarHTML(currentSlug) {
+  // Helper to check if slug exists anywhere in the tree
+  const containsSlug = (item, targetSlug) => {
+    if (item.slug === targetSlug) return true
+    if (item.children && item.children.length > 0) {
+      return item.children.some(child => containsSlug(child, targetSlug))
+    }
+    return false
+  }
+  
   // Find which navbar section this slug belongs to
   let currentNavSection = null
   for (const nav of navbarSections) {
     for (const section of nav.sections) {
-      if (section.items.some(item => item.slug === currentSlug)) {
+      if (section.items.some(item => containsSlug(item, currentSlug))) {
         currentNavSection = nav
         break
       }
@@ -485,19 +558,155 @@ function generateSidebarHTML(currentSlug) {
             <ul class="space-y-2">
     `
     
+    // Helper function to check if any child is active
+    const hasActiveChild = (item) => {
+      if (item.slug === currentSlug) return true
+      if (item.children && item.children.length > 0) {
+        return item.children.some(child => hasActiveChild(child))
+      }
+      return false
+    }
+    
+    // Render items with nested children
     for (const item of section.items) {
       const isActive = item.slug === currentSlug
+      const hasChildren = item.children && item.children.length > 0
+      const isExpanded = hasActiveChild(item)
       const activeClass = isActive ? 'shadow-[0_0_15px_rgba(168,85,247,0.3)]' : ''
       const activeBg = isActive ? 'background: rgba(168, 85, 247, 0.15);' : ''
+      
       sidebarHTML += `
-              <li>
-                <a 
-                  href="/docs/${item.slug}.html" 
-                  class="block px-5 py-3 rounded-md text-lg text-foreground hover:bg-accent hover:text-accent-foreground hover:shadow-[0_0_15px_rgba(168,85,247,0.3)] transition-all duration-200 ${activeClass}"
-                  style="${activeBg}"
-                >
-                  ${item.title}
-                </a>
+              <li class="sidebar-item-wrapper">
+                <div class="flex items-center justify-between">
+                  <a 
+                    href="/docs/${item.slug}.html" 
+                    class="flex-1 block px-5 py-3 rounded-md text-lg text-foreground hover:bg-accent hover:text-accent-foreground hover:shadow-[0_0_15px_rgba(168,85,247,0.3)] transition-all duration-200 ${activeClass}"
+                    style="${activeBg}"
+                  >
+                    ${item.title}
+                  </a>
+      `
+      
+      if (hasChildren) {
+        sidebarHTML += `
+                  <button 
+                    class="sidebar-toggle px-3 py-3 text-muted-foreground hover:text-foreground transition-colors"
+                    data-target="${item.slug}-children"
+                    aria-label="Toggle ${item.title} submenu"
+                  >
+                    <svg class="h-5 w-5 transform transition-transform ${isExpanded ? 'rotate-90' : ''}" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                    </svg>
+                  </button>
+        `
+      }
+      
+      sidebarHTML += `
+                </div>
+      `
+      
+      // Render nested children
+      if (hasChildren) {
+        sidebarHTML += `
+                <ul id="${item.slug}-children" class="ml-4 mt-1 space-y-1 p-2 rounded-lg bg-muted/30 ${isExpanded ? '' : 'hidden'}">
+        `
+        
+        for (const child of item.children) {
+          const childIsActive = child.slug === currentSlug
+          const childHasChildren = child.children && child.children.length > 0
+          const childIsExpanded = hasActiveChild(child)
+          const childActiveClass = childIsActive ? 'shadow-[0_0_15px_rgba(168,85,247,0.3)]' : ''
+          const childActiveBg = childIsActive ? 'background: rgba(168, 85, 247, 0.15);' : ''
+          
+          sidebarHTML += `
+                  <li class="sidebar-item-wrapper">
+                    <div class="flex items-center justify-between">
+                      <a 
+                        href="/docs/${child.slug}.html" 
+                        class="flex-1 block px-4 py-2 rounded-md text-base text-foreground hover:bg-accent hover:text-accent-foreground hover:shadow-[0_0_15px_rgba(168,85,247,0.3)] transition-all duration-200 ${childActiveClass}"
+                        style="${childActiveBg}"
+                      >
+                        ${child.title}
+                      </a>
+          `
+          
+          if (childHasChildren) {
+            sidebarHTML += `
+                      <button 
+                        class="sidebar-toggle px-2 py-2 text-muted-foreground hover:text-foreground transition-colors"
+                        data-target="${child.slug}-children"
+                        aria-label="Toggle ${child.title} submenu"
+                      >
+                        <svg class="h-4 w-4 transform transition-transform ${childIsExpanded ? 'rotate-90' : ''}" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                        </svg>
+                      </button>
+            `
+          }
+          
+          sidebarHTML += `
+                    </div>
+          `
+          
+          // Render nested children (level 3)
+          if (childHasChildren) {
+            sidebarHTML += `
+                    <ul id="${child.slug}-children" class="ml-4 mt-1 space-y-1 p-2 rounded-lg bg-muted/40 ${childIsExpanded ? '' : 'hidden'}">
+            `
+            
+            for (const grandchild of child.children) {
+              const grandchildIsActive = grandchild.slug === currentSlug
+              const grandchildActiveClass = grandchildIsActive ? 'shadow-[0_0_15px_rgba(168,85,247,0.3)]' : ''
+              const grandchildActiveBg = grandchildIsActive ? 'background: rgba(168, 85, 247, 0.15);' : ''
+              const comingSoonIcon = grandchild.comingSoon ? `
+                <span class="coming-soon-icon ml-2 inline-flex items-center justify-center w-4 h-4 rounded-full bg-muted text-muted-foreground text-xs" title="Available soon">
+                  <svg class="w-3 h-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </span>
+              ` : ''
+              
+              if (grandchild.comingSoon) {
+                // Render as non-clickable span for coming soon items
+                sidebarHTML += `
+                      <li>
+                        <span class="flex items-center px-3 py-2 rounded-md text-sm text-muted-foreground cursor-not-allowed opacity-60">
+                          <span>${grandchild.title}</span>${comingSoonIcon}
+                        </span>
+                      </li>
+                `
+              } else {
+                // Render as clickable link for available items
+                sidebarHTML += `
+                      <li>
+                        <a 
+                          href="/docs/${grandchild.slug}.html" 
+                          class="flex items-center px-3 py-2 rounded-md text-sm text-foreground hover:bg-accent hover:text-accent-foreground hover:shadow-[0_0_15px_rgba(168,85,247,0.3)] transition-all duration-200 ${grandchildActiveClass}"
+                          style="${grandchildActiveBg}"
+                        >
+                          <span>${grandchild.title}</span>
+                        </a>
+                      </li>
+                `
+              }
+            }
+            
+            sidebarHTML += `
+                    </ul>
+            `
+          }
+          
+          sidebarHTML += `
+                  </li>
+          `
+        }
+        
+        sidebarHTML += `
+                </ul>
+        `
+      }
+      
+      sidebarHTML += `
               </li>
       `
     }
@@ -659,6 +868,35 @@ function generateHTMLPage(title, content, slug) {
       overscroll-behavior: none;
       overscroll-behavior-y: none;
     }
+    
+    /* Coming soon tooltip */
+    .coming-soon-icon {
+      position: relative;
+      cursor: help;
+    }
+    
+    .coming-soon-icon::after {
+      content: attr(title);
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%) translateY(-8px);
+      background: rgba(0, 0, 0, 0.9);
+      color: white;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+      z-index: 100;
+    }
+    
+    .coming-soon-icon:hover::after {
+      opacity: 1;
+      transition-delay: 1s;
+    }
   </style>
 </head>
 <body>
@@ -706,6 +944,34 @@ function generateHTMLPage(title, content, slug) {
         console.log('Mobile menu toggle');
       });
     }
+
+    // Sidebar dropdown toggle
+    (function() {
+      const toggleButtons = document.querySelectorAll('.sidebar-toggle');
+      
+      toggleButtons.forEach(button => {
+        button.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          
+          const targetId = button.getAttribute('data-target');
+          const targetElement = document.getElementById(targetId);
+          const icon = button.querySelector('svg');
+          
+          if (targetElement) {
+            const isHidden = targetElement.classList.contains('hidden');
+            
+            if (isHidden) {
+              targetElement.classList.remove('hidden');
+              if (icon) icon.classList.add('rotate-90');
+            } else {
+              targetElement.classList.add('hidden');
+              if (icon) icon.classList.remove('rotate-90');
+            }
+          }
+        });
+      });
+    })();
 
     // Search bar pop-out effect with background blur
     (function() {
@@ -1151,9 +1417,19 @@ async function generateIndex() {
 
 // Get all doc slugs from config
 function getAllDocSlugs() {
+  const collectSlugs = (item) => {
+    const slugs = [item.slug]
+    if (item.children && item.children.length > 0) {
+      item.children.forEach(child => {
+        slugs.push(...collectSlugs(child))
+      })
+    }
+    return slugs
+  }
+  
   return navbarSections.flatMap(nav =>
     nav.sections.flatMap(section =>
-    section.items.map(item => item.slug)
+      section.items.flatMap(item => collectSlugs(item))
     )
   )
 }

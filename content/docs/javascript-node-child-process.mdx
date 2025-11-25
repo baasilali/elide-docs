@@ -1,0 +1,49 @@
+---
+title: "Child Process"
+description: "Node.js Child Process API in Elide"
+---
+
+# Child Process
+
+The `child_process` module provides the ability to spawn subprocesses.
+
+## Basic Usage
+
+```javascript
+import { exec, spawn } from 'node:child_process';
+
+// Execute a command
+exec('ls -la', (error, stdout, stderr) => {
+  if (error) {
+    console.error(`Error: ${error.message}`);
+    return;
+  }
+  console.log(stdout);
+});
+
+// Spawn a new process
+const child = spawn('ls', ['-la']);
+child.stdout.on('data', (data) => {
+  console.log(`stdout: ${data}`);
+});
+```
+
+## Common Methods
+
+### child_process.exec(command[, options][, callback])
+
+Spawns a shell and executes the command within that shell.
+
+### child_process.spawn(command[, args][, options])
+
+Spawns a new process using the given command.
+
+### child_process.fork(modulePath[, args][, options])
+
+Spawns a new Node.js process and invokes a specified module.
+
+## Learn More
+
+- [Node.js Child Process Documentation](https://nodejs.org/api/child_process.html)
+
+

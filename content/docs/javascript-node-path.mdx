@@ -1,0 +1,58 @@
+---
+title: "Path"
+description: "Node.js Path API in Elide"
+---
+
+# Path
+
+The `path` module provides utilities for working with file and directory paths.
+
+## Basic Usage
+
+```javascript
+import path from 'node:path';
+
+const filePath = '/user/local/bin/file.txt';
+
+console.log('Directory:', path.dirname(filePath));
+console.log('Basename:', path.basename(filePath));
+console.log('Extension:', path.extname(filePath));
+
+const joined = path.join('/user', 'local', 'bin', 'file.txt');
+console.log('Joined:', joined);
+
+const resolved = path.resolve('file.txt');
+console.log('Resolved:', resolved);
+```
+
+## Common Methods
+
+### path.join([...paths])
+
+Joins all given path segments together using the platform-specific separator.
+
+### path.resolve([...paths])
+
+Resolves a sequence of paths or path segments into an absolute path.
+
+### path.dirname(path)
+
+Returns the directory name of a path.
+
+### path.basename(path[, ext])
+
+Returns the last portion of a path.
+
+### path.extname(path)
+
+Returns the extension of the path.
+
+### path.parse(path)
+
+Returns an object whose properties represent significant elements of the path.
+
+## Learn More
+
+- [Node.js Path Documentation](https://nodejs.org/api/path.html)
+
+

@@ -1,0 +1,37 @@
+---
+title: "Assertions"
+description: "Node.js Assertions API in Elide"
+---
+
+# Assertions
+
+The `assert` module provides a set of assertion functions for verifying invariants.
+
+## Basic Usage
+
+```javascript
+import assert from 'node:assert';
+
+assert.strictEqual(1 + 1, 2);
+assert.deepStrictEqual({ a: 1 }, { a: 1 });
+```
+
+## Common Methods
+
+### assert.strictEqual(actual, expected[, message])
+
+Tests strict equality between the `actual` and `expected` parameters.
+
+### assert.deepStrictEqual(actual, expected[, message])
+
+Tests for deep equality between the `actual` and `expected` parameters.
+
+### assert.throws(fn[, error][, message])
+
+Expects the function `fn` to throw an error.
+
+## Learn More
+
+- [Node.js Assert Documentation](https://nodejs.org/api/assert.html)
+
+

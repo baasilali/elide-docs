@@ -1,0 +1,48 @@
+---
+title: "Events"
+description: "Node.js Events API in Elide"
+---
+
+# Events
+
+The `events` module provides an EventEmitter class for handling events.
+
+## Basic Usage
+
+```javascript
+import { EventEmitter } from 'node:events';
+
+class MyEmitter extends EventEmitter {}
+
+const myEmitter = new MyEmitter();
+
+myEmitter.on('event', (a, b) => {
+  console.log(a, b);
+});
+
+myEmitter.emit('event', 'a', 'b');
+```
+
+## Common Methods
+
+### emitter.on(eventName, listener)
+
+Adds the listener function to the end of the listeners array for the event.
+
+### emitter.emit(eventName[, ...args])
+
+Synchronously calls each of the listeners registered for the event.
+
+### emitter.once(eventName, listener)
+
+Adds a one-time listener function for the event.
+
+### emitter.removeListener(eventName, listener)
+
+Removes the specified listener from the listener array.
+
+## Learn More
+
+- [Node.js Events Documentation](https://nodejs.org/api/events.html)
+
+

@@ -1,0 +1,54 @@
+---
+title: "URL"
+description: "Node.js URL API in Elide"
+---
+
+# URL
+
+The `url` module provides utilities for URL resolution and parsing.
+
+## Basic Usage
+
+```javascript
+import { URL } from 'node:url';
+
+const myURL = new URL('https://example.com:8000/path?query=value#hash');
+
+console.log('Protocol:', myURL.protocol);
+console.log('Hostname:', myURL.hostname);
+console.log('Port:', myURL.port);
+console.log('Pathname:', myURL.pathname);
+console.log('Search:', myURL.search);
+console.log('Hash:', myURL.hash);
+```
+
+## URL Class
+
+### new URL(input[, base])
+
+Creates a new URL object by parsing the input relative to the base.
+
+```javascript
+const myURL = new URL('/path', 'https://example.com');
+console.log(myURL.href); // 'https://example.com/path'
+```
+
+## URLSearchParams
+
+The `URLSearchParams` API provides read and write access to the query of a URL.
+
+```javascript
+const params = new URLSearchParams('foo=bar&baz=qux');
+
+console.log(params.get('foo')); // 'bar'
+params.append('key', 'value');
+params.delete('baz');
+
+console.log(params.toString()); // 'foo=bar&key=value'
+```
+
+## Learn More
+
+- [Node.js URL Documentation](https://nodejs.org/api/url.html)
+
+

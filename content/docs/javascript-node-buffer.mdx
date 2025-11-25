@@ -1,0 +1,41 @@
+---
+title: "Buffer"
+description: "Node.js Buffer API in Elide"
+---
+
+# Buffer
+
+The `Buffer` class is a global type for dealing with binary data directly.
+
+## Basic Usage
+
+```javascript
+// Create a Buffer from a string
+const buf1 = Buffer.from('hello world', 'utf8');
+
+// Create a Buffer of length 10 filled with zeros
+const buf2 = Buffer.alloc(10);
+
+// Create an uninitialized Buffer of length 10
+const buf3 = Buffer.allocUnsafe(10);
+```
+
+## Common Methods
+
+### Buffer.from(array)
+
+Allocates a new Buffer using an array of bytes.
+
+### Buffer.alloc(size[, fill[, encoding]])
+
+Allocates a new Buffer of `size` bytes.
+
+### buf.toString([encoding[, start[, end]]])
+
+Decodes the Buffer to a string according to the specified character encoding.
+
+## Learn More
+
+- [Node.js Buffer Documentation](https://nodejs.org/api/buffer.html)
+
+

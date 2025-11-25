@@ -1,0 +1,66 @@
+---
+title: "Zlib"
+description: "Node.js Zlib API in Elide"
+---
+
+# Zlib
+
+The `zlib` module provides compression functionality implemented using Gzip, Deflate/Inflate, and Brotli.
+
+## Basic Usage
+
+```javascript
+import { gzip, gunzip } from 'node:zlib/promises';
+import { promisify } from 'node:util';
+
+// Compress data
+const input = 'Hello, World!';
+const compressed = await gzip(input);
+console.log('Compressed size:', compressed.length);
+
+// Decompress data
+const decompressed = await gunzip(compressed);
+console.log('Decompressed:', decompressed.toString());
+```
+
+## Common Methods
+
+### zlib.gzip(buffer[, options], callback)
+
+Compresses a Buffer using Gzip.
+
+### zlib.gunzip(buffer[, options], callback)
+
+Decompresses a Gzip buffer.
+
+### zlib.deflate(buffer[, options], callback)
+
+Compresses a Buffer using Deflate.
+
+### zlib.inflate(buffer[, options], callback)
+
+Decompresses a Deflate buffer.
+
+### zlib.brotliCompress(buffer[, options], callback)
+
+Compresses a Buffer using Brotli.
+
+## Streaming API
+
+```javascript
+import { createGzip } from 'node:zlib';
+import { pipeline } from 'node:stream/promises';
+import { createReadStream, createWriteStream } from 'node:fs';
+
+await pipeline(
+  createReadStream('input.txt'),
+  createGzip(),
+  createWriteStream('input.txt.gz')
+);
+```
+
+## Learn More
+
+- [Node.js Zlib Documentation](https://nodejs.org/api/zlib.html)
+
+

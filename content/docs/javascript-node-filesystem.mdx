@@ -1,0 +1,56 @@
+---
+title: "Filesystem"
+description: "Node.js Filesystem API in Elide"
+---
+
+# Filesystem
+
+The `fs` module provides an API for interacting with the file system.
+
+## Basic Usage
+
+```javascript
+import { readFile, writeFile } from 'node:fs/promises';
+
+// Read a file
+const content = await readFile('file.txt', 'utf8');
+console.log(content);
+
+// Write to a file
+await writeFile('output.txt', 'Hello, World!', 'utf8');
+```
+
+## Common Methods
+
+### fs.readFile(path[, options], callback)
+
+Asynchronously reads the entire contents of a file.
+
+### fs.writeFile(file, data[, options], callback)
+
+Asynchronously writes data to a file, replacing the file if it already exists.
+
+### fs.readdir(path[, options], callback)
+
+Reads the contents of a directory.
+
+### fs.stat(path[, options], callback)
+
+Gets file status information.
+
+## Promise API
+
+The `fs/promises` API provides promise-based versions of the filesystem methods:
+
+```javascript
+import * as fs from 'node:fs/promises';
+
+await fs.mkdir('newdir');
+await fs.rmdir('olddir');
+```
+
+## Learn More
+
+- [Node.js Filesystem Documentation](https://nodejs.org/api/fs.html)
+
+

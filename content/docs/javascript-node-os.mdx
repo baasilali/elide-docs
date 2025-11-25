@@ -1,0 +1,54 @@
+---
+title: "OS"
+description: "Node.js OS API in Elide"
+---
+
+# OS
+
+The `os` module provides operating system-related utility methods and properties.
+
+## Basic Usage
+
+```javascript
+import os from 'node:os';
+
+console.log('Platform:', os.platform());
+console.log('Architecture:', os.arch());
+console.log('CPUs:', os.cpus().length);
+console.log('Free memory:', os.freemem());
+console.log('Total memory:', os.totalmem());
+console.log('Home directory:', os.homedir());
+console.log('Temp directory:', os.tmpdir());
+```
+
+## Common Methods
+
+### os.platform()
+
+Returns a string identifying the operating system platform.
+
+### os.arch()
+
+Returns the operating system CPU architecture.
+
+### os.cpus()
+
+Returns an array of objects containing information about each logical CPU core.
+
+### os.freemem()
+
+Returns the amount of free system memory in bytes.
+
+### os.totalmem()
+
+Returns the total amount of system memory in bytes.
+
+### os.homedir()
+
+Returns the home directory of the current user.
+
+## Learn More
+
+- [Node.js OS Documentation](https://nodejs.org/api/os.html)
+
+
