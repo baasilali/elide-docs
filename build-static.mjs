@@ -22,17 +22,17 @@ const navbarSections = [
     id: 'runtime',
     title: 'Runtime',
     sections: [
-      {
-        title: 'Getting Started',
-        items: [
-          { title: 'Introduction', href: '/docs/introduction', slug: 'introduction' },
+  {
+    title: 'Getting Started',
+    items: [
+      { title: 'Introduction', href: '/docs/introduction', slug: 'introduction' },
           { title: 'Getting Started', href: '/docs/getting-started', slug: 'getting-started' },
           { title: 'Elide Runtime', href: '/docs/runtime', slug: 'runtime' },
-        ],
-      },
-      {
+    ],
+  },
+  {
         title: 'Documentation',
-        items: [
+    items: [
           { title: 'CLI References', href: '/docs/cli-references', slug: 'cli-references' },
           { title: 'Contributors', href: '/docs/contributors', slug: 'contributors' },
           { title: 'Acknowledgements', href: '/docs/acknowledgements', slug: 'acknowledgements' },
@@ -73,16 +73,16 @@ const navbarSections = [
       },
       {
         title: 'Supported Languages',
-        items: [
-          { title: 'JavaScript', href: '/docs/javascript', slug: 'javascript' },
-          { title: 'TypeScript', href: '/docs/typescript', slug: 'typescript' },
-          { title: 'Python', href: '/docs/python', slug: 'python' },
+    items: [
+      { title: 'JavaScript', href: '/docs/javascript', slug: 'javascript' },
+      { title: 'TypeScript', href: '/docs/typescript', slug: 'typescript' },
+      { title: 'Python', href: '/docs/python', slug: 'python' },
           { title: 'Ruby', href: '/docs/ruby', slug: 'ruby' },
-        ],
-      },
-      {
+    ],
+  },
+  {
         title: 'Additional Languages',
-        items: [
+    items: [
           { title: 'WebAssembly', href: '/docs/webassembly', slug: 'webassembly' },
           { title: 'Pkl', href: '/docs/pkl', slug: 'pkl' },
           { title: 'Experimental Engines', href: '/docs/experimental-engines', slug: 'experimental-engines' },
@@ -96,8 +96,8 @@ const navbarSections = [
     sections: [
       {
         title: 'Core Topics',
-        items: [
-          { title: 'Security', href: '/docs/security', slug: 'security' },
+    items: [
+      { title: 'Security', href: '/docs/security', slug: 'security' },
           { title: 'Performance', href: '/docs/performance', slug: 'performance' },
         ],
       },
@@ -321,7 +321,7 @@ function generateNavBarHTML(currentSlug) {
     const isActive = isNavActive(nav.id)
     const firstSlug = nav.sections[0]?.items[0]?.slug || 'introduction'
     const icon = navIcons[nav.id] || ''
-    return `
+  return `
       <a href="/docs/${firstSlug}.html" class="flex items-center gap-2.5 px-4 lg:px-5 py-4 text-base font-medium transition-all duration-200 relative ${isActive ? 'text-primary' : 'text-muted-foreground hover:text-foreground'}">
         ${icon}
         <span>${nav.title}</span>
@@ -439,10 +439,6 @@ function generateSidebarHTML(currentSlug) {
   let sidebarHTML = `
     <aside class="fixed top-36 left-0 z-40 h-[calc(100vh-9rem)] w-[416px] border-r border-border bg-card/30 backdrop-blur-md hidden lg:block">
       <div class="flex flex-col h-full p-8 overflow-y-auto">
-        <div class="mb-10">
-          <h2 class="text-3xl font-bold text-foreground mb-2">${currentNavSection.title}</h2>
-          <p class="text-lg text-muted-foreground">Technical reference & guides</p>
-        </div>
         <nav class="flex-1 space-y-8">
   `
   
@@ -500,8 +496,8 @@ function generateSidebarHTML(currentSlug) {
     if (!isLastSection) {
       sidebarHTML += `
             <div class="mt-6 pt-6 border-t border-border/40 ml-3 mr-0"></div>
-      `
-    }
+    `
+  }
     
     sidebarHTML += `
           </div>
@@ -539,13 +535,13 @@ function generateTocHTML(content) {
   const headings = extractHeadings(content)
   
   if (headings.length === 0) {
-    return `
+  return `
       <aside class="hidden lg:block fixed top-36 right-0 w-[374px] h-[calc(100vh-9rem)] overflow-y-auto">
         <div class="p-8">
           <div class="text-base font-semibold text-foreground mb-5">
-            On this page
-          </div>
-          <nav class="space-y-1 border-l-2 border-border">
+          On this page
+        </div>
+        <nav class="space-y-1 border-l-2 border-border">
             <p class="block py-2 px-4 text-sm text-muted-foreground">No sections found</p>
           </nav>
         </div>
@@ -650,7 +646,7 @@ function generateHTMLPage(title, content, slug) {
             <div class="w-full">
               <article class="mdx-content">
                 ${contentWithIds}
-              </article>
+            </article>
             </div>
           </div>
         </main>
@@ -1117,7 +1113,7 @@ async function generateIndex() {
 function getAllDocSlugs() {
   return navbarSections.flatMap(nav =>
     nav.sections.flatMap(section =>
-      section.items.map(item => item.slug)
+    section.items.map(item => item.slug)
     )
   )
 }
