@@ -8,7 +8,7 @@ const execAsync = promisify(exec)
 
 // Build CSS using Tailwind CLI
 async function buildCSS() {
-  console.log('📦 Building CSS...')
+  console.log('[CSS] Building CSS...')
   
   // Ensure public directory exists
   if (!existsSync('public')) {
@@ -18,9 +18,9 @@ async function buildCSS() {
   // Run Tailwind CLI to compile CSS
   try {
     await execAsync('npx @tailwindcss/cli@latest -i styles/globals.css -o public/styles.css --minify')
-    console.log('✓ CSS built to public/styles.css')
+    console.log('[OK] CSS built to public/styles.css')
   } catch (error) {
-    console.error('❌ CSS build failed:', error.message)
+    console.error('[FAIL] CSS build failed:', error.message)
     throw error
   }
 }

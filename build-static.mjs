@@ -241,7 +241,7 @@ function highlightCode(code, language) {
 
 // Clean and create dist directory
 async function setup() {
-  console.log('🧹 Cleaning dist directory...')
+  console.log('[CLEAN] Cleaning dist directory...')
   await fs.rm(DIST_DIR, { recursive: true, force: true })
   await fs.mkdir(DIST_DIR, { recursive: true })
   await fs.mkdir(path.join(DIST_DIR, 'docs'), { recursive: true })
@@ -250,7 +250,7 @@ async function setup() {
 
 // Copy static assets
 async function copyAssets() {
-  console.log('📦 Copying static assets...')
+  console.log('[COPY] Copying static assets...')
   
   async function copyRecursive(src, dest) {
     const stat = await fs.stat(src)
@@ -280,10 +280,10 @@ async function copyAssets() {
       const dest = path.join(DIST_DIR, 'assets', file)
       
       await copyRecursive(src, dest)
-      console.log(`  ✓ Copied ${file}`)
+      console.log(`  [OK] Copied ${file}`)
     }
   } catch (err) {
-    console.warn('  ⚠ Could not copy public assets:', err.message)
+    console.warn('  [WARN] Could not copy public assets:', err.message)
   }
 }
 
@@ -946,7 +946,7 @@ function generateHTMLPage(title, content, slug) {
 
 // MDX to HTML converter
 async function processMDXFile(slug) {
-  console.log(`  📄 Processing ${slug}...`)
+  console.log(`  [BUILD] Processing ${slug}...`)
   
   const filePath = path.join(CONTENT_DIR, `${slug}.mdx`)
   const source = await fs.readFile(filePath, 'utf8')
@@ -1031,14 +1031,14 @@ async function processMDXFile(slug) {
   const outputPath = path.join(DIST_DIR, 'docs', `${slug}.html`)
   await fs.writeFile(outputPath, pageHTML, 'utf8')
   
-  console.log(`  ✓ Generated ${slug}.html`)
+  console.log(`  [OK] Generated ${slug}.html`)
   
   return { slug, title, frontmatter }
 }
 
 // Generate index/home page
 async function generateIndex() {
-  console.log('🏠 Generating index page...')
+  console.log('[INDEX] Generating index page...')
   
   const html = `<!DOCTYPE html>
 <html lang="en" class="dark">
@@ -1110,7 +1110,7 @@ async function generateIndex() {
   
   await fs.writeFile(path.join(DIST_DIR, 'index.html'), html, 'utf8')
   
-  console.log('  ✓ Generated index.html (landing page)')
+  console.log('  [OK] Generated index.html (landing page)')
 }
 
 // Get all doc slugs from config
@@ -1124,7 +1124,7 @@ function getAllDocSlugs() {
 
 // Main build function
 async function build() {
-  console.log('🚀 Building Elide Documentation (Static)...\n')
+  console.log('[BUILD] Building Elide Documentation (Static)...\n')
   
   try {
     // Setup
@@ -1134,7 +1134,7 @@ async function build() {
     await copyAssets()
     
     // Get all docs from config
-    console.log('\n📚 Processing documentation files...')
+    console.log('\n[DOCS] Processing documentation files...')
     const slugs = getAllDocSlugs()
     console.log(`  Found ${slugs.length} documents\n`)
     
@@ -1145,21 +1145,21 @@ async function build() {
         const doc = await processMDXFile(slug)
         docs.push(doc)
       } catch (err) {
-        console.error(`  ✗ Error processing ${slug}:`, err.message)
+        console.error(`  [ERROR] Error processing ${slug}:`, err.message)
       }
     }
     
     // Generate index page
     await generateIndex()
     
-    console.log('\n✅ Build complete! Files in dist/')
-    console.log('\n📖 To view the docs, run:')
+    console.log('\n[SUCCESS] Build complete! Files in dist/')
+    console.log('\n[INFO] To view the docs, run:')
     console.log('   elide serve dist --port 3000')
     console.log('   or')
     console.log('   bun run serve')
     
   } catch (error) {
-    console.error('❌ Build failed:', error)
+    console.error('[FAIL] Build failed:', error)
     process.exit(1)
   }
 }
