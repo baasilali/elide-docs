@@ -338,6 +338,9 @@ function generateNavBarHTML(currentSlug) {
   const releasesActive = activeNavId === 'releases'
   
   return `
+    <!-- Search Backdrop Overlay -->
+    <div id="search-backdrop" class="fixed inset-0 bg-black/50 backdrop-blur-md z-40 opacity-0 pointer-events-none transition-opacity duration-300"></div>
+    
     <nav class="fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-card/80 backdrop-blur-md border-b border-border shadow-lg">
       <!-- Top Row - Logo, Search, Install -->
       <div class="border-b border-border/50">
@@ -350,16 +353,17 @@ function generateNavBarHTML(currentSlug) {
 
             <!-- Search Bar - Desktop (Center) -->
             <div class="hidden md:flex flex-1 max-w-md mx-10 lg:mx-14 xl:mx-20">
-              <div class="relative w-full">
-                <svg class="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <div id="search-container" class="relative w-full transition-all duration-300">
+                <svg class="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground pointer-events-none z-10" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
                 <input
+                  id="search-input"
                   type="text"
                   placeholder="Search..."
-                  class="w-full pl-12 pr-5 py-3 bg-background/50 border border-border rounded-md text-base focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
+                  class="w-full pl-12 pr-5 py-3 bg-background/50 border border-border rounded-md text-base focus:outline-none transition-all duration-300"
                 />
-                <kbd class="absolute right-4 top-1/2 transform -translate-y-1/2 px-2.5 py-1 text-sm bg-muted rounded border border-border">
+                <kbd class="absolute right-4 top-1/2 transform -translate-y-1/2 px-2.5 py-1 text-sm bg-muted rounded border border-border pointer-events-none z-10" id="search-kbd">
                   ⌘K
                 </kbd>
               </div>
@@ -670,6 +674,111 @@ function generateHTMLPage(title, content, slug) {
         console.log('Mobile menu toggle');
       });
     }
+
+    // Search bar pop-out effect with background blur
+    (function() {
+      const searchInput = document.getElementById('search-input');
+      const searchContainer = document.getElementById('search-container');
+      const searchBackdrop = document.getElementById('search-backdrop');
+      const searchKbd = document.getElementById('search-kbd');
+      const sidebar = document.querySelector('aside');
+      const tocSidebar = document.getElementById('toc-sidebar');
+      const mainContent = document.querySelector('main');
+      
+      if (!searchInput || !searchContainer || !searchBackdrop) return;
+      
+      function activateSearch() {
+        // Show backdrop with blur
+        searchBackdrop.style.opacity = '1';
+        searchBackdrop.style.pointerEvents = 'auto';
+        
+        // Pop out search bar
+        searchContainer.style.transform = 'scale(1.05) translateY(-2px)';
+        searchContainer.style.zIndex = '60';
+        searchInput.style.borderColor = 'rgb(168, 85, 247)';
+        searchInput.style.boxShadow = '0 0 0 3px rgba(168, 85, 247, 0.1), 0 20px 40px rgba(0, 0, 0, 0.3)';
+        searchInput.style.backgroundColor = 'rgb(var(--background))';
+        
+        // Blur sidebars and main content
+        if (sidebar) {
+          sidebar.style.filter = 'blur(4px)';
+          sidebar.style.opacity = '0.5';
+          sidebar.style.transition = 'filter 0.3s, opacity 0.3s';
+        }
+        if (tocSidebar) {
+          tocSidebar.style.filter = 'blur(4px)';
+          tocSidebar.style.opacity = '0.5';
+          tocSidebar.style.transition = 'filter 0.3s, opacity 0.3s';
+        }
+        if (mainContent) {
+          mainContent.style.filter = 'blur(4px)';
+          mainContent.style.opacity = '0.5';
+          mainContent.style.transition = 'filter 0.3s, opacity 0.3s';
+        }
+        
+        // Hide kbd hint
+        if (searchKbd) searchKbd.style.opacity = '0';
+      }
+      
+      function deactivateSearch() {
+        // Hide backdrop
+        searchBackdrop.style.opacity = '0';
+        searchBackdrop.style.pointerEvents = 'none';
+        
+        // Reset search bar
+        searchContainer.style.transform = 'scale(1) translateY(0)';
+        searchContainer.style.zIndex = '';
+        searchInput.style.borderColor = '';
+        searchInput.style.boxShadow = '';
+        searchInput.style.backgroundColor = '';
+        
+        // Remove blur from sidebars and main content
+        if (sidebar) {
+          sidebar.style.filter = '';
+          sidebar.style.opacity = '';
+        }
+        if (tocSidebar) {
+          tocSidebar.style.filter = '';
+          tocSidebar.style.opacity = '';
+        }
+        if (mainContent) {
+          mainContent.style.filter = '';
+          mainContent.style.opacity = '';
+        }
+        
+        // Show kbd hint if input is empty
+        if (searchKbd && !searchInput.value) searchKbd.style.opacity = '1';
+      }
+      
+      // Focus event
+      searchInput.addEventListener('focus', activateSearch);
+      
+      // Blur event
+      searchInput.addEventListener('blur', () => {
+        // Small delay to allow clicking on search results if implemented
+        setTimeout(deactivateSearch, 150);
+      });
+      
+      // Escape key to close
+      searchInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          searchInput.blur();
+        }
+      });
+      
+      // Click backdrop to close
+      searchBackdrop.addEventListener('click', () => {
+        searchInput.blur();
+      });
+      
+      // Cmd/Ctrl + K to focus search
+      document.addEventListener('keydown', (e) => {
+        if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+          e.preventDefault();
+          searchInput.focus();
+        }
+      });
+    })();
 
     // Table of Contents scroll tracking with pink/purple highlighting
     (function() {
