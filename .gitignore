@@ -5,7 +5,14 @@ node_modules
 .env
 .env.local
 .dev
+dev/
 
 # Build outputs
 dist/
 public/styles.css
+
+# Internal docs (not needed for reproduction)
+references/
+
+# Optional: Uncomment if you don't want to track lock file
+# bun.lock
