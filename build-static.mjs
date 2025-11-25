@@ -341,7 +341,7 @@ function generateNavBarHTML(currentSlug) {
     <nav class="fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-card/80 backdrop-blur-md border-b border-border shadow-lg">
       <!-- Top Row - Logo, Search, Install -->
       <div class="border-b border-border/50">
-        <div class="max-w-[1920px] mx-auto px-8 lg:px-10 xl:px-14">
+        <div class="w-full px-8 lg:px-10 xl:px-14">
           <div class="flex justify-between items-center h-20">
             <!-- Logo (Far Left) -->
             <a href="/" class="flex items-center gap-2 hover:opacity-80 transition-opacity">
@@ -387,7 +387,7 @@ function generateNavBarHTML(currentSlug) {
 
       <!-- Bottom Row - Navigation (Aligned with Logo) -->
       <div class="hidden md:block">
-        <div class="max-w-[1920px] mx-auto px-8 lg:px-10 xl:px-14">
+        <div class="w-full px-8 lg:px-10 xl:px-14">
           <div class="flex justify-between items-center">
             <!-- Left Navigation - Aligned with Logo above -->
             <div class="flex items-center gap-3 lg:gap-5 xl:gap-7">
