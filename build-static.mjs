@@ -531,8 +531,8 @@ function generateSidebarHTML(currentSlug) {
   
   let sidebarHTML = `
     <aside class="fixed top-36 left-0 z-40 h-[calc(100vh-9rem)] w-[416px] border-r border-border bg-card/30 backdrop-blur-md hidden lg:block">
-      <div class="flex flex-col h-full p-8 overflow-y-auto">
-        <nav class="flex-1 space-y-8">
+      <div class="flex flex-col h-full">
+        <nav class="flex-1 space-y-8 overflow-y-auto p-8">
   `
   
   // Icon mapping for section headers
@@ -737,7 +737,7 @@ function generateSidebarHTML(currentSlug) {
         </nav>
         
         <!-- Bottom Links -->
-        <div class="mt-8 pt-6 border-t border-border/50">
+        <div class="p-8 pt-6 border-t border-border/50">
           <div class="space-y-2">
             <a href="https://github.com/elide-dev/elide" target="_blank" rel="noopener noreferrer" class="flex items-center gap-3 px-5 py-3 text-lg text-muted-foreground hover:text-foreground transition-colors rounded-lg hover:bg-accent/50">
               <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
