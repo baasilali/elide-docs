@@ -6,98 +6,439 @@ date: "2025-11-20"
 
 # CLI References
 
-Complete guide to the Elide command-line interface.
+Elide supports multiple sub-commands, similar to Git. This reference guide covers all available commands and options.
 
-## Commands
+## Usage Syntax
 
-### elide run
-
-Run a script file:
-
-```bash
-elide run [options] <file>
+```text
+Usage:
+  elide srcfile.{js|ts|jsx|tsx|py|kts...} [OPTIONS] [--] [ARG...]
+  or:  elide {script} [OPTIONS] [--] [ARG...]
+  or:  elide build|test|check|project [OPTIONS] [TASKS...]
+  or:  elide info|help|discord|bug... [OPTIONS]
+  or:  elide js|node [OPTIONS] [--code CODE] [FILE] [ARG...]
+  or:  elide run|repl|serve [OPTIONS] [--code CODE] [FILE] [ARG...]
+  or:  elide javac|kotlinc|jar|javadoc|... [OPTIONS] [SOURCES...]
 ```
 
-**Options:**
-- `--inspect` - Enable debugger
-- `--watch` - Watch for file changes
-- `--env <file>` - Load environment variables
+Manage, configure, and run polyglot applications with Elide.
 
-**Examples:**
+### Parameters
 
-```bash
-# Run a JavaScript file
-elide run app.js
+<div class="my-6">
+  <table class="w-full border-collapse">
+    <thead>
+      <tr class="border-b-2 border-border">
+        <th class="text-left py-3 px-4 font-semibold">Parameter</th>
+        <th class="text-left py-3 px-4 font-semibold">Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="border-b border-border/40">
+        <td class="py-3 px-4"><code>[@filename...]</code></td>
+        <td class="py-3 px-4">One or more argument files with options, commands and parameters</td>
+      </tr>
+      <tr class="border-b border-border/40">
+        <td class="py-3 px-4"><code>[FILE]</code></td>
+        <td class="py-3 px-4">Source file to run</td>
+      </tr>
+      <tr>
+        <td class="py-3 px-4"><code>[ARG...]</code></td>
+        <td class="py-3 px-4">Arguments to pass to the script</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
 
-# Run with debugging
-elide run --inspect app.js
+<div class="border-t border-border/40 my-12"></div>
 
-# Run with environment file
-elide run --env .env app.js
+## Runner Commands
+
+**`run`, `r`, `repl`**
+
+Run a script file or a snippet of code; if no code is given, start an interactive REPL session. Elide will select an appropriate language if given a clearly identifiable source file (Python for `.py`, Ruby for `.rb`, etc.).
+
+```shell
+$ elide run app.js
+$ elide run script.py
+$ elide repl
+$ elide run --code "console.log('Hello!')"
 ```
 
-### elide build
+**`serve`**
 
-Build your application:
+Alias to `run` a server in any language; Elide will block until the server exits.
 
-```bash
-elide build [options]
+```shell
+$ elide serve server.js
 ```
 
-**Options:**
-- `--native` - Build native binary
-- `--output <path>` - Output directory
-- `--optimize` - Enable optimizations
+**`test`**
 
-**Examples:**
+Run a polyglot script, server, or interactive shell in test mode.
 
-```bash
-# Build native binary
-elide build --native
-
-# Build with optimization
-elide build --native --optimize
+```shell
+$ elide test
+$ elide test pattern
 ```
 
-### elide test
+<div class="border-t border-border/40 my-12"></div>
 
-Run tests:
+## Language-Specific Commands
 
-```bash
-elide test [pattern]
+**`js`, `node`**
+
+Runs a JavaScript file. Equivalent to `elide run --javascript ...`. Note that JavaScript is the default language engine.
+
+```shell
+$ elide js app.js
+$ elide node app.js
+$ elide js --code "console.log('Hello!')"
 ```
 
-### elide repl
+**`python`**
 
-Start interactive REPL:
+Alias to `run` some Python. Equivalent to `elide run --python ...`.
 
-```bash
-elide repl
+```shell
+$ elide python script.py
 ```
 
-## Configuration
+**`ruby`**
 
-Create `elide.pkl` for project configuration:
+Alias to `run` some Ruby. Equivalent to `elide run --ruby ...`.
 
-```pkl
-module elide
-
-build {
-  target = "native"
-  optimize = true
-}
-
-runtime {
-  maxMemory = "2G"
-  threads = 4
-}
+```shell
+$ elide ruby app.rb
 ```
 
-## Environment Variables
+<div class="border-t border-border/40 my-12"></div>
 
-| Variable | Description |
-|----------|-------------|
-| `ELIDE_HOME` | Elide installation directory |
-| `ELIDE_DEBUG` | Enable debug logging |
-| `ELIDE_CACHE` | Cache directory location |
+## Project Commands
 
+**`project`**
+
+Manage Elide projects, which are defined by `elide.pkl` or other project manifests.
+
+```shell
+$ elide project
+```
+
+**`init`**
+
+Initialize a new Elide project.
+
+```shell
+$ elide init
+```
+
+**`build`**
+
+For this or a specified project, run the build, or a script mapped at the name 'build' within `elide.pkl`, or project manifests like `package.json`.
+
+```shell
+$ elide build
+$ elide build --native
+```
+
+**`dev`**
+
+Run an Elide project in development mode.
+
+```shell
+$ elide dev
+```
+
+**`install`, `i`**
+
+For this or a specified project, resolve and install all dependencies. Dependencies are installed for all declared ecosystems, modulo provided flags.
+
+```shell
+$ elide install
+$ elide i
+```
+
+**`add`**
+
+For this or a specified project, add one or more dependencies, and then install them. Dependency coordinates are accepted in many forms.
+
+```shell
+$ elide add package-name
+$ elide add org.example:library:1.0.0
+```
+
+<div class="border-t border-border/40 my-12"></div>
+
+## JVM Toolchain Commands
+
+**`kotlinc`**
+
+The Kotlin compiler (kotlinc) is a command-line tool that compiles Kotlin programs.
+
+```shell
+$ elide kotlinc -- [KOTLINC_OPTIONS] [SOURCES...]
+```
+
+**`javac`**
+
+The Java compiler, supporting up to JDK 24.
+
+```shell
+$ elide javac -- [JAVAC_OPTIONS] [SOURCES...]
+```
+
+**`jar`**
+
+Builds and manages Java Archive files (JARs).
+
+```shell
+$ elide jar -- [TOOL_OPTIONS] [FILES...]
+```
+
+**`javadoc`**
+
+Renders Java code into documentation.
+
+```shell
+$ elide javadoc -- [TOOL_OPTIONS] [FILES...]
+```
+
+**`native-image`**
+
+The Native Image compiler (native-image) is a command-line tool that compiles native binaries.
+
+```shell
+$ elide native-image [OPTIONS]
+```
+
+**`jib`**
+
+Jib can build container images from JVM or native apps.
+
+```shell
+$ elide jib [OPTIONS]
+```
+
+<div class="border-t border-border/40 my-12"></div>
+
+## Utility Commands
+
+**`info`**
+
+Show info about the current app and environment.
+
+```shell
+$ elide info
+```
+
+Displays information about your Elide installation, including version, supported languages, and environment details.
+
+**`which`**
+
+Print the path to a tool binary.
+
+```shell
+$ elide which kotlinc
+$ elide which javac
+```
+
+**`help`, `docs`, `bug`, `issue`, `feature`**
+
+Report an issue or bug, find help for using Elide. Can search Elide's documentation at this version, and can open links to GitHub.
+
+```shell
+$ elide help
+$ elide docs run
+$ elide bug
+$ elide issue
+$ elide feature
+```
+
+**`discord`**
+
+Open or show a link to join the Elide Discord server.
+
+```shell
+$ elide discord
+```
+
+**`completions`**
+
+Generate bash/zsh completion script for Elide.
+
+```shell
+$ elide completions
+```
+
+**`pkl`**
+
+Run the Pkl command-line tools.
+
+```shell
+$ elide pkl [command]
+```
+
+**`lsp`**
+
+Run an LSP instance for an Elide project.
+
+```shell
+$ elide lsp
+```
+
+**`mcp`**
+
+Run an MCP instance for an Elide project.
+
+```shell
+$ elide mcp
+```
+
+**`secrets`**
+
+Manage secrets for the current app.
+
+```shell
+$ elide secrets
+```
+
+<div class="border-t border-border/40 my-12"></div>
+
+## Global Options
+
+All commands support these global options:
+
+<div class="my-6">
+  <table class="w-full border-collapse">
+    <thead>
+      <tr class="border-b-2 border-border">
+        <th class="text-left py-3 px-4 font-semibold">Option</th>
+        <th class="text-left py-3 px-4 font-semibold">Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="border-b border-border/40">
+        <td class="py-3 px-4"><code>-h, --help</code></td>
+        <td class="py-3 px-4">Show help text for any command</td>
+      </tr>
+      <tr class="border-b border-border/40">
+        <td class="py-3 px-4"><code>--version</code></td>
+        <td class="py-3 px-4">Print version information and exit</td>
+      </tr>
+      <tr class="border-b border-border/40">
+        <td class="py-3 px-4"><code>-v, --verbose</code></td>
+        <td class="py-3 px-4">Enable verbose output (debug logging)</td>
+      </tr>
+      <tr class="border-b border-border/40">
+        <td class="py-3 px-4"><code>--debug</code></td>
+        <td class="py-3 px-4">Activate debugging features and extra logging</td>
+      </tr>
+      <tr class="border-b border-border/40">
+        <td class="py-3 px-4"><code>-q, --quiet</code></td>
+        <td class="py-3 px-4">Squelch most output</td>
+      </tr>
+      <tr class="border-b border-border/40">
+        <td class="py-3 px-4"><code>-p, --project=PATH</code></td>
+        <td class="py-3 px-4">Path to the project to build</td>
+      </tr>
+      <tr class="border-b border-border/40">
+        <td class="py-3 px-4"><code>--[no-]pretty</code></td>
+        <td class="py-3 px-4">Enable or disable colorized output</td>
+      </tr>
+      <tr class="border-b border-border/40">
+        <td class="py-3 px-4"><code>--[no-]lockfile</code></td>
+        <td class="py-3 px-4">Enable or disable use of Elide's lockfile system</td>
+      </tr>
+      <tr class="border-b border-border/40">
+        <td class="py-3 px-4"><code>--[no-]frozen</code></td>
+        <td class="py-3 px-4">Treat the lockfile as frozen</td>
+      </tr>
+      <tr class="border-b border-border/40">
+        <td class="py-3 px-4"><code>--timeout=secs</code></td>
+        <td class="py-3 px-4">Timeout to apply when exiting (in seconds)</td>
+      </tr>
+      <tr>
+        <td class="py-3 px-4"><code>--</code></td>
+        <td class="py-3 px-4">Separator between options and positional parameters</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="alert alert-tip">
+  <svg class="alert-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+    <path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+  </svg>
+  <div class="alert-content">
+    <div class="alert-title">Tip: Debug Logging</div>
+    <p>Debug-level logging can be <strong>very verbose</strong>. Use <code>--debug</code> only when troubleshooting specific issues.</p>
+  </div>
+</div>
+
+<div class="border-t border-border/40 my-12"></div>
+
+## Exit Codes
+
+When running Elide commands, you may encounter these exit codes:
+
+<div class="my-6">
+  <table class="w-full border-collapse">
+    <thead>
+      <tr class="border-b-2 border-border">
+        <th class="text-left py-3 px-4 font-semibold">Code</th>
+        <th class="text-left py-3 px-4 font-semibold">Meaning</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="border-b border-border/40">
+        <td class="py-3 px-4"><code>0</code></td>
+        <td class="py-3 px-4">Successful program execution</td>
+      </tr>
+      <tr class="border-b border-border/40">
+        <td class="py-3 px-4"><code>1</code></td>
+        <td class="py-3 px-4">Generic failure (terminal error)</td>
+      </tr>
+      <tr>
+        <td class="py-3 px-4"><code>2</code></td>
+        <td class="py-3 px-4">Exception in user code</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="border-t border-border/40 my-12"></div>
+
+## See Also
+
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 my-8 not-prose">
+  <a href="/docs/runtime.html" class="feature-card group flex flex-col p-6 rounded-lg border border-border bg-card/30 backdrop-blur-sm transition-all duration-300 hover:border-primary/50 hover:shadow-[0_0_30px_rgba(168,85,247,0.2)]" style="text-decoration: none;">
+    <h3 class="text-lg font-bold text-foreground m-0 mb-3">Elide Runtime</h3>
+    <p class="text-muted-foreground text-base leading-relaxed flex-grow">
+      Learn about the runtime architecture and how Elide executes your code
+    </p>
+  </a>
+  
+  <a href="/docs/getting-started.html" class="feature-card group flex flex-col p-6 rounded-lg border border-border bg-card/30 backdrop-blur-sm transition-all duration-300 hover:border-primary/50 hover:shadow-[0_0_30px_rgba(168,85,247,0.2)]" style="text-decoration: none;">
+    <h3 class="text-lg font-bold text-foreground m-0 mb-3">Getting Started</h3>
+    <p class="text-muted-foreground text-base leading-relaxed flex-grow">
+      Run your first code samples with Elide
+    </p>
+  </a>
+</div>
+
+<div class="border-t border-border/40 my-12"></div>
+
+<div class="flex justify-between mt-12">
+  <a href="/docs/runtime.html" class="group inline-flex items-center gap-2 text-lg font-medium text-foreground hover:text-primary transition-colors" style="text-decoration: none;">
+    <svg class="h-5 w-5 transition-transform duration-300 group-hover:-translate-x-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M11 17l-5-5m0 0l5-5m-5 5h12" />
+    </svg>
+    <span>Previous: Elide Runtime</span>
+  </a>
+  <a href="/docs/contributors.html" class="group inline-flex items-center gap-2 text-lg font-medium text-foreground hover:text-primary transition-colors" style="text-decoration: none;">
+    <span>Next: Contributors</span>
+    <svg class="h-5 w-5 transition-transform duration-300 group-hover:translate-x-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+    </svg>
+  </a>
+</div>
