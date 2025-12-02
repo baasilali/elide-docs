@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+#!/usr/bin/env bun
 import { exec } from 'child_process'
 import { promisify } from 'util'
 import { mkdir } from 'fs/promises'
@@ -17,7 +17,7 @@ async function buildCSS() {
   
   // Run Tailwind CLI to compile CSS
   try {
-    await execAsync('npx @tailwindcss/cli@latest -i styles/globals.css -o public/styles.css --minify')
+    await execAsync('bunx @tailwindcss/cli@latest -i styles/globals.css -o public/styles.css --minify')
     console.log('[OK] CSS built to public/styles.css')
   } catch (error) {
     console.error('[FAIL] CSS build failed:', error.message)

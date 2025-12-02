@@ -4,7 +4,7 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "build:css": "npx @tailwindcss/cli -i styles/globals.css -o public/styles.css",
+    "build:css": "bunx @tailwindcss/cli -i styles/globals.css -o public/styles.css",
     "build": "bun run build:css && bun build-static.mjs",
     "serve": "elide serve dist --port 3000",
     "dev": "bun run build && bun run serve",
