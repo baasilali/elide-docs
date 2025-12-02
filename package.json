@@ -8,6 +8,7 @@
     "build": "bun run build:css && bun build-static.mjs",
     "serve": "elide serve dist --port 3000",
     "dev": "bun run build && bun run serve",
+    "test": "rm -rf dist && bun run build && bun run serve",
     "kill": "lsof -ti:3000,8080 | xargs kill -9 2>/dev/null || echo 'No processes found on ports 3000 or 8080'",
     "clean": "bun run kill && rm -rf dist node_modules/.cache"
   },
