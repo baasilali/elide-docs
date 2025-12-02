@@ -1502,6 +1502,28 @@ async function processMDXFile(slug) {
   return { slug, title, frontmatter }
 }
 
+// Generate redirect page for introduction -> readme
+async function generateIntroductionRedirect() {
+  console.log('[REDIRECT] Creating introduction.html redirect...')
+  
+  const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="refresh" content="0; url=/docs/readme.html">
+  <link rel="canonical" href="/docs/readme.html">
+  <title>Redirecting...</title>
+  <script>window.location.href = "/docs/readme.html";</script>
+</head>
+<body>
+  <p>Redirecting to <a href="/docs/readme.html">README</a>...</p>
+</body>
+</html>`
+  
+  await fs.writeFile(path.join(DIST_DIR, 'docs', 'introduction.html'), html, 'utf8')
+  console.log('  [OK] Generated introduction.html (redirects to readme.html)')
+}
+
 // Generate index/home page
 async function generateIndex() {
   console.log('[INDEX] Generating index page...')
@@ -1627,6 +1649,9 @@ async function build() {
     
     // Generate index page
     await generateIndex()
+    
+    // Generate introduction redirect
+    await generateIntroductionRedirect()
     
     console.log('\n[SUCCESS] Build complete! Files in dist/')
     console.log('\n[INFO] To view the docs, run:')
