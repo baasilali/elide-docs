@@ -1,50 +1,124 @@
 ---
 title: "Getting Started"
-description: "Get up and running with Elide in minutes"
+description: "Run your first code samples with Elide"
 date: "2025-11-20"
 ---
 
 # Getting Started
 
-Quick guide to installing and running your first Elide application.
+Run your first code samples with Elide
 
-## Prerequisites
+## Before you start
 
-Before you begin, make sure you have:
+You'll need an installed copy of Elide. Follow the <a href="/docs/installation.html" class="text-primary hover:text-primary/80 transition-colors border-b border-primary/40 hover:border-primary/60" style="text-decoration: none;">Installation</a> guide to obtain a copy of Elide.
 
-- Java 11 or higher
-- Basic knowledge of JavaScript/TypeScript or Python
+## Running some code
 
-## Installation
+Elide can accept a raw string of code or a file to run in any supported language. Best attempts are made to detect the primary language via the source file's extension (`.js` will load a JS VM, `.py` a Python VM, etc.).
 
-Install Elide using your preferred method:
-
-```bash
-# macOS/Linux
-curl -fsSL https://elide.dev/install.sh | bash
-
-# Windows
-iwr https://elide.dev/install.ps1 -useb | iex
-```
-
-## Your First Application
-
-Create a simple "Hello World" application:
-
-```javascript
-// hello.js
-console.log("Hello from Elide!")
-```
-
-Run it:
+**1. Let's run a snippet of JavaScript**
 
 ```bash
-elide run hello.js
+elide run --javascript -c "console.log('Hello!');"
 ```
 
-## Next Steps
+```shell
+Hello!
+Exiting session. Have a great day! 👋
+```
 
-- Read the [Elide Runtime](/docs/runtime) guide
-- Explore [CLI References](/docs/cli-references)
-- Check out [Examples](/examples)
+**2. Now let's do the same thing, but with some Python**
 
+```bash
+elide run --python -c 'print("Hello!")'
+```
+
+```shell
+Hello!
+Exiting session. Have a great day! 👋
+```
+
+<div class="alert alert-tip">
+  <svg class="alert-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+    <path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+  </svg>
+  <div class="alert-content">
+    <div class="alert-title">Tip: Language Selection</div>
+    <p>Elide can run multiple languages at once. Your primary language selection only affects how your entrypoint script is processed; you can run an entrypoint in Python that uses code in JavaScript, for example.</p>
+  </div>
+</div>
+
+## Polyglot terminal
+
+Elide can run an interactive read-eval-print-loop (REPL) session for each supported language. There are several ways to kick one off, the easiest being:
+
+**Open a JavaScript console:**
+
+```shell
+$ elide
+```
+
+**Open a Python console:**
+
+```shell
+$ elide python
+```
+
+<div class="alert alert-tip">
+  <svg class="alert-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+    <path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+  </svg>
+  <div class="alert-content">
+    <div class="alert-title">Tip: Exiting the REPL</div>
+    <p>You can use <code>Ctrl+D</code> or <code>Ctrl+C</code> twice to exit the interactive session.</p>
+  </div>
+</div>
+
+## See Also
+
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 my-8 not-prose">
+  <a href="/docs/installation.html" class="feature-card group flex flex-col p-6 rounded-lg border border-border bg-card/30 backdrop-blur-sm transition-all duration-300 hover:border-primary/50 hover:shadow-[0_0_30px_rgba(168,85,247,0.2)]" style="text-decoration: none;">
+    <h3 class="text-lg font-bold text-foreground m-0 mb-3">Installing Elide</h3>
+    <p class="text-muted-foreground text-base leading-relaxed flex-grow">
+      Install Elide on your machine with a simple one-liner or download pre-built binaries for your platform
+    </p>
+  </a>
+  
+  <a href="/docs/interop.html" class="feature-card group flex flex-col p-6 rounded-lg border border-border bg-card/30 backdrop-blur-sm transition-all duration-300 hover:border-primary/50 hover:shadow-[0_0_30px_rgba(168,85,247,0.2)]" style="text-decoration: none;">
+    <h3 class="text-lg font-bold text-foreground m-0 mb-3">Polyglot 101: Thinking in Multiple Languages</h3>
+    <p class="text-muted-foreground text-base leading-relaxed flex-grow">
+      Learn how to work with multiple programming languages in a single application
+    </p>
+  </a>
+  
+  <a href="/docs/javascript.html" class="feature-card group flex flex-col p-6 rounded-lg border border-border bg-card/30 backdrop-blur-sm transition-all duration-300 hover:border-primary/50 hover:shadow-[0_0_30px_rgba(168,85,247,0.2)]" style="text-decoration: none;">
+    <h3 class="text-lg font-bold text-foreground m-0 mb-3">Elide Runtime: JavaScript</h3>
+    <p class="text-muted-foreground text-base leading-relaxed flex-grow">
+      Explore JavaScript support in Elide including Node.js APIs and modern features
+    </p>
+  </a>
+  
+  <a href="/docs/python.html" class="feature-card group flex flex-col p-6 rounded-lg border border-border bg-card/30 backdrop-blur-sm transition-all duration-300 hover:border-primary/50 hover:shadow-[0_0_30px_rgba(168,85,247,0.2)]" style="text-decoration: none;">
+    <h3 class="text-lg font-bold text-foreground m-0 mb-3">Elide Runtime: Python</h3>
+    <p class="text-muted-foreground text-base leading-relaxed flex-grow">
+      Learn about Python support in Elide and how to use Python modules
+    </p>
+  </a>
+</div>
+
+<div class="border-t border-border/40 my-12"></div>
+
+<div class="flex justify-between mt-12">
+  <a href="/docs/installation.html" class="group inline-flex items-center gap-2 text-lg font-medium text-foreground hover:text-primary transition-colors" style="text-decoration: none;">
+    <svg class="h-5 w-5 transition-transform duration-300 group-hover:-translate-x-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M11 17l-5-5m0 0l5-5m-5 5h12" />
+    </svg>
+    <span>Previous: Installation</span>
+  </a>
+  <a href="/docs/runtime.html" class="group inline-flex items-center gap-2 text-lg font-medium text-foreground hover:text-primary transition-colors" style="text-decoration: none;">
+    <span>Next: Elide Runtime</span>
+    <svg class="h-5 w-5 transition-transform duration-300 group-hover:translate-x-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+    </svg>
+  </a>
+</div>
