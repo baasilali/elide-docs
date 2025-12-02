@@ -25,7 +25,8 @@ const navbarSections = [
   {
     title: 'Getting Started',
     items: [
-      { title: 'Introduction', href: '/docs/introduction', slug: 'introduction' },
+      { title: 'README', href: '/docs/readme', slug: 'readme' },
+          { title: 'Installation', href: '/docs/installation', slug: 'installation' },
           { title: 'Getting Started', href: '/docs/getting-started', slug: 'getting-started' },
           { title: 'Elide Runtime', href: '/docs/runtime', slug: 'runtime' },
     ],
@@ -403,7 +404,7 @@ function generateNavBarHTML(currentSlug) {
   const leftNavSections = navbarSections.filter(nav => nav.id !== 'releases')
   const leftNavHTML = leftNavSections.map(nav => {
     const isActive = isNavActive(nav.id)
-    const firstSlug = nav.sections[0]?.items[0]?.slug || 'introduction'
+    const firstSlug = nav.sections[0]?.items[0]?.slug || 'readme'
     const icon = navIcons[nav.id] || ''
   return `
       <a href="/docs/${firstSlug}.html" class="flex items-center gap-2.5 px-4 lg:px-5 py-4 text-base font-medium transition-all duration-200 relative ${isActive ? 'text-primary' : 'text-muted-foreground hover:text-foreground'}">
@@ -1388,7 +1389,7 @@ async function generateIndex() {
       
       <!-- Button -->
       <a 
-        href="/docs/introduction.html" 
+        href="/docs/readme.html" 
         class="inline-flex items-center px-8 py-4 bg-primary text-primary-foreground hover:bg-primary/90 hover:shadow-[0_0_30px_rgba(168,85,247,0.5)] transition-all duration-300 rounded-lg text-lg font-semibold"
       >
         View Documentation

@@ -141,7 +141,7 @@ bun run dev
 3. **Serving** (`elide serve`):
    - Elide's native HTTP server starts
    - Serves static files from `dist/`
-   - Handles routing (e.g., `/docs/introduction.html`)
+   - Handles routing (e.g., `/docs/readme.html`)
    - No server-side rendering or processing
    - Pure file serving with HTTP headers
 
@@ -286,6 +286,6 @@ No React, no MDX runtime, no UI frameworks.
 ## Notes
 
 - All navigation config is in `build-static.mjs` navbarSections array
-- Feature cards on introduction page use inline HTML in `introduction.mdx`
+- Feature cards on README page use inline HTML in `readme.mdx`
 - Mobile menu toggles but requires JavaScript implementation
 - Git hooks prevent committing `dist/` files
