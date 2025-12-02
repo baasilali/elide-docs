@@ -4,13 +4,10 @@ description: "Learn about Elide - a high-performance polyglot runtime for modern
 date: "2025-11-19"
 ---
 
-import { Alert } from '@/components/ui/alert'
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-
 # Welcome to Elide
 
-Elide is a high-performance multi-language software runtime powered by GraalVM that lets you run JavaScript, TypeScript, Python, and JVM languages in a single application with native-image compilation for instant startup times and minimal memory footprint.
+Elide is a high-performance multi-language software runtime powered by <a href="https://www.graalvm.org/" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-0.5 text-primary hover:text-primary/80 transition-colors border-b border-primary/40 hover:border-primary/60" style="text-decoration: none;">GraalVM<svg class="h-3 w-3 inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg></a>.
+Here you can find reference docs, guides, code samples, and more.
 
 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 my-12 not-prose">
   <a href="/docs/runtime.html" class="feature-card group flex flex-col p-6 rounded-xl border border-border bg-card/30 backdrop-blur-sm transition-all duration-300 hover:border-primary/50 hover:shadow-[0_0_40px_rgba(168,85,247,0.3)]" style="text-decoration: none; min-height: 240px;">
@@ -89,218 +86,133 @@ Elide is a high-performance multi-language software runtime powered by GraalVM t
 
 <div class="border-t border-border/40 my-12"></div>
 
-<Alert>
-  <strong>What makes Elide special?</strong> Unlike traditional runtimes, Elide can compile your entire application—including dependencies—into a single native binary that starts in milliseconds and uses a fraction of the memory.
-</Alert>
+## Highlights
 
-## What is Elide?
+**Elide is a runtime, like Node or Python.**
 
-Elide combines the best of multiple worlds:
+You install it on your machine as a standalone binary. Elide is statically linked and has essentially zero runtime dependencies.
 
-- **Polyglot Runtime**: Run multiple languages in a single application with seamless interoperability
-- **Native Compilation**: Compile to native binaries for instant startup (< 10ms) and low memory usage
-- **Built-in HTTP Server**: High-performance server powered by Netty (800K+ req/s on Linux)
-- **Modern APIs**: Clean, standards-based APIs similar to Deno and Bun
-- **GraalVM Foundation**: Built on battle-tested GraalVM technology for optimal performance
+You can install it on macOS or Linux with this one-liner:
 
-## Key Features
+```bash
+curl -sSL --tlsv1.2 elide.sh | bash -s -
+```
 
-<div className="grid gap-4 md:grid-cols-2 mt-6 not-prose">
-  <Card>
-    <CardHeader>
-      <CardTitle>Lightning Fast Startup</CardTitle>
-      <CardDescription>
-        Native image compilation delivers < 10ms cold start times vs 500ms+ for traditional JVM
-      </CardDescription>
-    </CardHeader>
-  </Card>
-  
-  <Card>
-    <CardHeader>
-      <CardTitle>Minimal Memory</CardTitle>
-      <CardDescription>
-        Optimized memory footprint - run hundreds of functions in less memory than a single Node.js process
-      </CardDescription>
-    </CardHeader>
-  </Card>
-  
-  <Card>
-    <CardHeader>
-      <CardTitle>Polyglot Power</CardTitle>
-      <CardDescription>
-        Use JavaScript for business logic, Python for data science, and Java libraries - all in one app
-      </CardDescription>
-    </CardHeader>
-  </Card>
-  
-  <Card>
-    <CardHeader>
-      <CardTitle>Production Ready</CardTitle>
-      <CardDescription>
-        Built on GraalVM with enterprise-grade security, performance, and reliability
-      </CardDescription>
-    </CardHeader>
-  </Card>
+<br />
+
+**Elide can run multiple languages.**
+
+JavaScript, TypeScript, WASM, and Python are built-in. Ruby, JVM (Java, Kotlin, Scala), and LLVM (Swift, C++, Rust) are on the way.
+
+```typescript
+// hello.ts
+import py from "./my-app.py"
+
+// this line exists to show that this is typescript
+const msg: () => string = () => `${py.say_hello()} + TypeScript!`
+console.log(JSON.stringify({greeting: msg()}))
+```
+
+```python
+def say_hello():
+  """Render a greeting."""
+  return f"Hello from Python"
+```
+
+```bash
+elide ./hello.ts
+```
+
+```json
+{"greeting": "Hello from Python + TypeScript!"}
+```
+
+<br />
+
+**Elide is extremely fast.**
+
+- Elide runs your Python code **up to 3x faster than CPython**.
+- Elide runs your TypeScript code **faster than Node can run JavaScript**.
+- Elide runs your HTTP endpoints at up to **800k RPS**. That's [really fast](/docs/performance).
+
+> **Note**  
+> Elide is independently benchmarked by TechEmpower. [Latest results](https://www.techempower.com/benchmarks/#hw=ph&test=plaintext&section=data-r23:~:text=133-,elide,-4%2C089%2C078)
+
+<br />
+
+**Elide supports the APIs you already know and the tools you already love.**
+
+- Elide is [WinterTC](https://wintertc.org) compatible and passes [Test262](https://github.com/tc39/test262)
+- Like other JS runtimes, Elide **supports a large slice of the [Node API](/docs/javascript-node-api)**.
+- Works with **NPM and PyPI**, **CJS** and **ESM**.
+- Insanely fast **dependency installation** (via [orogene](https://orogene.dev/) and [uv](https://github.com/astral-sh/uv)).
+- Elide supports embedded [SQLite](/docs/javascript-sqlite).
+
+<br />
+
+**Elide provides strong security boundaries and memory safety by default.**
+
+- Written in memory-safe [Kotlin](https://kotlinlang.org) and [Rust](https://rustlang.org).
+- Strong filesystem and environment isolation.
+- Virtualized filesystem support (mount a tarball as your fs!).
+- Extensively tested: over 10,000 unit & conformance tests, in addition to [Test262](https://github.com/tc39/test262).
+
+## Elide is in beta
+
+Check out Elide's launch video
+
+<div class="relative w-full my-6" style="padding-bottom: 56.25%;">
+  <iframe
+    class="absolute top-0 left-0 w-full h-full rounded-lg"
+    src="https://www.youtube.com/embed/Txl9ryfbCw4"
+    title="Elide Launch Video"
+    frameborder="0"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowfullscreen
+  ></iframe>
 </div>
 
-## Quick Example
+<br />
 
-Here's a simple HTTP server in Elide:
+<div class="border-t border-border/40 my-12"></div>
 
-```javascript
-// server.js
-const app = Elide.http
+## See also
 
-app.router.handle("GET", "/", (request, response) => {
-  response.send(200, "Hello, Elide!")
-})
+<div class="grid grid-cols-1 md:grid-cols-4 gap-4 my-8 not-prose">
+  <a href="/docs/installation" class="feature-card group flex flex-col p-4 rounded-lg border border-border bg-card/30 backdrop-blur-sm transition-all duration-300 hover:border-primary/50 hover:shadow-[0_0_30px_rgba(168,85,247,0.2)]" style="text-decoration: none;">
+    <h3 class="text-base font-bold text-foreground m-0 mb-2">Installing Elide</h3>
+    <p class="text-muted-foreground text-sm leading-relaxed flex-grow">
+      Install Elide on your machine
+    </p>
+  </a>
 
-app.router.handle("GET", "/api/data", (request, response) => {
-  response.json({
-    message: "Fast polyglot runtime",
-    timestamp: Date.now()
-  })
-})
-```
+  <a href="/docs/getting-started" class="feature-card group flex flex-col p-4 rounded-lg border border-border bg-card/30 backdrop-blur-sm transition-all duration-300 hover:border-primary/50 hover:shadow-[0_0_30px_rgba(168,85,247,0.2)]" style="text-decoration: none;">
+    <h3 class="text-base font-bold text-foreground m-0 mb-2">Getting Started</h3>
+    <p class="text-muted-foreground text-sm leading-relaxed flex-grow">
+      Code samples in each language
+    </p>
+  </a>
 
-Run it:
+  <a href="/docs/interop" class="feature-card group flex flex-col p-4 rounded-lg border border-border bg-card/30 backdrop-blur-sm transition-all duration-300 hover:border-primary/50 hover:shadow-[0_0_30px_rgba(168,85,247,0.2)]" style="text-decoration: none;">
+    <h3 class="text-base font-bold text-foreground m-0 mb-2">Polyglot 101: Thinking in Multiple Languages</h3>
+    <p class="text-muted-foreground text-sm leading-relaxed flex-grow">
+      Thinking about software in more than one language
+    </p>
+  </a>
 
-```bash
-elide run server.js
-```
+  <a href="/docs/runtime" class="feature-card group flex flex-col p-4 rounded-lg border border-border bg-card/30 backdrop-blur-sm transition-all duration-300 hover:border-primary/50 hover:shadow-[0_0_30px_rgba(168,85,247,0.2)]" style="text-decoration: none;">
+    <h3 class="text-base font-bold text-foreground m-0 mb-2">Elide Runtime: Language Guides</h3>
+    <p class="text-muted-foreground text-sm leading-relaxed flex-grow">
+      Runtime usage guides by language
+    </p>
+  </a>
+</div>
 
-Compile to native binary:
-
-```bash
-elide build --native
-```
-
-This creates a standalone binary with no runtime dependencies!
-
-## Performance Characteristics
-
-| Metric | Elide (Native) | Node.js | Deno |
-|--------|----------------|---------|------|
-| **Cold Start** | ~5ms | ~500ms | ~100ms |
-| **Memory (Hello World)** | ~10MB | ~50MB | ~40MB |
-| **HTTP Throughput** | 800K+ req/s | 200K req/s | 300K req/s |
-| **Binary Size** | ~15MB | N/A | ~90MB |
-
-## Why Choose Elide?
-
-### For Web Applications
-- Ultra-fast server-side rendering (SSR)
-- Minimal resource usage for cost savings
-- Single binary deployment
-- Built-in HTTP/2 and HTTP/3 support
-
-### For Microservices
-- Instant startup for serverless/FaaS
-- High throughput HTTP server
-- Native image packaging
-- Cross-language service composition
-
-### For CLI Tools
-- Fast startup makes CLI tools snappy
-- No runtime installation required
-- Single binary distribution
-- Cross-platform support
-
-### For Serverless Functions
-- Sub-10ms cold starts eliminate warmup
-- Minimal memory reduces costs
-- Native binaries work everywhere
-- No container overhead
-
-## Elide as a Framework
-
-Elide isn't just a runtime—it's also a modern framework with modular components:
-
-| Module | Description | Platforms |
-|--------|-------------|-----------|
-| `core` | Essential utilities and APIs | JVM, JavaScript, Native, WASM |
-| `base` | Extended functionality | JVM, JavaScript, Native |
-| `server` | HTTP server and routing | JVM, Native Image |
-| `ssr` | Server-side rendering | JVM, JavaScript |
-| `graalvm` | GraalVM integration | JVM, Native Image |
-
-Choose only the modules you need—everything works together seamlessly.
-
-## Language Support
-
-### JavaScript/TypeScript
-- **Full ES2024+ support** with modern features
-- **V8-compatible** APIs for familiarity
-- **TypeScript** with type checking and compilation
-- **Top-level await** and modern module system
-
-### Python
-- **Native Python execution** via GraalVM
-- **NumPy, Pandas** and scientific computing libraries
-- **Seamless JS-Python interop** - call Python from JavaScript
-- **Full CPython compatibility**
-
-### JVM Languages
-- **Java, Kotlin, Scala** first-class support
-- **Full Java ecosystem** - use any JVM library
-- **Interop with guest languages**
-- **Native image compilation**
-
-## Project Philosophy
-
-Elide is designed around three core principles:
-
-1. **Performance First**: Native compilation, advanced JIT, zero-copy operations
-2. **Developer Experience**: Clean APIs, excellent tooling, great documentation
-3. **Flexibility**: Use the best language for each task, compose seamlessly
-
-## Use Cases
-
-Elide excels at:
-
-- **High-Performance APIs**: Low latency, high throughput web services
-- **Serverless Functions**: Instant cold starts, minimal memory
-- **Full-Stack Applications**: SSR, API, database—all in one runtime
-- **CLI Tools**: Fast, distributable command-line applications
-- **Microservices**: Efficient resource usage for dense deployments
-- **Edge Computing**: Small footprint for edge/CDN deployment
-
-## What's Included
-
-Out of the box, Elide provides:
-
-- **HTTP Server**: High-performance Netty-based server
-- **Module System**: ES modules, CommonJS, native imports
-- **File System**: Standards-based file operations
-- **Crypto**: Built-in cryptographic primitives
-- **Fetch API**: Standard HTTP client
-- **Console & Logging**: Structured logging support
-- **Environment**: Access to env vars and system info
-
-## Getting Started
-
-Ready to build with Elide? Here's your path:
-
-1. **[Installation](/docs/installation)** - Install Elide on your system
-2. **[Quick Start](/docs/quick-start)** - Build your first Elide app
-3. **[Architecture](/docs/architecture)** - Understand how Elide works
-4. **[API Reference](/docs/api-server)** - Explore available APIs
-
-## Community & Support
-
-- **GitHub**: [github.com/elide-dev/elide](https://github.com/elide-dev/elide)
-- **Documentation**: [docs.elide.dev](https://docs.elide.dev)
-- **Website**: [elide.dev](https://elide.dev)
-- **Issues**: Report bugs and request features on GitHub
-
-## Next Steps
-
-Choose your path:
-
-- New to Elide? Start with the [Quick Start Guide](/docs/quick-start)
-- Want to understand the internals? Check out the [Architecture Guide](/docs/architecture)
-- Ready to build? Jump into the [Server API Reference](/docs/api-server)
-
-<Alert>
-  <strong>Coming from Node.js or Deno?</strong> Elide uses familiar Web APIs, so you'll feel right at home. The main difference is instant startup and dramatically lower memory usage thanks to native compilation.
-</Alert>
+<div class="flex justify-end mt-12">
+  <a href="/docs/installation" class="inline-flex items-center gap-2 px-6 py-3 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-colors" style="text-decoration: none;">
+    <span>Next: Installation</span>
+    <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+    </svg>
+  </a>
+</div>

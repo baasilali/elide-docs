@@ -348,6 +348,7 @@ async function copyAssets() {
     }
   }
   
+  // Copy public directory files
   try {
     const files = await fs.readdir(PUBLIC_DIR)
     for (const file of files) {
@@ -359,6 +360,17 @@ async function copyAssets() {
     }
   } catch (err) {
     console.warn('  [WARN] Could not copy public assets:', err.message)
+  }
+  
+  // Copy fonts directory
+  try {
+    const fontsSource = path.join(__dirname, 'assets', 'fonts')
+    const fontsDest = path.join(DIST_DIR, 'assets', 'fonts')
+    
+    await copyRecursive(fontsSource, fontsDest)
+    console.log(`  [OK] Copied fonts directory`)
+  } catch (err) {
+    console.warn('  [WARN] Could not copy fonts:', err.message)
   }
 }
 
@@ -1263,19 +1275,35 @@ async function processMDXFile(slug) {
   // Parse frontmatter
   const { content: mdxContent, data: frontmatter } = matter(source)
   
-  // Simple markdown to HTML conversion
+  // Step 1: Extract and preserve code blocks FIRST (before removing imports)
   let html = mdxContent
-    // Remove imports
-    .replace(/^import\s+.+$/gm, '')
-  
-  // Process code blocks with syntax highlighting FIRST
+  const codeBlocks = []
   html = html.replace(/```(\w+)?\n([\s\S]+?)```/g, (match, language, code) => {
     const trimmedCode = code.trim()
     const highlighted = highlightCode(trimmedCode, language || '')
-    return `<pre><code class="language-${language || 'text'}">${highlighted}</code></pre>`
+    const placeholder = `__CODE_BLOCK_${codeBlocks.length}__`
+    codeBlocks.push(`<pre><code class="language-${language || 'text'}">${highlighted}</code></pre>`)
+    return placeholder
   })
   
-  // Process markdown tables
+  // Step 2: Pre-process JSX - convert to HTML (now that code blocks are safe)
+  html = html
+    // Remove imports (only from non-code content now)
+    .replace(/^import\s+.+$/gm, '')
+    // Convert className to class
+    .replace(/className=/g, 'class=')
+    // Convert JSX components to HTML
+    .replace(/<Card>/g, '<div class="border border-border rounded-lg p-6 mb-4">')
+    .replace(/<\/Card>/g, '</div>')
+    .replace(/<CardHeader>/g, '<div class="mb-4">')
+    .replace(/<\/CardHeader>/g, '</div>')
+    .replace(/<CardTitle>/g, '<h3 class="text-xl font-bold mb-2">')
+    .replace(/<\/CardTitle>/g, '</h3>')
+    .replace(/<CardDescription>/g, '<p class="text-muted-foreground">')
+    .replace(/<\/CardDescription>/g, '</p>')
+  
+  // Step 3: Extract and preserve tables (with placeholders)
+  const tables = []
   html = html.replace(/\n\|(.+)\|\n\|[-:\s|]+\|\n((?:\|.+\|\n?)+)/g, (match, headerRow, bodyRows) => {
     const headers = headerRow.split('|').map(h => h.trim()).filter(h => h)
     const rows = bodyRows.trim().split('\n').map(row => 
@@ -1291,9 +1319,7 @@ async function processMDXFile(slug) {
     rows.forEach((row, idx) => {
       tableHTML += '<tr>'
       row.forEach((cell, cellIdx) => {
-        // Check if this is the first column
         const isFirstCol = cellIdx === 0
-        // Check if this is the second column (Elide column) and make it green
         const isElideCol = cellIdx === 1
         const cellClass = isFirstCol ? 'py-4 px-6 font-semibold' : 
                          isElideCol ? 'py-4 px-6 text-green-400 font-mono' : 
@@ -1304,34 +1330,165 @@ async function processMDXFile(slug) {
     })
     
     tableHTML += '</tbody></table></div>'
-    return tableHTML
+    const placeholder = `__TABLE_${tables.length}__`
+    tables.push(tableHTML)
+    return placeholder
   })
   
-  // Continue with other conversions
+  // Step 4: Extract and preserve HTML blocks (multi-line aware)
+  const htmlBlocks = []
+  
+  // Function to extract HTML blocks with proper nesting support
+  const extractHTMLBlocks = (text) => {
+    const blockTags = ['div', 'iframe', 'section', 'article', 'aside', 'nav', 'blockquote']
+    let result = text
+    
+    // Process each tag type
+    blockTags.forEach(tag => {
+      const openTagRegex = new RegExp(`<${tag}(\\s[^>]*)?>`, 'gi')
+      let match
+      let lastIndex = 0
+      let processed = ''
+      
+      while ((match = openTagRegex.exec(result)) !== null) {
+        // Add text before this tag
+        processed += result.slice(lastIndex, match.index)
+        
+        // Find the matching closing tag by counting nesting levels
+        let depth = 1
+        let searchPos = match.index + match[0].length
+        let closingTagPos = -1
+        
+        const searchText = result.slice(searchPos)
+        const tagRegex = new RegExp(`<(/?)${tag}(?:\\s[^>]*)?>`, 'gi')
+        let tagMatch
+        
+        while ((tagMatch = tagRegex.exec(searchText)) !== null && depth > 0) {
+          if (tagMatch[1] === '/') {
+            depth--
+            if (depth === 0) {
+              closingTagPos = searchPos + tagMatch.index + tagMatch[0].length
+              break
+            }
+          } else {
+            depth++
+          }
+        }
+        
+        if (closingTagPos > 0) {
+          // Extract the complete block including nested tags
+          const block = result.slice(match.index, closingTagPos)
+          const placeholder = `__HTML_BLOCK_${htmlBlocks.length}__`
+          htmlBlocks.push(block)
+          processed += placeholder
+          lastIndex = closingTagPos
+          openTagRegex.lastIndex = closingTagPos
+        } else {
+          // No closing tag found, keep the opening tag as is
+          processed += match[0]
+          lastIndex = match.index + match[0].length
+        }
+      }
+      
+      // Add remaining text
+      processed += result.slice(lastIndex)
+      result = processed
+    })
+    
+    return result
+  }
+  
+  html = extractHTMLBlocks(html)
+  
+  // Step 5: Process markdown syntax
   html = html
-    // Headers
+    // Headers (before inline formatting to avoid conflicts)
     .replace(/^#### (.+)$/gm, '<h4>$1</h4>')
     .replace(/^### (.+)$/gm, '<h3>$1</h3>')
     .replace(/^## (.+)$/gm, '<h2>$1</h2>')
     .replace(/^# (.+)$/gm, '<h1>$1</h1>')
+    // Links (before other inline to preserve them)
+    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>')
     // Bold and italic
     .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
     .replace(/\*(.+?)\*/g, '<em>$1</em>')
     // Inline code
     .replace(/`([^`]+)`/g, '<code>$1</code>')
-    // Links
-    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>')
-    // Lists
-    .replace(/^- (.+)$/gm, '<li>$1</li>')
-    .replace(/(<li>.*<\/li>)/s, '<ul>$1</ul>')
-    // Paragraphs
-    .split('\n\n')
-    .map(para => {
-      para = para.trim()
-      if (!para || para.startsWith('<')) return para
-      return `<p>${para}</p>`
-    })
-    .join('\n')
+  
+  // Step 6: Process lists properly - group consecutive list items
+  const lines = html.split('\n')
+  const processedLines = []
+  let inList = false
+  let listItems = []
+  
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i]
+    const listMatch = line.match(/^- (.+)$/)
+    
+    if (listMatch) {
+      // This is a list item
+      listItems.push(`<li>${listMatch[1]}</li>`)
+      inList = true
+    } else {
+      // Not a list item
+      if (inList && listItems.length > 0) {
+        // Close the previous list
+        processedLines.push('<ul>')
+        processedLines.push(...listItems)
+        processedLines.push('</ul>')
+        listItems = []
+        inList = false
+      }
+      processedLines.push(line)
+    }
+  }
+  
+  // Handle any remaining list items
+  if (inList && listItems.length > 0) {
+    processedLines.push('<ul>')
+    processedLines.push(...listItems)
+    processedLines.push('</ul>')
+  }
+  
+  html = processedLines.join('\n')
+  
+  // Step 7: Process paragraphs (split on double newlines, but preserve HTML)
+  const paragraphs = html.split('\n\n')
+  const processedParagraphs = paragraphs.map(para => {
+    para = para.trim()
+    if (!para) return ''
+    
+    // Skip if it's HTML (starts with < or contains a placeholder)
+    if (para.startsWith('<') || para.match(/__[A-Z_]+_\d+__/)) {
+      return para
+    }
+    
+    // Skip if it contains only HTML tags
+    if (para.match(/^<[^>]+>.*<\/[^>]+>$/s)) {
+      return para
+    }
+    
+    // Wrap in paragraph tags
+    return `<p>${para}</p>`
+  })
+  
+  html = processedParagraphs.join('\n\n')
+  
+  // Step 8: Restore all preserved content
+  // Restore HTML blocks
+  htmlBlocks.forEach((block, index) => {
+    html = html.replace(`__HTML_BLOCK_${index}__`, block)
+  })
+  
+  // Restore tables
+  tables.forEach((table, index) => {
+    html = html.replace(`__TABLE_${index}__`, table)
+  })
+  
+  // Restore code blocks
+  codeBlocks.forEach((block, index) => {
+    html = html.replace(`__CODE_BLOCK_${index}__`, block)
+  })
   
   const title = frontmatter.title || slug
   const pageHTML = generateHTMLPage(title, html, slug)

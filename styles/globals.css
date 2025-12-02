@@ -379,6 +379,70 @@ html.dark {
   color: oklch(0.7 0.01 270);
 }
 
+/* GitHub-style alerts */
+.mdx-content blockquote:has(> p:first-child > strong:first-child:only-child) {
+  @apply my-6 px-5 py-4 rounded-lg border-l-4;
+  font-style: normal;
+  background: rgba(59, 130, 246, 0.08);
+  border-color: rgb(59, 130, 246);
+  color: inherit;
+}
+
+.dark .mdx-content blockquote:has(> p:first-child > strong:first-child:only-child) {
+  background: rgba(59, 130, 246, 0.15);
+}
+
+.mdx-content blockquote:has(> p:first-child > strong:first-child:only-child:is(:contains("Note"))) {
+  background: rgba(59, 130, 246, 0.08);
+  border-color: rgb(59, 130, 246);
+}
+
+.dark .mdx-content blockquote:has(> p:first-child > strong:first-child:only-child:is(:contains("Note"))) {
+  background: rgba(59, 130, 246, 0.15);
+}
+
+.mdx-content blockquote:has(> p:first-child > strong:first-child:only-child:is(:contains("Tip"))) {
+  background: rgba(34, 197, 94, 0.08);
+  border-color: rgb(34, 197, 94);
+}
+
+.dark .mdx-content blockquote:has(> p:first-child > strong:first-child:only-child:is(:contains("Tip"))) {
+  background: rgba(34, 197, 94, 0.15);
+}
+
+.mdx-content blockquote:has(> p:first-child > strong:first-child:only-child:is(:contains("Important"))) {
+  background: rgba(168, 85, 247, 0.08);
+  border-color: rgb(168, 85, 247);
+}
+
+.dark .mdx-content blockquote:has(> p:first-child > strong:first-child:only-child:is(:contains("Important"))) {
+  background: rgba(168, 85, 247, 0.15);
+}
+
+.mdx-content blockquote:has(> p:first-child > strong:first-child:only-child:is(:contains("Warning"))) {
+  background: rgba(234, 179, 8, 0.08);
+  border-color: rgb(234, 179, 8);
+}
+
+.dark .mdx-content blockquote:has(> p:first-child > strong:first-child:only-child:is(:contains("Warning"))) {
+  background: rgba(234, 179, 8, 0.15);
+}
+
+.mdx-content blockquote:has(> p:first-child > strong:first-child:only-child:is(:contains("Caution"))) {
+  background: rgba(239, 68, 68, 0.08);
+  border-color: rgb(239, 68, 68);
+}
+
+.dark .mdx-content blockquote:has(> p:first-child > strong:first-child:only-child:is(:contains("Caution"))) {
+  background: rgba(239, 68, 68, 0.15);
+}
+
+.mdx-content blockquote > p:first-child > strong:first-child:only-child {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 700;
+}
+
 /* Tables */
 .mdx-content table {
   @apply w-full mb-8;
