@@ -263,8 +263,15 @@ function highlightCode(code, language) {
     // Shell keywords
     highlighted = highlighted.replace(/\b(if|then|else|elif|fi|for|while|do|done|case|esac|function|return|exit|export|source)\b/g, (match) => createToken('keyword', match))
     
-    // Commands at start of line or after pipe/semicolon
-    highlighted = highlighted.replace(/(^|\||;)\s*([a-z\-]+)/gm, (match, prefix, cmd) => prefix + ' ' + createToken('function', cmd))
+    // Shell prompt symbols (highlight but keep them)
+    highlighted = highlighted.replace(/(^|\n)([$#>]\s+)/gm, (match, newline, prompt) => newline + createToken('shell-symbol', prompt))
+    
+    // Commands at start of line (after optional prompt), after pipe, or semicolon
+    highlighted = highlighted.replace(/(^|__TOKEN_\d+__|[\|;])\s*([a-z\-]+)/gm, (match, prefix, cmd) => {
+      // Don't match if cmd is a token placeholder
+      if (cmd.startsWith('__TOKEN_')) return match
+      return prefix + ' ' + createToken('function', cmd)
+    })
     
     // Flags
     highlighted = highlighted.replace(/\s(--?[a-zA-Z][\w-]*)/g, (match, flag) => ' ' + createToken('flag', flag))
@@ -304,6 +311,31 @@ function highlightCode(code, language) {
     
     // Booleans
     highlighted = highlighted.replace(/\b(true|false|null)\b/g, (match) => createToken('boolean', match))
+  }
+  
+  // YAML
+  if (language === 'yaml' || language === 'yml') {
+    // Comments
+    highlighted = highlighted.replace(/#(.*?)$/gm, (match, content) => createToken('comment', '#' + content))
+    
+    // Strings (quoted)
+    highlighted = highlighted.replace(/(["'])((?:\\.|(?!\1)[^\\])*?)\1/g, (match) => createToken('string', match))
+    
+    // Keys (before colon)
+    highlighted = highlighted.replace(/^(\s*)([a-zA-Z_][\w-]*)\s*:/gm, (match, spaces, key) => spaces + createToken('property', key) + ':')
+    
+    // Booleans and null
+    highlighted = highlighted.replace(/:\s+(true|false|null|yes|no|on|off)\b/gi, (match, bool) => ': ' + createToken('boolean', bool))
+    
+    // Numbers (after colon)
+    highlighted = highlighted.replace(/:\s+(\d+\.?\d*)\b/g, (match, num) => ': ' + createToken('number', num))
+    
+    // Unquoted strings (values after colon that aren't already tokenized)
+    highlighted = highlighted.replace(/:\s+([a-zA-Z][\w\-\./@]+)/g, (match, value) => {
+      // Skip if it's already a token
+      if (value.startsWith('__TOKEN_')) return match
+      return ': ' + createToken('string', value)
+    })
   }
   
   // Replace all tokens with their HTML

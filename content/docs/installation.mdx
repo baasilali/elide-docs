@@ -1,546 +1,193 @@
 ---
 title: "Installation"
-description: "Install Elide on macOS, Linux, or Windows"
+description: "Install Elide on your machine"
 date: "2025-11-19"
 ---
 
-import { Alert } from '@/components/ui/alert'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-
 # Installation
 
-This guide covers installing Elide on your system.
+Elide sets up on your machine similar to Node or Python. Use the directions below to install Elide.
 
 ## System Requirements
 
-Before installing Elide, ensure your system meets these requirements:
+Elide supports **Linux** and **macOS**. **Windows** support is coming soon but is currently considered experimental:
 
-| Requirement | Minimum | Recommended |
-|-------------|---------|-------------|
-| **Operating System** | macOS 11+, Linux (glibc 2.17+), Windows 10+ | Latest stable |
-| **Memory** | 2GB RAM | 4GB+ RAM |
-| **Disk Space** | 500MB | 2GB+ |
-| **Architecture** | x86_64, arm64 | arm64 (Apple Silicon) |
+<div class="my-6">
+  <table class="w-full border-collapse">
+    <thead>
+      <tr class="border-b-2 border-border">
+        <th class="text-left py-3 px-4 font-semibold">OS</th>
+        <th class="text-left py-3 px-4 font-semibold">Architectures</th>
+        <th class="text-left py-3 px-4 font-semibold">Status</th>
+        <th class="text-left py-3 px-4 font-semibold">Notes</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="border-b border-border/40">
+        <td class="py-3 px-4">Linux</td>
+        <td class="py-3 px-4"><code>amd64</code> <code>aarch64</code></td>
+        <td class="py-3 px-4">Beta</td>
+        <td class="py-3 px-4"></td>
+      </tr>
+      <tr class="border-b border-border/40">
+        <td class="py-3 px-4">macOS</td>
+        <td class="py-3 px-4"><code>amd64</code> <code>aarch64</code></td>
+        <td class="py-3 px-4">Beta</td>
+        <td class="py-3 px-4">Limited support for certain features, see <em>macOS Limitations</em></td>
+      </tr>
+      <tr>
+        <td class="py-3 px-4">Windows</td>
+        <td class="py-3 px-4"><code>amd64</code></td>
+        <td class="py-3 px-4">Experimental</td>
+        <td class="py-3 px-4">Reach out for install instructions</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
 
-<Alert>
-  <strong>Note:</strong> For native image compilation, you'll need GraalVM. The installation scripts handle this automatically.
-</Alert>
+## Installing Elide
 
-## Quick Install
-
-<Tabs defaultValue="script" className="w-full">
-  <TabsList>
-    <TabsTrigger value="script">Install Script</TabsTrigger>
-    <TabsTrigger value="homebrew">Homebrew</TabsTrigger>
-    <TabsTrigger value="docker">Docker</TabsTrigger>
-    <TabsTrigger value="github">GitHub Actions</TabsTrigger>
-  </TabsList>
+<div class="my-8">
+  <div class="border-b border-border/40">
+    <div class="flex gap-1">
+      <button class="tab-button active px-4 py-2 font-medium text-sm border-b-2 border-primary text-primary bg-primary/10 rounded-t-md" onclick="switchTab(event, 'tab-script')">One-line Script</button>
+      <button class="tab-button px-4 py-2 font-medium text-sm border-b-2 border-transparent text-muted-foreground hover:text-foreground hover:border-border hover:bg-muted/50 rounded-t-md transition-colors" onclick="switchTab(event, 'tab-package')">Package Managers</button>
+      <button class="tab-button px-4 py-2 font-medium text-sm border-b-2 border-transparent text-muted-foreground hover:text-foreground hover:border-border hover:bg-muted/50 rounded-t-md transition-colors" onclick="switchTab(event, 'tab-binary')">Binary Download</button>
+      <button class="tab-button px-4 py-2 font-medium text-sm border-b-2 border-transparent text-muted-foreground hover:text-foreground hover:border-border hover:bg-muted/50 rounded-t-md transition-colors" onclick="switchTab(event, 'tab-windows')">Windows Installation</button>
+    </div>
+  </div>
   
-  <TabsContent value="script">
-
-### Install Script (Recommended)
-
-The easiest way to install Elide on Linux or macOS:
+  <div id="tab-script" class="tab-content pt-6">
 
 ```bash
-curl -sSL --tlsv1.2 https://elide.sh | bash -s -
+curl -sSL --tlsv1.2 elide.sh | bash -s -
 ```
 
-This script will:
-- Detect your OS and architecture
-- Download the appropriate binary
-- Install to `/usr/local/bin` (or user directory)
-- Set up PATH automatically
-
-After installation:
+The installer script can take options:
 
 ```bash
-# Verify installation
-elide --version
-
-# Show system info
-elide info
+curl -sSL --tlsv1.2 elide.sh | bash -s - --help
 ```
 
-  </TabsContent>
+  </div>
   
-  <TabsContent value="homebrew">
-
-### Homebrew (macOS and Linux)
-
-For macOS users, Homebrew is the recommended installation method:
-
-```bash
-# Add the Elide tap
-brew tap elide-dev/elide
-
-# Install Elide
-brew install elide
-```
-
-Update Elide:
-
-```bash
-brew upgrade elide
-```
-
-Uninstall:
-
-```bash
-brew uninstall elide
-```
-
-  </TabsContent>
+  <div id="tab-package" class="tab-content hidden pt-6">
+    <p>Elide is not available yet via package managers. Please check back soon.</p>
+  </div>
   
-  <TabsContent value="docker">
+  <div id="tab-binary" class="tab-content hidden pt-6">
+    <p>Binary downloads are available via <a href="https://github.com/elide-dev/elide/releases" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-0.5 text-primary hover:text-primary/80 transition-colors border-b border-primary/40 hover:border-primary/60" style="text-decoration: none;">GitHub Releases<svg class="h-3 w-3 inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg></a>.</p>
+  </div>
+  
+  <div id="tab-windows" class="tab-content hidden pt-6">
+    <p>Elide is not supported yet on Windows.</p>
+  </div>
+</div>
 
-### Docker
+<script>
+  function switchTab(event, tabId) {
+    // Hide all tab contents
+    document.querySelectorAll('.tab-content').forEach(content => {
+      content.classList.add('hidden');
+    });
+    
+    // Remove active state from all buttons
+    document.querySelectorAll('.tab-button').forEach(button => {
+      button.classList.remove('active', 'border-primary', 'text-primary', 'bg-primary/10');
+      button.classList.add('border-transparent', 'text-muted-foreground');
+    });
+    
+    // Show selected tab content
+    document.getElementById(tabId).classList.remove('hidden');
+    
+    // Add active state to clicked button
+    event.target.classList.add('active', 'border-primary', 'text-primary', 'bg-primary/10');
+    event.target.classList.remove('border-transparent', 'text-muted-foreground');
+  }
+</script>
 
-Run Elide in a container without installing locally:
+## Testing your installation
 
-```bash
-# Run Elide CLI
-docker run --rm -it ghcr.io/elide-dev/elide
+After installing Elide, follow these steps to verify the installation:
 
-# Run a script
-docker run --rm -v $(pwd):/app ghcr.io/elide-dev/elide run /app/server.js
+**1. Make sure Elide is on your PATH**
 
-# Interactive shell
-docker run --rm -it ghcr.io/elide-dev/elide repl
+```shell
+$ which elide
+/some/path/to/elide
 ```
 
-**Available images:**
+**2. Run --help:**
 
-- `ghcr.io/elide-dev/elide:latest` - Latest stable release
-- `ghcr.io/elide-dev/elide:beta` - Latest beta
-- `ghcr.io/elide-dev/elide:1.0.0-beta10` - Specific version
+```shell
+$ elide --help
+/some/path/to/elide
+```
 
-  </TabsContent>
-  
-  <TabsContent value="github">
+<img src="/assets/bin-help.png" alt="Help output from the Elide binary" class="rounded-lg border border-border my-6 w-full" />
 
-### GitHub Actions
+## Container Images
 
-Use Elide in your CI/CD pipeline:
+Elide ships as container images, too. You can use Elide from Docker:
+
+```shell
+docker run --rm -it ghcr.io/elide-dev/bash
+```
+
+## Continuous Integration
+
+Elide ships a <a href="https://github.com/marketplace/actions/setup-elide" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-0.5 text-primary hover:text-primary/80 transition-colors border-b border-primary/40 hover:border-primary/60" style="text-decoration: none;">GitHub action<svg class="h-3 w-3 inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg></a>:
 
 ```yaml
-name: Build with Elide
-
-on: [push]
-
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    
-    steps:
-      - uses: actions/checkout@v4
-      
-      # Setup Elide
-      - name: Setup Elide
-        uses: elide-dev/setup-elide@v2
-        with:
-          version: '1.0.0-beta10'  # or 'latest'
-      
-      # Use Elide
-      - name: Run tests
-        run: elide run tests/all.ts
-      
-      - name: Build native binary
-        run: elide build --native app.js
-      
-      - name: Upload artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: app-binary
-          path: ./app
+  - name: "Setup: Elide"
+    uses: elide-dev/setup-elide@v2
+    with:
+      # any tag from the `elide-dev/releases` repo.
+      # omit a version to use the latest version.
+      version: 1.0.0-beta10
 ```
-
-  </TabsContent>
-</Tabs>
-
-## Manual Installation
-
-### Download Pre-built Binary
-
-Download the latest release for your platform:
-
-1. Visit [github.com/elide-dev/elide/releases](https://github.com/elide-dev/elide/releases)
-2. Download the archive for your OS:
-   - **macOS (Apple Silicon)**: `elide-macos-aarch64.tar.gz`
-   - **macOS (Intel)**: `elide-macos-x86_64.tar.gz`
-   - **Linux (x64)**: `elide-linux-x86_64.tar.gz`
-   - **Linux (arm64)**: `elide-linux-aarch64.tar.gz`
-   - **Windows (x64)**: `elide-windows-x86_64.zip`
-
-3. Extract the archive:
-
-```bash
-# macOS/Linux
-tar -xzf elide-*.tar.gz
-
-# Move to PATH
-sudo mv elide /usr/local/bin/
-sudo chmod +x /usr/local/bin/elide
-```
-
-```powershell
-# Windows
-Expand-Archive elide-windows-x86_64.zip
-Move-Item elide.exe C:\Windows\System32\
-```
-
-## Platform-Specific Instructions
-
-### macOS
-
-#### Install via Homebrew (Recommended)
-
-```bash
-brew tap elide-dev/elide
-brew install elide
-```
-
-#### Install via Install Script
-
-```bash
-curl -sSL https://elide.sh | bash -s -
-```
-
-#### Verify Installation
-
-```bash
-elide --version
-elide info
-```
-
-#### Troubleshooting macOS
-
-**"elide cannot be opened because the developer cannot be verified"**
-
-```bash
-# Allow the binary to run
-xattr -d com.apple.quarantine /usr/local/bin/elide
-```
-
-**Permission denied**
-
-```bash
-# Make executable
-chmod +x /usr/local/bin/elide
-```
-
-### Linux
-
-#### Ubuntu/Debian
-
-Download and install the `.deb` package:
-
-```bash
-# Download
-curl -LO https://github.com/elide-dev/elide/releases/latest/download/elide_amd64.deb
-
-# Install
-sudo dpkg -i elide_amd64.deb
-
-# Fix dependencies if needed
-sudo apt-get install -f
-```
-
-#### Red Hat/Fedora/CentOS
-
-Download and install the `.rpm` package:
-
-```bash
-# Download
-curl -LO https://github.com/elide-dev/elide/releases/latest/download/elide_x86_64.rpm
-
-# Install
-sudo rpm -i elide_x86_64.rpm
-```
-
-#### Alpine Linux
-
-```bash
-# Using the install script
-wget -O - https://elide.sh | sh -s -
-```
-
-#### Arch Linux
-
-```bash
-# Using AUR helper (e.g., yay)
-yay -S elide-bin
-```
-
-### Windows
-
-#### Install via Scoop
-
-```powershell
-# Add bucket
-scoop bucket add elide https://github.com/elide-dev/scoop-elide
-
-# Install
-scoop install elide
-```
-
-#### Manual Installation
-
-1. Download `elide-windows-x86_64.zip`
-2. Extract to `C:\Program Files\Elide\`
-3. Add to PATH:
-
-```powershell
-[Environment]::SetEnvironmentVariable(
-    "Path",
-    $env:Path + ";C:\Program Files\Elide",
-    "Machine"
-)
-```
-
-4. Verify:
-
-```powershell
-elide --version
-```
-
-## Building from Source
-
-For the latest features, build from source:
-
-### Prerequisites
-
-- **Java 21+** (GraalVM recommended)
-- **Gradle 8+**
-- **Git**
-
-### Clone and Build
-
-```bash
-# Clone repository
-git clone https://github.com/elide-dev/elide.git
-cd elide
-
-# Build with Gradle
-./gradlew build
-
-# Build native image
-./gradlew nativeCompile
-
-# Binary will be in packages/cli/build/native/nativeCompile/
-```
-
-### Add to PATH
-
-```bash
-# Add to ~/.bashrc or ~/.zshrc
-export PATH="$PATH:/path/to/elide/packages/cli/build/native/nativeCompile"
-
-# Reload shell
-source ~/.bashrc  # or ~/.zshrc
-```
-
-## Verify Installation
-
-After installation, verify everything works:
-
-```bash
-# Check version
-elide --version
-# Output: Elide 1.0.0-beta10
-
-# Show system information
-elide info
-
-# Run a simple script
-echo 'console.log("Hello from Elide!")' > hello.js
-elide run hello.js
-
-# Test native compilation (if GraalVM is installed)
-elide build --native hello.js
-./hello
-```
-
-## IDE Setup
-
-### Visual Studio Code
-
-Install the Elide extension from the marketplace:
-
-1. Open VS Code
-2. Go to Extensions (`Cmd+Shift+X` / `Ctrl+Shift+X`)
-3. Search for "Elide"
-4. Click Install
-
-Features:
-- Syntax highlighting
-- IntelliSense for Elide APIs
-- Run and debug support
-- TypeScript integration
-
-### IntelliJ IDEA
-
-Install the Elide plugin:
-
-1. Open Settings > Plugins
-2. Search for "Elide"
-3. Click Install and restart
-
-Features:
-- Full IDE support for Kotlin/Java
-- Run configurations
-- Debugging
-- Native image build integration
-
-### Cursor / Other Editors
-
-Use the Language Server Protocol (LSP):
-
-```bash
-# Start Elide LSP server
-elide lsp --stdio
-```
-
-Configure your editor to use the Elide LSP server for `.js`, `.ts`, `.py` files in Elide projects.
-
-## GraalVM Installation (Optional)
-
-For native image compilation, you need GraalVM:
-
-### macOS
-
-```bash
-# Install via Homebrew
-brew install --cask graalvm/tap/graalvm-ce-java21
-
-# Set JAVA_HOME
-export JAVA_HOME=/Library/Java/JavaVirtualMachines/graalvm-ce-java21-XX.X.X/Contents/Home
-
-# Install native-image
-$JAVA_HOME/bin/gu install native-image
-```
-
-### Linux
-
-```bash
-# Download GraalVM
-curl -L https://github.com/graalvm/graalvm-ce-builds/releases/download/vm-21.3.0/graalvm-ce-java21-linux-amd64-21.3.0.tar.gz -o graalvm.tar.gz
-
-# Extract
-tar -xzf graalvm.tar.gz
-sudo mv graalvm-ce-java21-21.3.0 /opt/graalvm
-
-# Set JAVA_HOME
-export JAVA_HOME=/opt/graalvm
-export PATH=$JAVA_HOME/bin:$PATH
-
-# Install native-image
-gu install native-image
-```
-
-### Verify GraalVM
-
-```bash
-java -version
-native-image --version
-```
-
-## Updating Elide
-
-### Homebrew
-
-```bash
-brew upgrade elide
-```
-
-### Install Script
-
-Re-run the install script:
-
-```bash
-curl -sSL https://elide.sh | bash -s -
-```
-
-### Manual Update
-
-Download the latest release and replace your existing binary.
-
-## Uninstalling Elide
-
-### Homebrew
-
-```bash
-brew uninstall elide
-brew untap elide-dev/elide
-```
-
-### Manual Uninstall
-
-```bash
-# Remove binary
-sudo rm /usr/local/bin/elide
-
-# Remove configuration (optional)
-rm -rf ~/.elide
-```
-
-## Next Steps
-
-Now that Elide is installed:
-
-1. **[Quick Start Guide](/docs/quick-start)** - Build your first app
-2. **[Architecture](/docs/architecture)** - Understand how Elide works
-3. **[JavaScript Guide](/docs/javascript)** - Learn the JavaScript runtime
 
 ## Troubleshooting
 
-### Command Not Found
+Follow the steps below if you're having trouble installing Elide:
 
-If `elide` command is not found after installation:
+**1. Make sure Elide is on your PATH**
 
-1. **Check PATH:**
-   ```bash
-   echo $PATH
-   ```
-
-2. **Add to PATH manually:**
-   ```bash
-   export PATH="$PATH:/usr/local/bin"
-   ```
-
-3. **Restart terminal** and try again
-
-### Permission Denied
-
-```bash
-# macOS/Linux
-chmod +x /usr/local/bin/elide
+```shell
+$ which elide
+/some/path/to/elide
 ```
 
-### Native Image Build Fails
+**2. Make sure you have the right binary for your OS and architecture**
 
-Ensure GraalVM and native-image are installed:
-
-```bash
-native-image --version
+```shell
+$ file `which elide`
+/some/path/to/elide: Mach-O 64-bit executable arm64
 ```
 
-If not installed, see [GraalVM Installation](#graalvm-installation-optional) above.
+<div class="alert alert-note">
+  <svg class="alert-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+    <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+  </svg>
+  <div class="alert-content">
+    <div class="alert-title">Note</div>
+    <p>On Linux you should see an ELF binary.</p>
+  </div>
+</div>
 
-### Version Conflicts
+<div class="border-t border-border/40 my-12"></div>
 
-If you have multiple versions:
-
-```bash
-# List all installed versions
-brew list --versions elide
-
-# Use specific version
-brew switch elide 1.0.0-beta10
-```
-
-## Getting Help
-
-- **GitHub Issues**: [Report bugs](https://github.com/elide-dev/elide/issues)
-- **Documentation**: [docs.elide.dev](https://docs.elide.dev)
-- **Community**: Join discussions on GitHub
+<div class="flex justify-between mt-12">
+  <a href="/docs/readme.html" class="group inline-flex items-center gap-2 text-lg font-medium text-foreground hover:text-primary transition-colors" style="text-decoration: none;">
+    <svg class="h-5 w-5 transition-transform duration-300 group-hover:-translate-x-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M11 17l-5-5m0 0l5-5m-5 5h12" />
+    </svg>
+    <span>Previous: README</span>
+  </a>
+  <a href="/docs/getting-started.html" class="group inline-flex items-center gap-2 text-lg font-medium text-foreground hover:text-primary transition-colors" style="text-decoration: none;">
+    <span>Next: Getting Started</span>
+    <svg class="h-5 w-5 transition-transform duration-300 group-hover:translate-x-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+    </svg>
+  </a>
+</div>
