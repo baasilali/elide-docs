@@ -164,322 +164,25 @@ $ elide program.rb
 
 Elide automatically detects the language from the file extension (`.js`, `.ts`, `.py`, `.rb`, `.kts`, etc.).
 
-### Runtime Commands
-
-**`elide run [file]`** - Run a script file or code snippet
-
-```shell
-$ elide run app.js
-$ elide run --code "console.log('Hello!')"
-$ elide run script.py
-```
-
-Execute scripts in any supported language. The runtime detects the language automatically or you can specify it explicitly.
-
-**`elide repl`** - Start an interactive REPL session
-
-```shell
-$ elide repl
-$ elide repl --python
-```
-
-Opens an interactive read-eval-print-loop for testing code. If no language is specified, JavaScript is used by default.
-
-**`elide serve [file]`** - Run a server application
-
-```shell
-$ elide serve server.js
-```
-
-Alias to `run` specifically for server applications. Blocks until the server exits.
-
-**`elide test`** - Run tests
-
-```shell
-$ elide test
-$ elide test pattern
-```
-
-Execute test suites for your project.
-
-<div class="border-t border-border/40 my-12"></div>
-
-### Project Management
-
-**`elide project`** - Manage Elide projects
-
-```shell
-$ elide project
-```
-
-Manage projects defined by `elide.pkl` or other project manifests.
-
-**`elide init`** - Initialize a new project
-
-```shell
-$ elide init
-```
-
-Create a new Elide project with default configuration files.
-
-**`elide install`** / **`elide i`** - Install dependencies
-
-```shell
-$ elide install
-$ elide i
-```
-
-Resolve and install all dependencies for the current project. Dependencies are installed for all declared ecosystems.
-
-**`elide add`** - Add dependencies
-
-```shell
-$ elide add package-name
-$ elide add org.example:library:1.0.0
-```
-
-Add one or more dependencies to your project and install them. Accepts dependency coordinates in various formats.
-
-**`elide build`** - Build project
-
-```shell
-$ elide build
-$ elide build --native
-```
-
-Build the project or run a script mapped to 'build' in `elide.pkl` or `package.json`.
-
-<div class="border-t border-border/40 my-12"></div>
-
-**`elide dev`** - Development mode
-
-```shell
-$ elide dev
-```
-
-Run an Elide project in development mode with hot reload and debugging features.
-
-<div class="border-t border-border/40 my-12"></div>
-
-### JVM Toolchain
-
-Elide includes a full JVM toolchain for Java and Kotlin development:
-
-**`elide javac`** - Java compiler
-
-```shell
-$ elide javac -- [JAVAC_OPTIONS] [SOURCES...]
-```
-
-The Java compiler, supporting up to JDK 24.
-
-**`elide kotlinc`** - Kotlin compiler
-
-```shell
-$ elide kotlinc -- [KOTLINC_OPTIONS] [SOURCES...]
-```
-
-The Kotlin compiler for compiling Kotlin programs.
-
-**`elide jar`** - JAR builder
-
-```shell
-$ elide jar -- [OPTIONS] [FILES...]
-```
-
-Builds and manages Java Archive files (JARs).
-
-**`elide javadoc`** - Documentation generator
-
-```shell
-$ elide javadoc -- [OPTIONS] [SOURCES...]
-```
-
-Renders Java code into documentation.
-
-**`elide native-image`** - Native compiler
-
-```shell
-$ elide native-image [OPTIONS]
-```
-
-GraalVM Native Image compiler for building standalone native binaries.
-
-**`elide jib`** - Container builder
-
-```shell
-$ elide jib [OPTIONS]
-```
-
-Build container images from JVM or native applications without Docker.
-
-<div class="border-t border-border/40 my-12"></div>
-
-### Configuration & Tooling
-
-**`elide pkl`** - Pkl configuration
-
-```shell
-$ elide pkl [command]
-```
-
-Run the <a href="/docs/pkl.html" class="text-primary hover:text-primary/80 transition-colors border-b border-primary/40 hover:border-primary/60" style="text-decoration: none;">Pkl</a> command-line tools for configuration management.
-
-**`elide secrets`** - Secrets management
-
-```shell
-$ elide secrets
-```
-
-Manage secrets for the current application.
-
-**`elide lsp`** - Language Server Protocol
-
-```shell
-$ elide lsp
-```
-
-Run an LSP instance for IDE integration and code intelligence.
-
-**`elide mcp`** - Model Context Protocol
-
-```shell
-$ elide mcp
-```
-
-Run an MCP instance for AI integration.
-
-<div class="border-t border-border/40 my-12"></div>
-
-### Information & Help
-
-**`elide info`** - Show system information
-
-```shell
-$ elide info
-```
-
-Display information about your Elide installation, including version, supported languages, and environment details.
-
-**`elide which`** - Find tool binaries
-
-```shell
-$ elide which [tool]
-```
-
-Print the path to a tool binary.
-
-**`elide help`** / **`elide docs`** - Show documentation
-
-```shell
-$ elide help
-$ elide docs run
-```
-
-Display help text for any command or search Elide's documentation.
-
-**`elide bug`** / **`elide issue`** / **`elide feature`** - Report issues
-
-```shell
-$ elide bug
-$ elide issue
-$ elide feature
-```
-
-Open links to GitHub to report bugs, issues, or request features.
-
-**`elide discord`** - Join Discord
-
-```shell
-$ elide discord
-```
-
-Open or show a link to join the Elide Discord community server.
-
-**`elide completions`** - Shell completions
-
-```shell
-$ elide completions
-```
-
-Generate bash/zsh completion scripts for enhanced shell integration.
-
-**`elide --version`** - Show version
-
-```shell
-$ elide --version
-```
-
-Print the current Elide version and exit.
-
-<div class="border-t border-border/40 my-12"></div>
-
-### Global Options
-
-All commands support these global options:
-
-<div class="my-6">
-  <table class="w-full border-collapse">
-    <thead>
-      <tr class="border-b-2 border-border">
-        <th class="text-left py-3 px-4 font-semibold">Option</th>
-        <th class="text-left py-3 px-4 font-semibold">Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr class="border-b border-border/40">
-        <td class="py-3 px-4"><code>-h, --help</code></td>
-        <td class="py-3 px-4">Show help text for any command</td>
-      </tr>
-      <tr class="border-b border-border/40">
-        <td class="py-3 px-4"><code>--version</code></td>
-        <td class="py-3 px-4">Print version information and exit</td>
-      </tr>
-      <tr class="border-b border-border/40">
-        <td class="py-3 px-4"><code>-v, --verbose</code></td>
-        <td class="py-3 px-4">Enable verbose output (debug logging)</td>
-      </tr>
-      <tr class="border-b border-border/40">
-        <td class="py-3 px-4"><code>--debug</code></td>
-        <td class="py-3 px-4">Activate debugging features and extra logging</td>
-      </tr>
-      <tr class="border-b border-border/40">
-        <td class="py-3 px-4"><code>-q, --quiet</code></td>
-        <td class="py-3 px-4">Squelch most output</td>
-      </tr>
-      <tr class="border-b border-border/40">
-        <td class="py-3 px-4"><code>-p, --project=&lt;path&gt;</code></td>
-        <td class="py-3 px-4">Path to the project to build</td>
-      </tr>
-      <tr class="border-b border-border/40">
-        <td class="py-3 px-4"><code>--[no-]pretty</code></td>
-        <td class="py-3 px-4">Enable or disable colorized output</td>
-      </tr>
-      <tr class="border-b border-border/40">
-        <td class="py-3 px-4"><code>--[no-]lockfile</code></td>
-        <td class="py-3 px-4">Enable or disable use of Elide's lockfile system</td>
-      </tr>
-      <tr class="border-b border-border/40">
-        <td class="py-3 px-4"><code>--[no-]frozen</code></td>
-        <td class="py-3 px-4">Treat the lockfile as frozen</td>
-      </tr>
-      <tr>
-        <td class="py-3 px-4"><code>--timeout=secs</code></td>
-        <td class="py-3 px-4">Timeout to apply when exiting (in seconds)</td>
-      </tr>
-    </tbody>
-  </table>
+<div class="my-8 not-prose">
+  <a href="/docs/cli-references.html" class="feature-card group flex flex-col p-6 rounded-xl border-2 border-primary/50 bg-card/30 backdrop-blur-sm transition-all duration-300 hover:border-primary hover:shadow-[0_0_40px_rgba(168,85,247,0.3)]" style="text-decoration: none;">
+    <div class="flex items-center gap-3 mb-3">
+      <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="rgb(168, 85, 247)" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+      </svg>
+      <h3 class="text-xl font-bold text-foreground m-0">CLI Reference</h3>
+    </div>
+    <p class="text-muted-foreground mb-3 leading-relaxed">
+      Complete documentation for all Elide commands, options, and flags - including project management, JVM toolchain, and utility commands.
+    </p>
+    <div class="flex items-center gap-2 text-sm font-medium" style="color: rgb(168, 85, 247);">
+      <span>View full reference</span>
+      <svg class="h-4 w-4 transition-transform group-hover:translate-x-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="rgb(168, 85, 247)">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+      </svg>
+    </div>
+  </a>
 </div>
-
-### Argument Files
-
-Use argument files to provide options and parameters:
-
-```shell
-$ elide @args.txt
-```
-
-Each argument file can contain options, commands, and positional parameters.
 
 <div class="border-t border-border/40 my-12"></div>
 
@@ -519,40 +222,16 @@ Elide is powered by several cutting-edge technologies:
 
 <div class="border-t border-border/40 my-12"></div>
 
-## Exit Codes
-
-When running Elide commands, you may encounter these exit codes:
-
-<div class="my-6">
-  <table class="w-full border-collapse">
-    <thead>
-      <tr class="border-b-2 border-border">
-        <th class="text-left py-3 px-4 font-semibold">Code</th>
-        <th class="text-left py-3 px-4 font-semibold">Meaning</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr class="border-b border-border/40">
-        <td class="py-3 px-4"><code>0</code></td>
-        <td class="py-3 px-4">Successful program execution</td>
-      </tr>
-      <tr class="border-b border-border/40">
-        <td class="py-3 px-4"><code>1</code></td>
-        <td class="py-3 px-4">Generic failure (terminal error)</td>
-      </tr>
-      <tr>
-        <td class="py-3 px-4"><code>2</code></td>
-        <td class="py-3 px-4">Exception in user code</td>
-      </tr>
-    </tbody>
-  </table>
-</div>
-
-<div class="border-t border-border/40 my-12"></div>
-
 ## See Also
 
 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 my-8 not-prose">
+  <a href="/docs/cli-references.html" class="feature-card group flex flex-col p-6 rounded-lg border border-border bg-card/30 backdrop-blur-sm transition-all duration-300 hover:border-primary/50 hover:shadow-[0_0_30px_rgba(168,85,247,0.2)]" style="text-decoration: none;">
+    <h3 class="text-lg font-bold text-foreground m-0 mb-3">CLI References</h3>
+    <p class="text-muted-foreground text-base leading-relaxed flex-grow">
+      Complete reference for all Elide commands, options, and flags
+    </p>
+  </a>
+  
   <a href="/docs/interop.html" class="feature-card group flex flex-col p-6 rounded-lg border border-border bg-card/30 backdrop-blur-sm transition-all duration-300 hover:border-primary/50 hover:shadow-[0_0_30px_rgba(168,85,247,0.2)]" style="text-decoration: none;">
     <h3 class="text-lg font-bold text-foreground m-0 mb-3">Polyglot 101: Thinking in Multiple Languages</h3>
     <p class="text-muted-foreground text-base leading-relaxed flex-grow">
@@ -571,13 +250,6 @@ When running Elide commands, you may encounter these exit codes:
     <h3 class="text-lg font-bold text-foreground m-0 mb-3">Elide + WinterTC</h3>
     <p class="text-muted-foreground text-base leading-relaxed flex-grow">
       Learn about WinterCG conformance and web-standard API support
-    </p>
-  </a>
-  
-  <a href="/docs/cli-references.html" class="feature-card group flex flex-col p-6 rounded-lg border border-border bg-card/30 backdrop-blur-sm transition-all duration-300 hover:border-primary/50 hover:shadow-[0_0_30px_rgba(168,85,247,0.2)]" style="text-decoration: none;">
-    <h3 class="text-lg font-bold text-foreground m-0 mb-3">CLI References</h3>
-    <p class="text-muted-foreground text-base leading-relaxed flex-grow">
-      Complete reference for all Elide command-line options and flags
     </p>
   </a>
 </div>
