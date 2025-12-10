@@ -1,345 +1,88 @@
 ---
 title: "Python"
-description: "Python integration and polyglot capabilities in Elide"
+description: "Python runtime features and polyglot capabilities in Elide"
 date: "2025-11-19"
 ---
 
 import { Alert } from '@/components/ui/alert'
 
-# Python in Elide
+# Python
 
-Elide provides seamless Python integration powered by GraalPython, enabling polyglot applications that combine JavaScript and Python.
-
-## Python Runtime
-
-Elide includes a full CPython-compatible Python runtime:
-
-```python
-# hello.py
-def greet(name: str) -> str:
-    return f"Hello, {name}!"
-
-# Use Python's rich standard library
-import json
-import datetime
-
-def process_data(items):
-    """Process a list of items"""
-    results = []
-    for item in items:
-        results.append({
-            'id': item['id'],
-            'processed_at': datetime.datetime.now().isoformat(),
-            'value': item['value'] * 2
-        })
-    return results
-
-if __name__ == '__main__':
-    data = [{'id': 1, 'value': 100}]
-    print(process_data(data))
-```
-
-Run Python directly:
+Elide can run Python applications under the Python 3 language standard; Elide behaves nearly identically to CPython.
 
 ```bash
-elide run hello.py
-```
-
-## JavaScript ↔ Python Interop
-
-The most powerful feature is seamless interoperability:
-
-### Call Python from JavaScript
-
-```javascript
-// app.js - Import Python module
-const { greet, process_data } = await import('./hello.py')
-
-// Call Python functions with JavaScript data
-const message = await greet('World')
-console.log(message) // "Hello, World!"
-
-// Pass JavaScript arrays to Python
-const items = [
-  { id: 1, value: 100 },
-  { id: 2, value: 200 }
-]
-
-const results = await process_data(items)
-console.log(results)
-```
-
-### Call JavaScript from Python
-
-```python
-# python_app.py
-import polyglot
-
-# Access JavaScript objects
-console = polyglot.import_value('console')
-console.log('Hello from Python!')
-
-# Call JavaScript functions
-fetch = polyglot.import_value('fetch')
-response = fetch('https://api.example.com/data')
-data = response.json()
-```
-
-## Data Sharing
-
-Objects pass by reference between languages with zero serialization:
-
-```javascript
-// JavaScript
-const users = [
-  { name: "Alice", age: 30 },
-  { name: "Bob", age: 25 }
-]
-
-// Call Python with JavaScript array
-const { analyze } = await import('./analyzer.py')
-const result = await analyze(users)
+elide ./script.py
 ```
 
 ```python
-# analyzer.py
-def analyze(users):
-    """Analyze JavaScript array in Python"""
-    # users is accessible as Python list
-    total_age = sum(u['age'] for u in users)
-    avg_age = total_age / len(users)
-    
-    return {
-        'count': len(users),
-        'average_age': avg_age,
-        'names': [u['name'] for u in users]
-    }
+def hello():
+  print("Elide can run Python!")
 ```
 
-No serialization overhead!
+## Language Engine
 
-## Scientific Computing
+Elide can execute Python using <a href="https://github.com/oracle/graalpython" style="color: rgb(168, 85, 247); text-decoration: underline; font-weight: 500;">GraalPython</a> from Oracle.
 
-Use Python's data science ecosystem:
+| Language | Python |
+|----------|--------|
+| Standard | `3.11.x` |
+| Maturity | Alpha |
+| Engine | <a href="https://github.com/oracle/graalpython" style="color: rgb(168, 85, 247); text-decoration: underline; font-weight: 500;">GraalPython</a> |
+| Tools | <a href="https://astral.sh" style="color: rgb(168, 85, 247); text-decoration: underline; font-weight: 500;">uv</a> (see <a href="/docs/python-tooling" style="color: rgb(168, 85, 247); text-decoration: underline; font-weight: 500;">Python Tooling</a>) |
+
+## Python Interop
+
+Developers can expose Python symbols (functions, classes, and values) to the polyglot context using the `elide` built-in module:
 
 ```python
-# ml_model.py
-import numpy as np
-import pandas as pd
-from sklearn.linear_model import LinearRegression
+from elide import bind, poly
 
-def train_model(data):
-    """Train ML model on data"""
-    df = pd.DataFrame(data)
-    
-    X = df[['feature1', 'feature2']].values
-    y = df['target'].values
-    
-    model = LinearRegression()
-    model.fit(X, y)
-    
-    return {
-        'coefficients': model.coef_.tolist(),
-        'intercept': float(model.intercept_),
-        'score': float(model.score(X, y))
-    }
+@bind
+def say_hello(name = "Python"):
+  """Render a hello greeting to the specified name."""
+  return f"Hello, {name}!"
 
-def predict(model_params, features):
-    """Make predictions"""
-    # Reconstruct model from params
-    model = LinearRegression()
-    model.coef_ = np.array(model_params['coefficients'])
-    model.intercept_ = model_params['intercept']
-    
-    X = np.array(features).reshape(1, -1)
-    prediction = model.predict(X)
-    
-    return float(prediction[0])
+# use `poly` if you want to rename the symbol
+# (it's shorthand for 'polyglot')
+@poly(name = "goodbye")
+def say_goodbye(name = "Python"):
+  """Render a goodbye greeting to the specified name."""
+  return f"Goodbye, {name}!"
+
+# you can return other functions and complex types!
+@bind
+def message(leaving = False):
+  """Return a message renderer based on the user's disposition."""
+  if leaving:
+    return say_goodbye
+  return say_hello
 ```
 
-Use from JavaScript:
+**Now, from TypeScript, for example:**
 
-```javascript
-// server.js
-const { train_model, predict } = await import('./ml_model.py')
+```typescript
+import { message } from "./my-python.py"
 
-const app = Elide.http
-
-app.router.handle("POST", "/train", async (request, response) => {
-  const data = request.body.data
-  
-  // Train Python ML model
-  const model = await train_model(data)
-  
-  response.json(model)
-})
-
-app.router.handle("POST", "/predict", async (request, response) => {
-  const { model, features } = request.body
-  
-  // Use Python model for prediction
-  const prediction = await predict(model, features)
-  
-  response.json({ prediction })
-})
+console.log(JSON.stringify({hello: message()()}))
+console.log(JSON.stringify({goodbye: message(true)()}))
 ```
-
-## Package Management
-
-### Install Python Packages
 
 ```bash
-# Install packages with pip
-elide pip install numpy pandas scikit-learn
-
-# Or use requirements.txt
-elide pip install -r requirements.txt
+elide ./my-index.ts
 ```
 
-### Using venv
+Output:
 
-```bash
-# Create virtual environment
-python -m venv .venv
-
-# Activate
-source .venv/bin/activate  # Linux/macOS
-.venv\Scripts\activate  # Windows
-
-# Install packages
-pip install numpy pandas
-
-# Run with Elide
-elide run app.py
+```json
+{"hello": "Hello, Python!"}
+{"goodbye": "Goodbye, Python!"}
 ```
 
-## Best Practices
+## Additional Resources
 
-### Type Hints
+**[Python Tooling](/docs/python-tooling)** - Python package management and tooling in Elide
 
-```python
-from typing import List, Dict, Optional
+**[Polyglot Guide](/docs/polyglot)** - Deep dive into polyglot context and language interoperability
 
-def process_users(users: List[Dict[str, any]]) -> Dict[str, int]:
-    """Process user data with type hints"""
-    return {
-        'count': len(users),
-        'total_age': sum(u.get('age', 0) for u in users)
-    }
-
-def find_user(users: List[Dict], user_id: int) -> Optional[Dict]:
-    """Find user by ID"""
-    for user in users:
-        if user.get('id') == user_id:
-            return user
-    return None
-```
-
-### Error Handling
-
-```python
-class ValidationError(Exception):
-    """Custom validation error"""
-    pass
-
-def validate_user(user: dict):
-    if 'email' not in user:
-        raise ValidationError('Email is required')
-    if '@' not in user['email']:
-        raise ValidationError('Invalid email format')
-```
-
-Handle in JavaScript:
-
-```javascript
-try {
-  await validate_user(userData)
-} catch (error) {
-  if (error.name === 'ValidationError') {
-    console.error('Validation failed:', error.message)
-  }
-}
-```
-
-## Example: Full-Stack Polyglot App
-
-```javascript
-// server.js - JavaScript HTTP server
-const { analyze_sentiment, train_model } = await import('./ml.py')
-
-const app = Elide.http
-
-// API endpoint using Python ML
-app.router.handle("POST", "/sentiment", async (req, res) => {
-  const { text } = req.body
-  const sentiment = await analyze_sentiment(text)
-  res.json({ text, sentiment })
-})
-
-// Train endpoint
-app.router.handle("POST", "/train", async (req, res) => {
-  const { data } = req.body
-  const model = await train_model(data)
-  res.json({ model })
-})
-
-console.log("🚀 Polyglot server running!")
-```
-
-```python
-# ml.py - Python ML logic
-from textblob import TextBlob
-import numpy as np
-
-def analyze_sentiment(text: str) -> dict:
-    """Analyze sentiment using TextBlob"""
-    blob = TextBlob(text)
-    polarity = blob.sentiment.polarity
-    
-    if polarity > 0.1:
-        sentiment = 'positive'
-    elif polarity < -0.1:
-        sentiment = 'negative'
-    else:
-        sentiment = 'neutral'
-    
-    return {
-        'sentiment': sentiment,
-        'polarity': polarity,
-        'subjectivity': blob.sentiment.subjectivity
-    }
-
-def train_model(data: list) -> dict:
-    """Train a simple model"""
-    X = np.array([d['features'] for d in data])
-    y = np.array([d['label'] for d in data])
-    
-    # Training logic here...
-    
-    return {
-        'accuracy': 0.95,
-        'params': {}
-    }
-```
-## Performance Considerations
-
-### Zero-Copy Data Sharing
-- Arrays and objects pass by reference
-- No serialization between languages
-- Shared memory space
-
-### Native Performance
-- Python compiled with GraalVM
-- JIT optimization across language boundaries
-- Native image includes Python code
-
-## Next Steps
-
-- **[JavaScript Guide](/docs/javascript)** - JavaScript features
-- **[Runtime](/docs/runtime)** - How polyglot works
-- **[Server API](/docs/api-server)** - Build servers
-
-<Alert>
-  <strong>Key Benefit:</strong> Elide lets you use Python for ML/data science while building your API in JavaScript—all in one fast, efficient runtime!
-</Alert>
+**[TypeScript](/docs/typescript)** - Running TypeScript applications in Elide
 

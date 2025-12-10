@@ -42,18 +42,18 @@ URLs, by spec, support the following components:
 
 | URL Property | Sample Value | Description |
 |--------------|--------------|-------------|
-| `protocol` | `'https:'` | The transport technology in use, including the trailing `:`; usually `http:` or `https:` |
-| `origin` | `'https://google.com:443'` | The web origin value of the URL; consists of the scheme, domain, and port |
-| `host` | `'google.com:443'` | The full host string, like `https://google.com:443` from the example above |
-| `hostname` | `'google.com'` | Just the hostname, like `google.com` from the sample above |
-| `port` | `443` | Just the port, like `443` from the sample above (HTTPS) |
-| `pathname` | `/search` | The path portion of the url `/like-this/here`, or `/` at a minimum |
-| `hash` | `#hello` | The portion of the URL after `#`, if present |
-| `href` | `'https://google.com/search'` | Formatted string version of the whole URL |
-| `username` | `'user'` | If there is auth information in the URL (like `user:pass@...`), this is `user` |
-| `password` | `'pass'` | If there is auth information in the URL (like `user:pass@...`), this is `pass` |
-| `search` | `'?hello=hi'` | The portion of the URL after `?` but before `#`, if present, including the initial `?` |
-| `searchParams` | `URLSearchParams` object | Parsed `search` value into a multimap of key-value pairs |
+| protocol | 'https:' | The transport technology in use, including the trailing colon; usually http: or https: |
+| origin | 'https://google.com:443' | The web origin value of the URL; consists of the scheme, domain, and port |
+| host | 'google.com:443' | The full host string, like https://google.com:443 from the example above |
+| hostname | 'google.com' | Just the hostname, like google.com from the sample above |
+| port | 443 | Just the port, like 443 from the sample above (HTTPS) |
+| pathname | /search | The path portion of the url /like-this/here, or / at a minimum |
+| hash | #hello | The portion of the URL after #, if present |
+| href | 'https://google.com/search' | Formatted string version of the whole URL |
+| username | 'user' | If there is auth information in the URL (like user:pass@...), this is user |
+| password | 'pass' | If there is auth information in the URL (like user:pass@...), this is pass |
+| search | '?hello=hi' | The portion of the URL after ? but before #, if present, including the initial ? |
+| searchParams | URLSearchParams object | Parsed search value into a multimap of key-value pairs |
 
 ## URLSearchParams
 

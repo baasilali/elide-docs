@@ -6,338 +6,81 @@ date: "2025-11-20"
 
 # Pkl
 
-Elide has native support for Pkl, Apple's configuration-as-code language.
+Pkl is a typed configuration and data language by Apple.
+From [Pkl's User Manual](https://pkl-lang.org/main/current/index.html):
 
-## Overview
+<div class="alert alert-note">
+  <svg class="alert-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+    <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+  </svg>
+  <div class="alert-content">
+    <p>Pkl—pronounced Pickle—is an embeddable configuration language which provides rich support for data templating and validation. It can be used from the command line, integrated in a build pipeline, or embedded in a program. Pkl scales from small to large, simple to complex, ad-hoc to repetitive configuration tasks.</p>
+  </div>
+</div>
 
-Pkl (Pickle) provides:
+---
 
-- Type-safe configuration
-- Code reuse through modules
-- Validation and constraints
-- Multiple output formats (JSON, YAML, XML)
-- IDE support with autocompletion
+## What Pkl is for
 
-## Basic Syntax
+Pkl allows developers to express structured configurations in a concise and typed dialect (that's Pkl), which can be rendered into things like JSON, YAML, TOML, and more.
 
-```pkl
-// config.pkl
-module Config
+Pkl can also generate code in various languages to interface with these definitions.
 
-name = "My App"
-version = "1.0.0"
-port = 8080
+<div class="relative w-full my-6" style="padding-bottom: 56.25%;">
+  <iframe
+    class="absolute top-0 left-0 w-full h-full"
+    src="https://www.youtube.com/embed/lAxXWYAIt4k"
+    title="Theo explains why Apple's Pkl language is awesome"
+    frameborder="0"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowfullscreen
+  ></iframe>
+</div>
 
-database {
-  host = "localhost"
-  port = 5432
-  name = "myapp"
-}
+> Theo explains why Apple's Pkl language is awesome.
 
-features {
-  authentication = true
-  logging = true
-  caching = false
-}
+### Why Elide supports Pkl
+
+Have you ever gotten totally lost writing Kubernetes YAMLs, or perhaps been forced to push to GitHub repeatedly until your CI jobs stop choking on syntax?
+
+Pkl is an end-to-end answer for this problem, and many others. By allowing developers to express data models, or even actual data, in a typed and concise meta-format, JSON and other formats become checkable, interchangeable, formattable, and gain many other desirable attributes.
+
+## Usage
+
+Elide integrates with Pkl in several ways:
+
+### Command-line Pkl
+
+The entirety of [Pkl's command line](https://pkl-lang.org/main/current/pkl-cli/index.html) is embedded and supported within Elide; you can find it at `elide pkl`:
+
+```text
+Usage: elide pkl [OPTIONS] COMMAND [ARGS]...
+
+Options:
+  -v, --version  Show the version and exit
+  -h, --help     Show this message and exit
+
+Commands:
+  eval              Render pkl module(s)
+  repl              Start a REPL session
+  test              Run tests within the given module(s)
+  project           Run commands related to projects
+  download-package  Download package(s)
+  analyze           Commands related to static analysis
 ```
 
-## Loading Configuration
+For example, to render Pkl's own [CircleCI configuration](https://github.com/apple/pkl/blob/main/.circleci/config.pkl) into YAML:
 
-### JavaScript
-
-```javascript
-// Load Pkl configuration
-const config = await Elide.pkl.load('config.pkl')
-
-console.log(config.name)    // "My App"
-console.log(config.port)    // 8080
-console.log(config.database.host) // "localhost"
+```bash
+elide pkl eval ./pkl/.circleci/config.pkl | head -n4
 ```
 
-### Python
+Output:
 
-```python
-import elide
-
-# Load configuration
-config = elide.pkl.load('config.pkl')
-
-print(config['name'])  # "My App"
-print(config['port'])  # 8080
+```yaml
+# Generated from CircleCI.pkl. DO NOT EDIT.
+version: '2.1'
+orbs:
+  pr-approval: apple/pr-approval@0.1.0
 ```
-
-## Type Safety
-
-```pkl
-// typed-config.pkl
-module TypedConfig
-
-class DatabaseConfig {
-  host: String
-  port: Int
-  username: String
-  password: String
-  ssl: Boolean = true
-}
-
-database: DatabaseConfig = new {
-  host = "localhost"
-  port = 5432
-  username = "admin"
-  password = "secret"
-}
-```
-
-## Validation
-
-```pkl
-// validated-config.pkl
-module ValidatedConfig
-
-port: Int(this > 1024 && this < 65536)
-
-maxConnections: Int(this > 0 && this <= 10000) = 1000
-
-email: String(this.matches(Regex(#"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"#)))
-```
-
-## Modules and Imports
-
-### Creating a Module
-
-```pkl
-// database.pkl
-module Database
-
-class Config {
-  host: String
-  port: Int
-  database: String
-}
-
-default: Config = new {
-  host = "localhost"
-  port = 5432
-  database = "myapp"
-}
-```
-
-### Importing
-
-```pkl
-// app-config.pkl
-module AppConfig
-
-import "database.pkl"
-
-appName = "My Application"
-
-db = new database.Config {
-  host = "prod-server.example.com"
-  port = 5432
-  database = "production"
-}
-```
-
-## Environment-Specific Config
-
-```pkl
-// base.pkl
-module BaseConfig
-
-appName = "My App"
-debug = false
-
-// dev.pkl
-module DevConfig
-
-extends "base.pkl"
-
-debug = true
-database {
-  host = "localhost"
-}
-
-// prod.pkl
-module ProdConfig
-
-extends "base.pkl"
-
-database {
-  host = "prod-db.example.com"
-  ssl = true
-}
-```
-
-Load based on environment:
-
-```javascript
-const env = process.env.NODE_ENV || 'dev'
-const config = await Elide.pkl.load(`${env}.pkl`)
-```
-
-## Dynamic Values
-
-```pkl
-// dynamic.pkl
-module DynamicConfig
-
-import "pkl:platform"
-
-// Read environment variables
-apiKey = read("env:API_KEY")
-
-// Platform-specific values
-dataDir = if (platform.current.operatingSystem.name == "Windows")
-  then "C:\\Data"
-  else "/var/data"
-
-// Computed values
-baseUrl = "https://api.example.com"
-usersEndpoint = "\(baseUrl)/users"
-postsEndpoint = "\(baseUrl)/posts"
-```
-
-## Collections
-
-```pkl
-// collections.pkl
-module Collections
-
-// Lists
-numbers: List<Int> = List(1, 2, 3, 4, 5)
-
-// Maps
-settings: Map<String, Any> = Map(
-  "theme", "dark",
-  "language", "en",
-  "notifications", true
-)
-
-// Sets
-features: Set<String> = Set("auth", "logging", "caching")
-```
-
-## Output Formats
-
-### JSON Output
-
-```javascript
-const config = await Elide.pkl.load('config.pkl')
-
-// Convert to JSON
-const json = JSON.stringify(config, null, 2)
-console.log(json)
-```
-
-### YAML Output
-
-```pkl
-// Output as YAML
-output {
-  renderer = new YamlRenderer {}
-}
-```
-
-## Complete Example
-
-```pkl
-// elide.pkl
-module ElideConfig
-
-class ServerConfig {
-  host: String = "0.0.0.0"
-  port: Int(this > 0 && this < 65536)
-  ssl: Boolean = false
-}
-
-class DatabaseConfig {
-  host: String
-  port: Int = 5432
-  database: String
-  pool: PoolConfig
-}
-
-class PoolConfig {
-  min: Int(this >= 0) = 2
-  max: Int(this > min) = 10
-  idleTimeout: Duration = 30.s
-}
-
-class LogConfig {
-  level: "debug"|"info"|"warn"|"error" = "info"
-  format: "json"|"text" = "json"
-  output: String = "stdout"
-}
-
-server: ServerConfig = new {
-  port = 8080
-  ssl = true
-}
-
-database: DatabaseConfig = new {
-  host = "localhost"
-  database = "myapp"
-  pool {
-    min = 5
-    max = 20
-  }
-}
-
-logging: LogConfig = new {
-  level = "info"
-  format = "json"
-}
-```
-
-Load and use:
-
-```javascript
-const config = await Elide.pkl.load('elide.pkl')
-
-// Start server with config
-const server = Elide.http.createServer({
-  port: config.server.port,
-  host: config.server.host,
-  ssl: config.server.ssl
-})
-
-// Connect to database
-const db = await connectDatabase({
-  host: config.database.host,
-  port: config.database.port,
-  database: config.database.database,
-  pool: {
-    min: config.database.pool.min,
-    max: config.database.pool.max
-  }
-})
-```
-
-## Best Practices
-
-1. **Use types** - Define classes for structure and validation
-2. **Modularize** - Split config into logical modules
-3. **Validate early** - Add constraints to catch errors
-4. **Document** - Add comments to explain configuration options
-5. **Version control** - Track configuration changes
-6. **Environment separation** - Use inheritance for env-specific config
-
-## IDE Support
-
-Pkl has excellent IDE support:
-
-- **VS Code**: Install Pkl extension
-- **IntelliJ**: Built-in support
-- **Features**: 
-  - Syntax highlighting
-  - Autocompletion
-  - Error checking
-  - Refactoring
-
-## Resources
-
-- [Pkl Documentation](https://pkl-lang.org/)
-- [Pkl Language Tour](https://pkl-lang.org/main/current/language-tutorial/01_introduction.html)
-- [Pkl Examples](https://github.com/apple/pkl/tree/main/examples)
 

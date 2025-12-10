@@ -1,322 +1,40 @@
 ---
 title: "Ruby"
-description: "Using Ruby in Elide with TruffleRuby"
+description: "Ruby runtime features and polyglot capabilities in Elide"
 date: "2025-11-20"
 ---
 
 # Ruby
 
-Run Ruby code in Elide powered by TruffleRuby for high performance.
+Elide can execute your Ruby applications, while integrating with other languages like JavaScript and Python.
 
-## Overview
-
-Elide supports Ruby 3.2+ through TruffleRuby, providing:
-
-- Full Ruby language support
-- High performance execution
-- Polyglot interoperability
-- Native gem support (pure Ruby)
-
-## Quick Start
-
-```ruby
-# hello.rb
-puts "Hello from Ruby in Elide!"
-
-# Variables
-name = "Elide"
-version = "1.0"
-puts "#{name} version #{version}"
-
-# Arrays and iteration
-[1, 2, 3, 4, 5].each do |n|
-  puts n * 2
-end
-```
-
-Run it:
+<div class="alert alert-warning">
+  <svg class="alert-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+  </svg>
+  <div class="alert-content">
+    <div class="alert-title">Warning</div>
+    <p>Elide ships with Ruby disabled by default. This restriction will be lifted in a future release. Please file an issue <a href="https://github.com/elide-dev/elide/issues/new">here</a> if Ruby support is a blocker for you.</p>
+  </div>
+</div>
 
 ```bash
-elide run hello.rb
+elide run --ruby ...
 ```
 
-## Ruby Features
-
-### Classes and Modules
-
 ```ruby
-# person.rb
-class Person
-  attr_accessor :name, :age
-  
-  def initialize(name, age)
-    @name = name
-    @age = age
-  end
-  
-  def greet
-    "Hello, I'm #{@name} and I'm #{@age} years old"
-  end
-end
-
-person = Person.new("Alice", 30)
-puts person.greet
-```
-
-### Blocks and Procs
-
-```ruby
-# Blocks
-[1, 2, 3].map { |n| n * 2 }
-
-# Procs
-square = Proc.new { |x| x * x }
-puts square.call(5) # 25
-
-# Lambdas
-multiply = ->(x, y) { x * y }
-puts multiply.call(3, 4) # 12
-```
-
-### Metaprogramming
-
-```ruby
-class DynamicClass
-  def method_missing(method, *args)
-    puts "Called #{method} with #{args.join(', ')}"
-  end
-  
-  def respond_to_missing?(method, include_private = false)
-    true
-  end
-end
-
-obj = DynamicClass.new
-obj.anything(1, 2, 3) # Works!
-```
-
-## File I/O
-
-```ruby
-# Read file
-content = File.read('data.txt')
-
-# Write file
-File.write('output.txt', 'Hello, World!')
-
-# Read lines
-File.readlines('data.txt').each do |line|
-  puts line
-end
-
-# With block
-File.open('data.txt', 'r') do |file|
-  file.each_line do |line|
-    puts line
-  end
+def hello
+  puts "Elide can run Ruby!"
 end
 ```
 
-## HTTP Requests
+## Language Engine
 
-### Using Net::HTTP
+Elide executes Ruby using <a href="https://github.com/oracle/truffleruby" style="color: rgb(168, 85, 247); text-decoration: underline; font-weight: 500;">TruffleRuby</a> from Oracle.
 
-```ruby
-require 'net/http'
-require 'json'
-
-uri = URI('https://api.example.com/data')
-response = Net::HTTP.get(uri)
-data = JSON.parse(response)
-
-puts data['key']
-```
-
-### POST Requests
-
-```ruby
-require 'net/http'
-require 'json'
-
-uri = URI('https://api.example.com/users')
-req = Net::HTTP::Post.new(uri, 'Content-Type' => 'application/json')
-req.body = { name: 'Alice', age: 30 }.to_json
-
-res = Net::HTTP.start(uri.hostname, uri.port, use_ssl: true) do |http|
-  http.request(req)
-end
-
-puts res.body
-```
-
-## Polyglot Interop
-
-### Calling JavaScript from Ruby
-
-```ruby
-# Call JavaScript
-result = Polyglot.eval('js', '[1, 2, 3].map(x => x * 2)')
-puts result.inspect # [2, 4, 6]
-
-# Import JavaScript module
-fs = Polyglot.import('fs')
-content = fs.readFileSync('data.txt', 'utf8')
-```
-
-### Calling Ruby from JavaScript
-
-```javascript
-// Evaluate Ruby code
-const result = Polyglot.eval('ruby', '5 + 3')
-console.log(result) // 8
-
-// Call Ruby methods
-const ruby = Polyglot.eval('ruby', `
-  class Calculator
-    def add(a, b)
-      a + b
-    end
-  end
-  Calculator.new
-`)
-
-console.log(ruby.add(5, 3)) // 8
-```
-
-## Gems
-
-### Pure Ruby Gems
-
-Most pure Ruby gems work out of the box:
-
-```bash
-# Install gem
-gem install json
-gem install httparty
-```
-
-```ruby
-require 'json'
-require 'httparty'
-
-response = HTTParty.get('https://api.example.com/data')
-data = JSON.parse(response.body)
-```
-
-### Native Extension Gems
-
-Gems with C extensions may have limited support. Prefer pure Ruby alternatives when possible.
-
-| Gem | Status |
-|-----|--------|
-| `json` | ✅ Supported |
-| `nokogiri` | ⚠️ Partial |
-| `pg` | ⚠️ Partial |
-| `sqlite3` | ⚠️ Partial |
-
-## Performance
-
-TruffleRuby provides excellent performance:
-
-| Benchmark | MRI | TruffleRuby |
-|-----------|-----|-------------|
-| **Startup** | 1.0x | 1.2x |
-| **Warmup** | 1.0x | 10-20x |
-| **Peak** | 1.0x | 20-50x |
-
-## Best Practices
-
-1. **Warmup**: Performance improves after warmup period
-2. **Pure Ruby**: Prefer pure Ruby over C extensions
-3. **Idiomatic code**: Write idiomatic Ruby for best performance
-4. **Profile**: Use profiling to find bottlenecks
-
-## Example: Web Scraper
-
-```ruby
-require 'net/http'
-require 'json'
-
-class WebScraper
-  def initialize(url)
-    @url = URI(url)
-  end
-  
-  def fetch
-    response = Net::HTTP.get(@url)
-    parse(response)
-  end
-  
-  private
-  
-  def parse(html)
-    # Simple parsing (use Nokogiri for real scraping)
-    html.scan(/<title>(.*?)<\/title>/).flatten
-  end
-end
-
-scraper = WebScraper.new('https://example.com')
-titles = scraper.fetch
-puts titles
-```
-
-## Example: Data Processing
-
-```ruby
-# Process CSV data
-data = [
-  { name: 'Alice', score: 85 },
-  { name: 'Bob', score: 92 },
-  { name: 'Charlie', score: 78 }
-]
-
-# Calculate average
-average = data.map { |row| row[:score] }.sum / data.length.to_f
-puts "Average: #{average}"
-
-# Filter and sort
-top_scorers = data
-  .select { |row| row[:score] > 80 }
-  .sort_by { |row| -row[:score] }
-
-top_scorers.each do |person|
-  puts "#{person[:name]}: #{person[:score]}"
-end
-```
-
-## Debugging
-
-```ruby
-# Use binding.pry for debugging (if available)
-require 'pry'
-
-def complex_method(x)
-  y = x * 2
-  binding.pry # Breakpoint
-  y + 10
-end
-
-# Or use basic puts debugging
-def debug_method(x)
-  puts "Input: #{x.inspect}"
-  result = x * 2
-  puts "After multiply: #{result.inspect}"
-  result
-end
-```
-
-## Limitations
-
-Current limitations:
-
-- C extension support is limited
-- Some Ruby gems may not work
-- Threading has some restrictions
-- Fork is not available in native image
-
-## Resources
-
-- [TruffleRuby Documentation](https://github.com/oracle/truffleruby)
-- [Ruby Documentation](https://ruby-doc.org/)
-- [Ruby Style Guide](https://rubystyle.guide/)
+| Language | Ruby |
+|----------|------|
+| Standard | <a href="https://en.wikipedia.org/wiki/Ruby_MRI" style="color: rgb(168, 85, 247); text-decoration: underline; font-weight: 500;">MRI</a> `3.2` |
+| Maturity | Alpha |
+| Engine | <a href="https://github.com/oracle/truffleruby" style="color: rgb(168, 85, 247); text-decoration: underline; font-weight: 500;">TruffleRuby</a> |
 
