@@ -354,7 +354,6 @@ function highlightCode(code, language) {
 
 // Clean and create dist directory
 async function setup() {
-  console.log('[CLEAN] Cleaning dist directory...')
   await fs.rm(DIST_DIR, { recursive: true, force: true })
   await fs.mkdir(DIST_DIR, { recursive: true })
   await fs.mkdir(path.join(DIST_DIR, 'docs'), { recursive: true })
@@ -363,8 +362,6 @@ async function setup() {
 
 // Copy static assets
 async function copyAssets() {
-  console.log('[COPY] Copying static assets...')
-  
   async function copyRecursive(src, dest) {
     const stat = await fs.stat(src)
     
@@ -392,23 +389,19 @@ async function copyAssets() {
     for (const file of files) {
       const src = path.join(PUBLIC_DIR, file)
       const dest = path.join(DIST_DIR, 'assets', file)
-      
       await copyRecursive(src, dest)
-      console.log(`  [OK] Copied ${file}`)
     }
   } catch (err) {
-    console.warn('  [WARN] Could not copy public assets:', err.message)
+    throw new Error(`Failed to copy public assets: ${err.message}`)
   }
   
   // Copy fonts directory
   try {
     const fontsSource = path.join(__dirname, 'assets', 'fonts')
     const fontsDest = path.join(DIST_DIR, 'assets', 'fonts')
-    
     await copyRecursive(fontsSource, fontsDest)
-    console.log(`  [OK] Copied fonts directory`)
   } catch (err) {
-    console.warn('  [WARN] Could not copy fonts:', err.message)
+    throw new Error(`Failed to copy fonts: ${err.message}`)
   }
   
   // Copy assets directory images
@@ -418,21 +411,18 @@ async function copyAssets() {
     const entries = await fs.readdir(assetsSource)
     
     for (const entry of entries) {
-      // Skip fonts directory (already copied above) and empty files
       if (entry === 'fonts') continue
       
       const src = path.join(assetsSource, entry)
       const stat = await fs.stat(src)
       
-      // Only copy files (not directories)
       if (stat.isFile()) {
         const dest = path.join(assetsDest, entry)
         await fs.copyFile(src, dest)
-        console.log(`  [OK] Copied ${entry} from assets`)
       }
     }
   } catch (err) {
-    console.warn('  [WARN] Could not copy assets directory:', err.message)
+    throw new Error(`Failed to copy assets: ${err.message}`)
   }
 }
 
@@ -1572,8 +1562,6 @@ function generateHTMLPage(title, content, slug, searchIndex = []) {
 
 // MDX to HTML converter
 async function processMDXFile(slug, searchIndex = []) {
-  console.log(`  [BUILD] Processing ${slug}...`)
-  
   const filePath = path.join(CONTENT_DIR, `${slug}.mdx`)
   const source = await fs.readFile(filePath, 'utf8')
   
@@ -1802,15 +1790,11 @@ async function processMDXFile(slug, searchIndex = []) {
   const outputPath = path.join(DIST_DIR, 'docs', `${slug}.html`)
   await fs.writeFile(outputPath, pageHTML, 'utf8')
   
-  console.log(`  [OK] Generated ${slug}.html`)
-  
   return { slug, title, frontmatter }
 }
 
 // Generate redirect page for introduction -> readme
 async function generateIntroductionRedirect() {
-  console.log('[REDIRECT] Creating introduction.html redirect...')
-  
   const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1826,13 +1810,10 @@ async function generateIntroductionRedirect() {
 </html>`
   
   await fs.writeFile(path.join(DIST_DIR, 'docs', 'introduction.html'), html, 'utf8')
-  console.log('  [OK] Generated introduction.html (redirects to readme.html)')
 }
 
 // Generate index/home page
 async function generateIndex() {
-  console.log('[INDEX] Generating index page...')
-  
   const html = `<!DOCTYPE html>
 <html lang="en" class="dark">
 <head>
@@ -1902,13 +1883,16 @@ async function generateIndex() {
 </html>`
   
   await fs.writeFile(path.join(DIST_DIR, 'index.html'), html, 'utf8')
-  
-  console.log('  [OK] Generated index.html (landing page)')
 }
 
 // Get all doc slugs from config
 function getAllDocSlugs() {
   const collectSlugs = (item) => {
+    // Skip external links and coming soon items
+    if (item.external || item.comingSoon) {
+      return []
+    }
+    
     const slugs = [item.slug]
     if (item.children && item.children.length > 0) {
       item.children.forEach(child => {
@@ -1995,7 +1979,7 @@ async function generateSearchIndex() {
 
 // Main build function
 async function build() {
-  console.log('[BUILD] Building Elide Documentation (Static)...\n')
+  const startTime = Date.now()
   
   try {
     // Setup
@@ -2005,23 +1989,21 @@ async function build() {
     await copyAssets()
     
     // Generate search index
-    console.log('\n[SEARCH] Generating search index...')
     const searchIndex = await generateSearchIndex()
-    console.log(`  Found ${searchIndex.length} searchable items\n`)
     
     // Get all docs from config
-    console.log('[DOCS] Processing documentation files...')
     const slugs = getAllDocSlugs()
-    console.log(`  Found ${slugs.length} documents\n`)
     
     // Process each doc
     const docs = []
+    const errors = []
+    
     for (const slug of slugs) {
       try {
         const doc = await processMDXFile(slug, searchIndex)
         docs.push(doc)
       } catch (err) {
-        console.error(`  [ERROR] Error processing ${slug}:`, err.message)
+        errors.push({ slug, error: err.message })
       }
     }
     
@@ -2031,14 +2013,20 @@ async function build() {
     // Generate introduction redirect
     await generateIntroductionRedirect()
     
-    console.log('\n[SUCCESS] Build complete! Files in dist/')
-    console.log('\n[INFO] To view the docs, run:')
-    console.log('   elide serve dist --port 3000')
-    console.log('   or')
-    console.log('   bun run serve')
+    const elapsed = ((Date.now() - startTime) / 1000).toFixed(2)
+    
+    if (errors.length > 0) {
+      console.log(`[BUILD COMPLETED WITH ERRORS] ${docs.length} pages built, ${errors.length} failed (${elapsed}s)\n`)
+      errors.forEach(({ slug, error }) => {
+        console.error(`  [ERROR] ${slug}: ${error}`)
+      })
+      process.exit(1)
+    } else {
+      console.log(`[SUCCESS] All ${docs.length} pages built successfully (${elapsed}s)`)
+    }
     
   } catch (error) {
-    console.error('[FAIL] Build failed:', error)
+    console.error(`[BUILD FAILED] ${error.message}`)
     process.exit(1)
   }
 }
