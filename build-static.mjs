@@ -42,8 +42,8 @@ const navbarSections = [
       {
         title: 'Resources',
         items: [
-          { title: 'Binary Report', href: '/elide-report.html', slug: 'binary-report', external: true },
-          { title: 'SBOM', href: '/elide.sbom.json', slug: 'sbom', external: true },
+          { title: 'Binary Report', href: 'https://dl.elide.dev/cli/v1/snapshot/linux-amd64/1.0.0-beta8/elide.build-report.html', slug: 'binary-report', external: true },
+          { title: 'SBOM', href: 'https://dl.elide.dev/cli/v1/snapshot/linux-amd64/1.0.0-beta8/elide.sbom.json', slug: 'sbom', external: true },
         ],
       },
     ],
@@ -678,16 +678,19 @@ function generateSidebarHTML(currentSlug) {
       const isExpanded = hasActiveChild(item)
       const activeClass = isActive ? 'shadow-[0_0_15px_rgba(168,85,247,0.3)]' : ''
       const activeBg = isActive ? 'background: rgba(168, 85, 247, 0.15);' : ''
+      const itemHref = item.external ? item.href : `/docs/${item.slug}.html`
+      const targetAttr = item.external ? 'target="_blank" rel="noopener noreferrer"' : ''
       
       sidebarHTML += `
               <li class="sidebar-item-wrapper">
                 <div class="flex items-center justify-between">
                   <a 
-                    href="/docs/${item.slug}.html" 
+                    href="${itemHref}" 
+                    ${targetAttr}
                     class="flex-1 block px-5 py-3 rounded-md text-lg text-foreground hover:bg-accent hover:text-accent-foreground hover:shadow-[0_0_15px_rgba(168,85,247,0.3)] transition-all duration-200 ${activeClass}"
                     style="${activeBg}"
                   >
-                    ${item.title}
+                    ${item.title}${item.external ? ' <svg class="inline-block h-4 w-4 ml-1 mb-0.5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>' : ''}
                   </a>
       `
       
