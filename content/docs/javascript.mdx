@@ -5,630 +5,83 @@ date: "2025-11-19"
 ---
 
 import { Alert } from '@/components/ui/alert'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
-# JavaScript in Elide
+# JavaScript
 
-Elide provides a full-featured JavaScript runtime with ES2024+ support, Node.js compatibility, and Web standard APIs.
+Elide can execute JavaScript, just like Node.js, Deno, or Bun. Similar to other popular JavaScript runtimes, Elide strives for Node API compatibility.
 
-## Language Support
-
-### ECMAScript Compatibility
-
-Elide supports all modern JavaScript features:
-
-```javascript
-// ES2024+ Features
-const data = [1, 2, 3, 4, 5]
-
-// Array grouping
-const grouped = data.groupBy(n => n % 2 === 0 ? 'even' : 'odd')
-
-// Promise.withResolvers
-const { promise, resolve, reject } = Promise.withResolvers()
-
-// Top-level await
-const config = await fetch('/config.json').then(r => r.json())
-
-// Optional chaining & nullish coalescing
-const port = config?.server?.port ?? 3000
-
-// Private class fields
-class Database {
-  #connection
-  
-  async connect() {
-    this.#connection = await createConnection()
-  }
-}
-
-// BigInt
-const large = 9007199254740991n + 1n
+```bash
+elide run --javascript ...
 ```
 
-### async/await
-
 ```javascript
-// Async functions
-async function fetchUser(id) {
-  const response = await fetch(`/api/users/${id}`)
-  if (!response.ok) {
-    throw new Error(`User ${id} not found`)
-  }
-  return response.json()
-}
-
-// Parallel execution
-const [user, posts, comments] = await Promise.all([
-  fetchUser(1),
-  fetch('/api/posts').then(r => r.json()),
-  fetch('/api/comments').then(r => r.json())
-])
-
-// Promise.allSettled
-const results = await Promise.allSettled([
-  fetch('/api/user'),
-  fetch('/api/posts'),
-  fetch('/api/comments')
-])
-
-results.forEach(result => {
-  if (result.status === 'fulfilled') {
-    console.log('Success:', result.value)
-  } else {
-    console.error('Error:', result.reason)
-  }
-})
-```
-
-## Web APIs
-
-### Fetch API
-
-Standard Web Fetch for HTTP requests:
-
-```javascript
-// GET request
-const response = await fetch('https://api.example.com/data')
-const data = await response.json()
-
-// POST with JSON
-const result = await fetch('/api/users', {
-  method: 'POST',
-  headers: {
-    'Content-Type': 'application/json',
-    'Authorization': `Bearer ${token}`
-  },
-  body: JSON.stringify({
-    name: 'Alice',
-    email: 'alice@example.com'
-  })
-})
-
-// With timeout
-const controller = new AbortController()
-const timeout = setTimeout(() => controller.abort(), 5000)
-
-try {
-  const response = await fetch(url, {
-    signal: controller.signal
-  })
-  const data = await response.json()
-} finally {
-  clearTimeout(timeout)
-}
-
-// Form data
-const formData = new FormData()
-formData.append('file', fileBlob, 'document.pdf')
-formData.append('user', 'alice')
-
-await fetch('/upload', {
-  method: 'POST',
-  body: formData
-})
-```
-
-### URL API
-
-```javascript
-const url = new URL('https://example.com/path?foo=bar')
-
-// Properties
-console.log(url.protocol) // 'https:'
-console.log(url.hostname) // 'example.com'
-console.log(url.pathname) // '/path'
-
-// Search params
-url.searchParams.set('page', '2')
-url.searchParams.append('filter', 'active')
-url.searchParams.delete('foo')
-
-console.log(url.toString())
-// 'https://example.com/path?page=2&filter=active'
-
-// URL patterns
-const pattern = new URLPattern('/users/:id')
-const match = pattern.exec('/users/123')
-console.log(match.pathname.groups.id) // '123'
-```
-
-### TextEncoder/TextDecoder
-
-```javascript
-// Encode to UTF-8
-const encoder = new TextEncoder()
-const bytes = encoder.encode('Hello, 世界')
-
-// Decode from UTF-8
-const decoder = new TextDecoder()
-const text = decoder.decode(bytes)
-
-// Different encodings
-const latin1Decoder = new TextDecoder('iso-8859-1')
-const text2 = latin1Decoder.decode(latin1Bytes)
-```
-
-### Streams API
-
-```javascript
-// Readable stream
-const stream = new ReadableStream({
-  start(controller) {
-    controller.enqueue('chunk 1')
-    controller.enqueue('chunk 2')
-    controller.close()
-  }
-})
-
-// Consume stream
-for await (const chunk of stream) {
-  console.log(chunk)
-}
-
-// Transform stream
-const transformStream = new TransformStream({
-  transform(chunk, controller) {
-    controller.enqueue(chunk.toUpperCase())
-  }
-})
-
-const transformed = readableStream
-  .pipeThrough(transformStream)
-```
-
-## Built-in Modules
-
-### Console
-
-```javascript
-// Standard logging
-console.log('Hello', 'World')
-console.info('Information')
-console.warn('Warning!')
-console.error('Error occurred')
-console.debug('Debug info')
-
-// Formatting
-console.log('User: %s, Age: %d', name, age)
-
-// Groups
-console.group('User Details')
-console.log('Name:', user.name)
-console.log('Email:', user.email)
-console.groupEnd()
-
-// Tables
-console.table([
-  { name: 'Alice', age: 30 },
-  { name: 'Bob', age: 25 }
-])
-
-// Timing
-console.time('fetch')
-await fetch('/api/data')
-console.timeEnd('fetch')
-
-// Assertions
-console.assert(value > 0, 'Value must be positive')
-
-// Stack trace
-console.trace('Show call stack')
-```
-
-### Timers
-
-```javascript
-// setTimeout
-const timeoutId = setTimeout(() => {
-  console.log('Executed after 1 second')
-}, 1000)
-
-clearTimeout(timeoutId)
-
-// setInterval
-const intervalId = setInterval(() => {
-  console.log('Executed every second')
-}, 1000)
-
-clearInterval(intervalId)
-
-// setImmediate (Node.js compat)
-setImmediate(() => {
-  console.log('Executed in next tick')
-})
-
-// queueMicrotask
-queueMicrotask(() => {
-  console.log('Executed as microtask')
-})
-```
-
-### Performance API
-
-```javascript
-// High-resolution timing
-const start = performance.now()
-
-// ... do work
-
-const duration = performance.now() - start
-console.log(`Operation took ${duration}ms`)
-
-// Marks and measures
-performance.mark('start')
-await doWork()
-performance.mark('end')
-
-performance.measure('work-duration', 'start', 'end')
-
-const measures = performance.getEntriesByType('measure')
-console.log(measures[0].duration)
-
-// Resource timing
-const entries = performance.getEntriesByType('resource')
-entries.forEach(entry => {
-  console.log(`${entry.name}: ${entry.duration}ms`)
-})
-```
-
-## Node.js Compatibility
-
-### Process
-
-```javascript
-// Environment variables
-const port = process.env.PORT || 3000
-const env = process.env.NODE_ENV || 'development'
-
-// Process info
-console.log(process.version) // Elide version
-console.log(process.platform) // linux, darwin, win32
-console.log(process.arch) // x64, arm64
-
-// Current directory
-console.log(process.cwd())
-
-// Change directory
-process.chdir('/path/to/directory')
-
-// Exit codes
-process.exit(0) // Success
-process.exit(1) // Error
-
-// Event handlers
-process.on('uncaughtException', (error) => {
-  console.error('Uncaught exception:', error)
-  process.exit(1)
-})
-
-process.on('unhandledRejection', (reason, promise) => {
-  console.error('Unhandled rejection:', reason)
-})
-
-// Signals
-process.on('SIGINT', () => {
-  console.log('Received SIGINT')
-  process.exit(0)
-})
-
-process.on('SIGTERM', () => {
-  console.log('Received SIGTERM')
-  cleanup()
-  process.exit(0)
-})
-```
-
-### Buffer
-
-```javascript
-// Create buffer
-const buf1 = Buffer.from('Hello')
-const buf2 = Buffer.from([0x48, 0x65, 0x6c, 0x6c, 0x6f])
-const buf3 = Buffer.alloc(10) // Zeroed buffer
-const buf4 = Buffer.allocUnsafe(10) // Uninitialized (faster)
-
-// Convert to string
-const text = buf1.toString('utf8')
-const hex = buf1.toString('hex')
-const base64 = buf1.toString('base64')
-
-// Concatenate
-const combined = Buffer.concat([buf1, buf2])
-
-// Compare
-const result = buf1.compare(buf2) // -1, 0, or 1
-
-// Slice
-const slice = buf1.slice(0, 2)
-```
-
-### Path
-
-```javascript
-import * as path from 'node:path'
-
-// Join paths
-const fullPath = path.join('/users', 'alice', 'documents')
-// '/users/alice/documents'
-
-// Resolve absolute path
-const absolute = path.resolve('docs', 'guide.md')
-// '/current/dir/docs/guide.md'
-
-// Get directory name
-const dir = path.dirname('/path/to/file.txt')
-// '/path/to'
-
-// Get base name
-const base = path.basename('/path/to/file.txt')
-// 'file.txt'
-
-// Get extension
-const ext = path.extname('file.txt')
-// '.txt'
-
-// Parse path
-const parsed = path.parse('/path/to/file.txt')
-// {
-//   root: '/',
-//   dir: '/path/to',
-//   base: 'file.txt',
-//   ext: '.txt',
-//   name: 'file'
-// }
-```
-
-## Elide-Specific APIs
-
-### HTTP Server
-
-```javascript
-// Built-in high-performance HTTP server
-const app = Elide.http
-
-app.router.handle("GET", "/", (request, response) => {
-  response.send(200, "Hello, Elide!")
-})
-
-app.router.handle("POST", "/api/data", (request, response) => {
-  const body = request.body
-  
-  response.json({
-    received: body,
-    timestamp: Date.now()
-  })
-})
-
-app.router.handle("GET", "/users/:id", (request, response) => {
-  const userId = request.params.id
-  
-  // Fetch user...
-  response.json({ id: userId, name: "Alice" })
-})
-
-console.log("Server running on http://localhost:8080")
-```
-
-### File System
-
-```javascript
-// Read file
-const content = await Elide.fs.readFile('./file.txt', 'utf-8')
-
-// Write file
-await Elide.fs.writeFile('./output.txt', 'Hello, World!')
-
-// Read directory
-const files = await Elide.fs.readdir('./directory')
-
-// File stats
-const stats = await Elide.fs.stat('./file.txt')
-console.log({
-  size: stats.size,
-  mtime: stats.mtime,
-  isFile: stats.isFile(),
-  isDirectory: stats.isDirectory()
-})
-
-// Check if exists
-const exists = await Elide.fs.exists('./file.txt')
-
-// Delete file
-await Elide.fs.unlink('./file.txt')
-
-// Create directory
-await Elide.fs.mkdir('./new-dir', { recursive: true })
-
-// Watch for changes (development mode)
-const watcher = Elide.fs.watch('./src', (event, filename) => {
-  console.log(`${filename} ${event}`)
-})
-```
-
-## Error Handling
-
-### Try/Catch
-
-```javascript
-try {
-  const data = await fetch('/api/data')
-  const json = await data.json()
-  return json
-} catch (error) {
-  if (error instanceof TypeError) {
-    console.error('Network error:', error.message)
-  } else if (error instanceof SyntaxError) {
-    console.error('Invalid JSON:', error.message)
-  } else {
-    console.error('Unknown error:', error)
-  }
-  throw error
+export default function hello() {
+  console.log("Elide can run JavaScript!")
 }
 ```
 
-### Custom Errors
+## Language Engine
 
-```javascript
-class ValidationError extends Error {
-  constructor(message, field) {
-    super(message)
-    this.name = 'ValidationError'
-    this.field = field
-  }
-}
+Elide is an ECMA2024-compliant JavaScript engine. JS is the most mature language offered by Elide; execution is powered by [GraalJs](https://github.com/oracle/graaljs), which ships with GraalVM.
 
-function validateUser(user) {
-  if (!user.email) {
-    throw new ValidationError('Email is required', 'email')
-  }
-  if (!user.name) {
-    throw new ValidationError('Name is required', 'name')
-  }
-}
+| Language | JavaScript |
+|----------|------------|
+| Standard | ECMA2024 |
+| Maturity | Beta |
+| Engine | [GraalJs](https://github.com/oracle/graaljs) |
+| Tools | [Orogene](https://orogene.dev) and [OXC](https://oxc.rs) |
 
-try {
-  validateUser({ email: '' })
-} catch (error) {
-  if (error instanceof ValidationError) {
-    console.error(`Validation failed: ${error.field} - ${error.message}`)
-  }
-}
-```
+## Standards Conformance
 
-## Module System
+Elide conforms to several JavaScript standards.
 
-### ES Modules
+### WinterTC
 
-```javascript
-// Default export
-export default function greet(name) {
-  return `Hello, ${name}!`
-}
+Elide is a [WinterTC](https://wintertc.org)-conforming runtime. Elide supports the [Minimum Common API](https://min-common-api.proposal.wintertc.org/) and several other WinterTC proposals or standards.
 
-// Named exports
-export const PI = 3.14159
-export function add(a, b) {
-  return a + b
-}
+See our [WinterTC Conformance](https://docs.elide.dev/docs/wintertc) page for more information.
 
-// Import
-import greet from './greet.js'
-import { PI, add } from './math.js'
+### Node API
 
-// Import all
-import * as math from './math.js'
-console.log(math.PI, math.add(1, 2))
+The [Node API](https://nodejs.org/api) constitutes the functions and modules provided by Node.js on top of V8. The Node API is quite large and covers everything from assertion testing to zlib compression.
 
-// Dynamic import
-const module = await import('./dynamic.js')
-module.init()
-```
+Elide aims for full Node API compatibility where possible and applicable. Elide is written on top of [GraalVM](https://graalvm.org) rather than V8, so immediately several Node API modules do not apply (for example, the `v8` module).
 
-### CommonJS
+Most Node.js applications and libraries only make use of a small surface area of the Node API. As [Bun](https://bun.sh) and [Deno](https://deno.land) have shown, a great deal of software can run out of the box with sufficient but incomplete Node API coverage.
 
-```javascript
-// Export
-module.exports = {
-  greet(name) {
-    return `Hello, ${name}!`
-  }
-}
+## Performance
 
-// Or single export
-module.exports = function greet(name) {
-  return `Hello, ${name}!`
-}
+Elide executes JavaScript with comparable performance to V8-based runtimes like Node and Deno, and JSC runtimes like Bun. Although GraalVM is a completely different core engine, it is well suited for CLI and server use, whereas V8 and JSC were architected with browsers in mind.
 
-// Import
-const { greet } = require('./greet')
-const greet = require('./greet')
-```
+As a result, Elide can deliver very strong performance in JavaScript, especially for server-side use cases.
 
-## Best Practices
+**Elide is ranked highly on the [TechEmpower benchmarks](https://www.techempower.com/benchmarks/#hw=ph&test=plaintext&section=data-r23).** At the time of this writing, Elide holds the **133rd position** for plaintext responses. Node & Deno, FastAPI & Django (Python), and many other popular frameworks rank lower than this score.
 
-### Async Patterns
-
-```javascript
-// ❌ Don't: Sequential awaits when not needed
-const user = await fetchUser(id)
-const posts = await fetchPosts(id)
-const comments = await fetchComments(id)
-
-// ✅ Do: Parallel execution
-const [user, posts, comments] = await Promise.all([
-  fetchUser(id),
-  fetchPosts(id),
-  fetchComments(id)
-])
-```
-
-### Error Handling
-
-```javascript
-// ❌ Don't: Silent failures
-try {
-  await riskyOperation()
-} catch (error) {
-  // Swallowed error
-}
-
-// ✅ Do: Proper error handling
-try {
-  await riskyOperation()
-} catch (error) {
-  console.error('Operation failed:', error)
-  // Handle or rethrow
-  throw error
-}
-```
-
-### Memory Management
-
-```javascript
-// ❌ Don't: Memory leaks with timers
-setInterval(() => {
-  // This runs forever
-}, 1000)
-
-// ✅ Do: Clear timers when done
-const intervalId = setInterval(() => {
-  // Do work
-}, 1000)
-
-// Clean up
-process.on('SIGTERM', () => {
-  clearInterval(intervalId)
-  process.exit(0)
-})
-```
-
-## Next Steps
-
-- **[TypeScript Guide](/docs/typescript)** - TypeScript features
-- **[Server API](/docs/api-server)** - Build HTTP servers
-- **[Runtime](/docs/runtime)** - Deep dive into the runtime
+| Tech Stack | TechEmpower Rank | Typical RPS | Warm Hit Latency | Cold Start Latency |
+|------------|------------------|-------------|------------------|-------------------|
+| Elide + JavaScript | 133 | ~800,000+ | ~3ms | ~30ms |
+| Deno | 184 | ~200,000 | ~70ms | ~15ms |
+| Node.js + Express | 364 | - | ~550ms | ~10ms |
+| FastAPI + Python | 292 | - | ~30ms | - |
+| Django + Python | 388 | - | ~65ms | - |
+| Node.js + Next.js | 497 | ~3,000 | ~700ms | - |
 
 <Alert>
-  <strong>Pro Tip:</strong> Elide's JavaScript runtime is designed to be familiar to Node.js and Deno developers. Most code will work without modification!
+All scores are selected from the first (highest performing) benchmark for a given framework. All numbers shown were measured on modern Linux x86-64.
 </Alert>
+
+## Glossary
+
+**JavaScript**: A high-level programming language that conforms to the ECMAScript specification.
+
+**Node.js**: A JavaScript runtime designed primarily for server-side use. Node.js embeds Google's V8 JavaScript engine, the same available in Google Chrome.
+
+**Node API**: Suite of APIs provided on top of regular JavaScript, which collectively become Node.js. For example, if you've ever imported or required the `fs` or `path` module, you've used the Node API.
+
+**ECMAScript**: Formal name for JavaScript, as defined by the ECMAScript Standard. JavaScript language versions are denoted as ECMA years; for example, ECMA2024 includes JavaScript features up to the year 2024.
+
+## Additional Resources
+
+**[Node API Support](/docs/node-api)** - Node API compatibility in Elide
+
+**[TypeScript](/docs/typescript)** - Running TypeScript applications in Elide
