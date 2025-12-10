@@ -1,54 +1,105 @@
 ---
 title: "URL"
-description: "Node.js URL API in Elide"
+description: "API support for the node:url module"
+date: "2025-11-20"
 ---
 
 # URL
 
-The `url` module provides utilities for URL resolution and parsing.
+API support and documentation for the `node:url` module.
 
-## Basic Usage
+**Module:** `node:url`  
+**Support:** Alpha  
+**Docs:** <a href="https://nodejs.org/api/url.html" style="color: rgb(168, 85, 247); text-decoration: underline; font-weight: 500;">Node.js URL Docs</a>
 
-```javascript
-import { URL } from 'node:url';
-
-const myURL = new URL('https://example.com:8000/path?query=value#hash');
-
-console.log('Protocol:', myURL.protocol);
-console.log('Hostname:', myURL.hostname);
-console.log('Port:', myURL.port);
-console.log('Pathname:', myURL.pathname);
-console.log('Search:', myURL.search);
-console.log('Hash:', myURL.hash);
-```
-
-## URL Class
-
-### new URL(input[, base])
-
-Creates a new URL object by parsing the input relative to the base.
+## Import
 
 ```javascript
-const myURL = new URL('/path', 'https://example.com');
-console.log(myURL.href); // 'https://example.com/path'
+// ESM
+import url from "node:url"
 ```
-
-## URLSearchParams
-
-The `URLSearchParams` API provides read and write access to the query of a URL.
 
 ```javascript
-const params = new URLSearchParams('foo=bar&baz=qux');
-
-console.log(params.get('foo')); // 'bar'
-params.append('key', 'value');
-params.delete('baz');
-
-console.log(params.toString()); // 'foo=bar&key=value'
+// CJS
+const url = require("node:url")
 ```
 
-## Learn More
+| Status | Module |
+|--------|--------|
+| 🟢 Supported | `node:url` |
 
-- [Node.js URL Documentation](https://nodejs.org/api/url.html)
+## Standards
 
+| Standard / Docs | Notes |
+|----------------|-------|
+| [Node.JS URL API](https://nodejs.org/api/url.html) | Node's take on the URL standard |
+| [WHATWG: URL Standard](https://url.spec.whatwg.org/) | Universal URL standard offered by WHATWG |
+| [MDN: URL](https://developer.mozilla.org/en-US/docs/Web/API/URL) | MDN's documentation for the URL standard in browsers |
 
+## Classes
+
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; margin-top: 24px;">
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 URL</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Supported</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 URLSearchParams</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Supported</div>
+  </div>
+</div>
+
+## Methods
+
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; margin-top: 24px;">
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🔴 domainToASCII()</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Not implemented</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🔴 domainToUnicode()</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Not implemented</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🔴 fileURLToPath()</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Not implemented</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🔴 format()</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Not implemented</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🔴 pathToFileURL()</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Not implemented</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🔴 resolve()</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Legacy - Not implemented</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🔴 urlToHttpOptions()</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Not implemented</div>
+  </div>
+</div>
+
+<div class="flex justify-between mt-12">
+  <a href="/docs/javascript-node-path.html" class="group inline-flex items-center gap-2 text-lg font-medium text-foreground hover:text-primary transition-colors" style="text-decoration: none;">
+    <svg class="h-5 w-5 transition-transform duration-300 group-hover:-translate-x-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M11 17l-5-5m0 0l5-5m-5 5h12" />
+    </svg>
+    <span>Previous: Path</span>
+  </a>
+  <a href="/docs/javascript-node-zlib.html" class="group inline-flex items-center gap-2 text-lg font-medium text-foreground hover:text-primary transition-colors" style="text-decoration: none;">
+    <span>Next: Zlib</span>
+    <svg class="h-5 w-5 transition-transform duration-300 group-hover:translate-x-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+    </svg>
+  </a>
+</div>

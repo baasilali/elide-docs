@@ -1,49 +1,234 @@
 ---
 title: "Child Process"
-description: "Node.js Child Process API in Elide"
+description: "API support for the node:child_process module"
+date: "2025-11-20"
 ---
 
 # Child Process
 
-The `child_process` module provides the ability to spawn subprocesses.
+API support and documentation for the `node:child_process` module.
 
-## Basic Usage
+**Module:** `node:child_process`  
+**Support:** Alpha  
+**Docs:** <a href="https://nodejs.org/api/child_process.html" style="color: rgb(168, 85, 247); text-decoration: underline; font-weight: 500;">Node.js Child Process Docs</a>
+
+## Import
 
 ```javascript
-import { exec, spawn } from 'node:child_process';
-
-// Execute a command
-exec('ls -la', (error, stdout, stderr) => {
-  if (error) {
-    console.error(`Error: ${error.message}`);
-    return;
-  }
-  console.log(stdout);
-});
-
-// Spawn a new process
-const child = spawn('ls', ['-la']);
-child.stdout.on('data', (data) => {
-  console.log(`stdout: ${data}`);
-});
+// ESM
+import proc from "node:child_process"
 ```
 
-## Common Methods
+```javascript
+// CJS
+const proc = require("node:child_process")
+```
 
-### child_process.exec(command[, options][, callback])
+| Status | Module | Docs |
+|--------|--------|------|
+| 🟡 Partially supported | `node:child_process` | [Node.js Child Process](https://nodejs.org/api/child_process.html) |
 
-Spawns a shell and executes the command within that shell.
+## Classes
 
-### child_process.spawn(command[, args][, options])
+### ChildProcess
 
-Spawns a new process using the given command.
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; margin-top: 24px;">
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟡 ChildProcess</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Partially supported</div>
+  </div>
+</div>
 
-### child_process.fork(modulePath[, args][, options])
+### ChildProcess Events
 
-Spawns a new Node.js process and invokes a specified module.
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; margin-top: 24px;">
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🔴 'close'</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Not implemented</div>
+  </div>
 
-## Learn More
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🔴 'disconnect'</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Not implemented</div>
+  </div>
 
-- [Node.js Child Process Documentation](https://nodejs.org/api/child_process.html)
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🔴 'error'</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Not implemented</div>
+  </div>
 
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🔴 'exit'</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Not implemented</div>
+  </div>
 
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🔴 'message'</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Not implemented</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🔴 'spawn'</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Not implemented</div>
+  </div>
+</div>
+
+### ChildProcess Properties
+
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; margin-top: 24px;">
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🔴 channel</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Not implemented</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 connected</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Supported</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 exitCode</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Supported</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🔴 killed</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Not implemented</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 pid</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Supported</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🔴 signalCode</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Not implemented</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🔴 spawnargs</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Not implemented</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🔴 spawnfile</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Not implemented</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 stderr</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Supported</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 stdin</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Supported</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 stdio</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Supported</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 stdout</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Supported</div>
+  </div>
+</div>
+
+### ChildProcess Methods
+
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; margin-top: 24px;">
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🔴 disconnect()</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Not implemented</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 kill()</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Supported</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🔴 ref()</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Not implemented</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🔴 send()</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Not implemented</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🔴 unref()</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Not implemented</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🔴 [Symbol.dispose]()</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Not implemented</div>
+  </div>
+</div>
+
+## Module Methods
+
+API support is available for spawning child processes **synchronously** or **asynchronously**; refer to the corresponding section below for your desired call style.
+
+### Process Creation (Asynchronous)
+
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; margin-top: 24px;">
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 exec()</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Supported</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 execFile()</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Supported</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🔴 fork()</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Not implemented</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 spawn()</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Supported</div>
+  </div>
+</div>
+
+### Process Creation (Synchronous)
+
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; margin-top: 24px;">
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 execFileSync()</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Supported</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 execSync()</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Supported</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 spawnSync()</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Supported</div>
+  </div>
+</div>
+
+<div class="flex justify-between mt-12">
+  <a href="/docs/javascript-node-buffer.html" class="group inline-flex items-center gap-2 text-lg font-medium text-foreground hover:text-primary transition-colors" style="text-decoration: none;">
+    <svg class="h-5 w-5 transition-transform duration-300 group-hover:-translate-x-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M11 17l-5-5m0 0l5-5m-5 5h12" />
+    </svg>
+    <span>Previous: Buffer</span>
+  </a>
+  <a href="/docs/javascript-node-events.html" class="group inline-flex items-center gap-2 text-lg font-medium text-foreground hover:text-primary transition-colors" style="text-decoration: none;">
+    <span>Next: Events</span>
+    <svg class="h-5 w-5 transition-transform duration-300 group-hover:translate-x-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+    </svg>
+  </a>
+</div>

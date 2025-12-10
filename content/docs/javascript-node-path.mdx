@@ -1,58 +1,127 @@
 ---
 title: "Path"
-description: "Node.js Path API in Elide"
+description: "API support for the node:path module"
+date: "2025-11-20"
 ---
 
 # Path
 
-The `path` module provides utilities for working with file and directory paths.
+API support and documentation for the `node:path` module.
 
-## Basic Usage
+**Module:** `node:path`  
+**Support:** Alpha  
+**Docs:** <a href="https://nodejs.org/api/path.html" style="color: rgb(168, 85, 247); text-decoration: underline; font-weight: 500;">Node.js Path Docs</a>
+
+## Import
 
 ```javascript
-import path from 'node:path';
-
-const filePath = '/user/local/bin/file.txt';
-
-console.log('Directory:', path.dirname(filePath));
-console.log('Basename:', path.basename(filePath));
-console.log('Extension:', path.extname(filePath));
-
-const joined = path.join('/user', 'local', 'bin', 'file.txt');
-console.log('Joined:', joined);
-
-const resolved = path.resolve('file.txt');
-console.log('Resolved:', resolved);
+// ESM
+import path from "node:path"
 ```
 
-## Common Methods
+```javascript
+// CJS
+const path = require("node:path")
+```
 
-### path.join([...paths])
+| Status | Module | Docs |
+|--------|--------|------|
+| 🟢 Supported | `node:path` | [Node.js Path](https://nodejs.org/api/path.html) |
 
-Joins all given path segments together using the platform-specific separator.
+## Properties
 
-### path.resolve([...paths])
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; margin-top: 24px;">
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 delimiter</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Supported</div>
+  </div>
 
-Resolves a sequence of paths or path segments into an absolute path.
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 posix</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Supported</div>
+  </div>
 
-### path.dirname(path)
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 sep</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Supported</div>
+  </div>
 
-Returns the directory name of a path.
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 win32</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Supported</div>
+  </div>
+</div>
 
-### path.basename(path[, ext])
+## Methods
 
-Returns the last portion of a path.
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; margin-top: 24px;">
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 basename()</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Supported</div>
+  </div>
 
-### path.extname(path)
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 dirname()</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Supported</div>
+  </div>
 
-Returns the extension of the path.
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 extname()</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Supported</div>
+  </div>
 
-### path.parse(path)
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 format()</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Supported</div>
+  </div>
 
-Returns an object whose properties represent significant elements of the path.
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 isAbsolute()</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Supported</div>
+  </div>
 
-## Learn More
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 join()</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Supported</div>
+  </div>
 
-- [Node.js Path Documentation](https://nodejs.org/api/path.html)
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 normalize()</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Supported</div>
+  </div>
 
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 parse()</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Supported</div>
+  </div>
 
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 relative()</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Supported</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 resolve()</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Supported</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 toNamespacedPath()</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Supported</div>
+  </div>
+</div>
+
+<div class="flex justify-between mt-12">
+  <a href="/docs/javascript-node-os.html" class="group inline-flex items-center gap-2 text-lg font-medium text-foreground hover:text-primary transition-colors" style="text-decoration: none;">
+    <svg class="h-5 w-5 transition-transform duration-300 group-hover:-translate-x-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M11 17l-5-5m0 0l5-5m-5 5h12" />
+    </svg>
+    <span>Previous: OS</span>
+  </a>
+  <a href="/docs/javascript-node-url.html" class="group inline-flex items-center gap-2 text-lg font-medium text-foreground hover:text-primary transition-colors" style="text-decoration: none;">
+    <span>Next: URL</span>
+    <svg class="h-5 w-5 transition-transform duration-300 group-hover:translate-x-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+    </svg>
+  </a>
+</div>

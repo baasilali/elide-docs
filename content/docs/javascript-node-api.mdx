@@ -1,14 +1,607 @@
 ---
 title: "Node API"
 description: "Node.js API compatibility in Elide"
+date: "2025-11-20"
 ---
 
 # Node API
 
-Elide provides compatibility with Node.js APIs for seamless JavaScript execution.
+Elide aims for near-complete Node.js API compatibility; where modules don't make sense or aren't possible to implement, problems are noted below.
 
-## Available APIs
+Most `npm` packages intended for `Node.js` environments will work with Elide out of the box; the best way to know for certain is to try it.
 
-Documentation coming soon. You'll provide the specific Node API content.
+This page is updated regularly to reflect compatibility status of the latest version of Elide. The information below reflects Elide's compatibility with **Node.js v22**.
 
+If you run into any bugs with a particular package, please <a href="https://github.com/elide-dev/elide/issues/new" style="color: rgb(168, 85, 247); text-decoration: underline; font-weight: 500;">open an issue</a>. Opening issues for compatibility bugs helps us prioritize what to work on next.
 
+| API | Pinned Version |
+|-----|----------------|
+| Node.js Standard Library | Node v22.0.0 |
+
+## Legend
+
+- 🔴 Not implemented, can't implement, won't implement; this is not a final state.
+- 🟡 In progress, coming soon, under testing/experimental, available but not fully in compliance yet.
+- 🟢 Fully implemented; total or near-total compliance.
+
+## Built-in Modules
+
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; margin-top: 24px;">
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 node:assert</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Supported</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟡 node:assert/strict</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Coming soon</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🔴 node:async_hooks</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Not implemented</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟡 node:buffer</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Partial support</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟡 node:child_process</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Partial support</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🔴 node:cluster</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Not implemented</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟡 node:console</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Coming soon. See console global</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🔴 node:crypto</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Not implemented</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🔴 node:dgram</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Not implemented</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🔴 node:diagnostics_channel</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Not implemented</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🔴 node:dns</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Not implemented</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🔴 node:domain</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Not implemented</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 node:events</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Supported</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟡 node:fs</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Partial: readFile, writeFile, etc.</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🔴 node:http</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Not implemented</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🔴 node:http2</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Not implemented</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🔴 node:https</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Not implemented</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🔴 node:inspector</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Not implemented</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🔴 node:module</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Not implemented</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🔴 node:net</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Not implemented</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 node:os</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Supported</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 node:path</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Supported</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🔴 node:perf_hooks</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Not implemented</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 node:process</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Supported</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🔴 node:punycode</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Not implemented</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🔴 node:querystring</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Not implemented</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🔴 node:readline</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Not implemented</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🔴 node:repl</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Not implemented</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 node:stream</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Supported</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🔴 node:string_decoder</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Not implemented</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟡 node:sys</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">See node:util</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🔴 node:test</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Not implemented</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🔴 node:timers</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Not implemented</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🔴 node:tls</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Not implemented</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🔴 node:trace_events</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Not implemented</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🔴 node:tty</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Not implemented</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 node:url</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Supported</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟡 node:util</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Mostly polyfilled</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🔴 node:v8</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Not implemented</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🔴 node:vm</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Not implemented</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🔴 node:wasi</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Not implemented</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🔴 node:worker_threads</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Not implemented</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 node:zlib</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Supported</div>
+  </div>
+</div>
+
+## Globals
+
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; margin-top: 24px;">
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 AbortController</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Supported</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 AbortSignal</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Supported</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 atob()</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Supported</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 Blob</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Supported</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🔴 BroadcastChannel</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Not implemented</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 btoa()</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Supported</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 Buffer</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Supported</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 ByteLengthQueuingStrategy</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Supported</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 clearImmediate()</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Supported</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 clearInterval()</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Supported</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 clearTimeout()</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Supported</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🔴 CompressionStream</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Not implemented</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 console</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Supported</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🔴 CountQueuingStrategy</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Not implemented</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🔴 Crypto</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Not implemented</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🔴 CryptoKey</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Not implemented</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 CustomEvent</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Supported</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🔴 DecompressionStream</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Not implemented</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🔴 DOMException</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Not implemented</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 Event</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Supported</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 EventTarget</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Supported</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 exports</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Supported</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 fetch</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Supported (experimental)</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🔴 FormData</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Not implemented</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 global</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Alias to globalThis</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 globalThis</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Supported</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 Headers</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Supported</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🔴 MessageChannel</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Not implemented</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🔴 MessageEvent</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Not implemented</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🔴 MessagePort</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Not implemented</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 module</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Supported</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 performance</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Supported</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🔴 PerformanceEntry</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Not implemented</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🔴 PerformanceMark</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Not implemented</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🔴 PerformanceMeasure</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Not implemented</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🔴 PerformanceObserver</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Not implemented</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🔴 PerformanceObserverEntryList</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Not implemented</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🔴 PerformanceResourceTiming</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Not implemented</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 process</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Supported</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 queueMicrotask()</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Supported</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 ReadableByteStreamController</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Supported</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 ReadableStream</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Supported</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 ReadableStreamBYOBReader</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Supported</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 ReadableStreamBYOBRequest</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Supported</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 ReadableStreamDefaultController</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Supported</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 ReadableStreamDefaultReader</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Supported</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 Request</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Supported</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 require()</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Supported with cache and resolve</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 Response</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Supported</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟡 setImmediate()</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Coming soon</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 setInterval()</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Supported</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 setTimeout()</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Supported</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 structuredClone()</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Supported</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🔴 SubtleCrypto</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Not implemented</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 TextDecoder</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Supported</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🔴 TextDecoderStream</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Not implemented</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 TextEncoder</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Supported</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🔴 TextEncoderStream</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Not implemented</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 TransformStream</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Supported</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 TransformStreamDefaultController</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Supported</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 URL</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Full compliance</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 URLSearchParams</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Supported</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 WebAssembly</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Supported</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 WritableStream</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Supported</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 WritableStreamDefaultController</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Supported</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 WritableStreamDefaultWriter</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Supported</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 __dirname</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Supported in CJS contexts</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 __filename</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Supported in CJS contexts</div>
+  </div>
+</div>
+
+## Let us know what you need
+
+We prioritize upcoming Node API work based on need; please <a href="https://github.com/elide-dev/elide/issues/new" style="color: rgb(168, 85, 247); text-decoration: underline; font-weight: 500;">file an issue</a> if you see a module you need which isn't implemented.
+
+<div class="flex justify-between mt-12">
+  <a href="/docs/javascript.html" class="group inline-flex items-center gap-2 text-lg font-medium text-foreground hover:text-primary transition-colors" style="text-decoration: none;">
+    <svg class="h-5 w-5 transition-transform duration-300 group-hover:-translate-x-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M11 17l-5-5m0 0l5-5m-5 5h12" />
+    </svg>
+    <span>Previous: JavaScript</span>
+  </a>
+  <a href="/docs/javascript-web-apis.html" class="group inline-flex items-center gap-2 text-lg font-medium text-foreground hover:text-primary transition-colors" style="text-decoration: none;">
+    <span>Next: Web & JavaScript APIs</span>
+    <svg class="h-5 w-5 transition-transform duration-300 group-hover:translate-x-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+    </svg>
+  </a>
+</div>

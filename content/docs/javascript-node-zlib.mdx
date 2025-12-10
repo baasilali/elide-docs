@@ -1,66 +1,235 @@
 ---
 title: "Zlib"
-description: "Node.js Zlib API in Elide"
+description: "API support for the node:zlib module"
+date: "2025-11-20"
 ---
 
 # Zlib
 
-The `zlib` module provides compression functionality implemented using Gzip, Deflate/Inflate, and Brotli.
+API support and documentation for the `node:zlib` module.
 
-## Basic Usage
+**Module:** `node:zlib`  
+**Support:** Alpha  
+**Docs:** <a href="https://nodejs.org/api/zlib.html" style="color: rgb(168, 85, 247); text-decoration: underline; font-weight: 500;">Node.js Zlib Docs</a>
 
-```javascript
-import { gzip, gunzip } from 'node:zlib/promises';
-import { promisify } from 'node:util';
-
-// Compress data
-const input = 'Hello, World!';
-const compressed = await gzip(input);
-console.log('Compressed size:', compressed.length);
-
-// Decompress data
-const decompressed = await gunzip(compressed);
-console.log('Decompressed:', decompressed.toString());
-```
-
-## Common Methods
-
-### zlib.gzip(buffer[, options], callback)
-
-Compresses a Buffer using Gzip.
-
-### zlib.gunzip(buffer[, options], callback)
-
-Decompresses a Gzip buffer.
-
-### zlib.deflate(buffer[, options], callback)
-
-Compresses a Buffer using Deflate.
-
-### zlib.inflate(buffer[, options], callback)
-
-Decompresses a Deflate buffer.
-
-### zlib.brotliCompress(buffer[, options], callback)
-
-Compresses a Buffer using Brotli.
-
-## Streaming API
+## Import
 
 ```javascript
-import { createGzip } from 'node:zlib';
-import { pipeline } from 'node:stream/promises';
-import { createReadStream, createWriteStream } from 'node:fs';
-
-await pipeline(
-  createReadStream('input.txt'),
-  createGzip(),
-  createWriteStream('input.txt.gz')
-);
+// ESM
+import zlib from "node:zlib"
 ```
 
-## Learn More
+```javascript
+// CJS
+const zlib = require("node:zlib")
+```
 
-- [Node.js Zlib Documentation](https://nodejs.org/api/zlib.html)
+| Status | Module | Docs |
+|--------|--------|------|
+| 🟡 Partially supported | `node:zlib` | [Zlib](https://nodejs.org/api/zlib.html) |
 
+## Classes
 
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; margin-top: 24px;">
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 BrotliCompress</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Supported</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 BrotliDecompress</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Supported</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟡 BrotliOptions</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Options not applied yet</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 Deflate</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Supported</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🔴 DeflateRaw</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Not implemented</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 Gunzip</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Supported</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 Gzip</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Supported</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 Inflate</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Supported</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🔴 InflateRaw</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Not implemented</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟡 Options</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Options not applied yet</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 Unzip</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Supported</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🔴 ZlibBase</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Not implemented</div>
+  </div>
+</div>
+
+## Properties
+
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; margin-top: 24px;">
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 constants</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Supported</div>
+  </div>
+</div>
+
+## Methods
+
+### Convenience Methods
+
+These methods compress or decompress data:
+
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; margin-top: 24px;">
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 brotliCompress()</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Supported</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 brotliCompressSync()</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Supported</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 brotliDecompress()</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Supported</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 brotliDecompressSync()</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Supported</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 crc32()</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Supported</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 deflate()</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Supported</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 deflateSync()</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Supported</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 gunzip()</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Supported</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 gunzipSync()</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Supported</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 gzip()</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Supported</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 gzipSync()</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Supported</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 inflate()</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Supported</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 inflateSync()</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Supported</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 unzip()</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Supported</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 unzipSync()</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Supported</div>
+  </div>
+</div>
+
+### Stream Methods
+
+These methods create streams which compress or decompress data:
+
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; margin-top: 24px;">
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 createBrotliCompress()</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Supported</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 createBrotliDecompress()</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Supported</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 createDeflate()</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Supported</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 createGunzip()</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Supported</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 createGzip()</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Supported</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 createInflate()</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Supported</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 createUnzip()</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Supported</div>
+  </div>
+</div>
+
+<div class="flex justify-start mt-12">
+  <a href="/docs/javascript-node-url.html" class="group inline-flex items-center gap-2 text-lg font-medium text-foreground hover:text-primary transition-colors" style="text-decoration: none;">
+    <svg class="h-5 w-5 transition-transform duration-300 group-hover:-translate-x-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M11 17l-5-5m0 0l5-5m-5 5h12" />
+    </svg>
+    <span>Previous: URL</span>
+  </a>
+</div>

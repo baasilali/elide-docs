@@ -1,48 +1,64 @@
 ---
 title: "Events"
-description: "Node.js Events API in Elide"
+description: "API support for the node:events module"
+date: "2025-11-20"
 ---
 
 # Events
 
-The `events` module provides an EventEmitter class for handling events.
+API support and documentation for the `node:events` module.
 
-## Basic Usage
+## Import
 
 ```javascript
-import { EventEmitter } from 'node:events';
-
-class MyEmitter extends EventEmitter {}
-
-const myEmitter = new MyEmitter();
-
-myEmitter.on('event', (a, b) => {
-  console.log(a, b);
-});
-
-myEmitter.emit('event', 'a', 'b');
+// ESM
+import events from "node:events"
 ```
 
-## Common Methods
+```javascript
+// CJS
+const events = require("node:events")
+```
 
-### emitter.on(eventName, listener)
+| Specification | Module | Support | Documentation |
+|---------------|--------|---------|---------------|
+| Node.js API | `node:events` | 🟡 Partially supported | [Node.js Events Docs](https://nodejs.org/api/events.html) |
 
-Adds the listener function to the end of the listeners array for the event.
+## Classes
 
-### emitter.emit(eventName[, ...args])
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; margin-top: 24px;">
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 CustomEvent</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Supported</div>
+  </div>
 
-Synchronously calls each of the listeners registered for the event.
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟡 Event</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Partially supported</div>
+  </div>
 
-### emitter.once(eventName, listener)
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟡 EventEmitter</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Partially supported</div>
+  </div>
 
-Adds a one-time listener function for the event.
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟡 EventTarget</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Partially supported</div>
+  </div>
+</div>
 
-### emitter.removeListener(eventName, listener)
-
-Removes the specified listener from the listener array.
-
-## Learn More
-
-- [Node.js Events Documentation](https://nodejs.org/api/events.html)
-
-
+<div class="flex justify-between mt-12">
+  <a href="/docs/javascript-node-child-process.html" class="group inline-flex items-center gap-2 text-lg font-medium text-foreground hover:text-primary transition-colors" style="text-decoration: none;">
+    <svg class="h-5 w-5 transition-transform duration-300 group-hover:-translate-x-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M11 17l-5-5m0 0l5-5m-5 5h12" />
+    </svg>
+    <span>Previous: Child Process</span>
+  </a>
+  <a href="/docs/javascript-node-filesystem.html" class="group inline-flex items-center gap-2 text-lg font-medium text-foreground hover:text-primary transition-colors" style="text-decoration: none;">
+    <span>Next: Filesystem</span>
+    <svg class="h-5 w-5 transition-transform duration-300 group-hover:translate-x-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+    </svg>
+  </a>
+</div>

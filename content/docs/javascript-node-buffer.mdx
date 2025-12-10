@@ -1,41 +1,44 @@
 ---
 title: "Buffer"
-description: "Node.js Buffer API in Elide"
+description: "API support for the node:buffer module"
+date: "2025-11-20"
 ---
 
 # Buffer
 
-The `Buffer` class is a global type for dealing with binary data directly.
+API support and documentation for the `node:buffer` module.
 
-## Basic Usage
+## Import
 
 ```javascript
-// Create a Buffer from a string
-const buf1 = Buffer.from('hello world', 'utf8');
-
-// Create a Buffer of length 10 filled with zeros
-const buf2 = Buffer.alloc(10);
-
-// Create an uninitialized Buffer of length 10
-const buf3 = Buffer.allocUnsafe(10);
+// ESM
+import buffer from "node:buffer"
 ```
 
-## Common Methods
+```javascript
+// CJS
+const buffer = require("node:buffer")
+```
 
-### Buffer.from(array)
+| Specification | Module | Support | Documentation |
+|---------------|--------|---------|---------------|
+| Node.js API | `node:buffer` | 🟡 Partially supported | [Node.js Buffer Docs](https://nodejs.org/api/buffer.html) |
 
-Allocates a new Buffer using an array of bytes.
+## Methods
 
-### Buffer.alloc(size[, fill[, encoding]])
+Use `Buffer.from` as you do in Node.js. More docs are coming soon.
 
-Allocates a new Buffer of `size` bytes.
-
-### buf.toString([encoding[, start[, end]]])
-
-Decodes the Buffer to a string according to the specified character encoding.
-
-## Learn More
-
-- [Node.js Buffer Documentation](https://nodejs.org/api/buffer.html)
-
-
+<div class="flex justify-between mt-12">
+  <a href="/docs/javascript-node-assertions.html" class="group inline-flex items-center gap-2 text-lg font-medium text-foreground hover:text-primary transition-colors" style="text-decoration: none;">
+    <svg class="h-5 w-5 transition-transform duration-300 group-hover:-translate-x-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M11 17l-5-5m0 0l5-5m-5 5h12" />
+    </svg>
+    <span>Previous: Assertions</span>
+  </a>
+  <a href="/docs/javascript-node-child-process.html" class="group inline-flex items-center gap-2 text-lg font-medium text-foreground hover:text-primary transition-colors" style="text-decoration: none;">
+    <span>Next: Child Process</span>
+    <svg class="h-5 w-5 transition-transform duration-300 group-hover:translate-x-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+    </svg>
+  </a>
+</div>
