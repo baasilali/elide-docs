@@ -8,170 +8,133 @@ date: "2025-11-20"
 
 Overview of language compatibility and standards supported by Elide.
 
-## JavaScript/TypeScript
+## Language Support Matrix
 
-### ECMAScript Support
+| Language | Stability | Elide's Engine | Stock Engine | Notes |
+|----------|-----------|----------------|--------------|-------|
+| JavaScript | beta | GraalJs | V8 | ECMA2024-compatible. Node API compat pending. |
+| TypeScript | beta | OXC | TSC | |
+| WebAssembly | beta | GraalWasm | V8 | |
+| Python | beta | GraalPython | CPython | Roughly ~85% compatible with PyPI top 1000. See here. |
+| Pkl | beta | Apple Pkl | Apple Pkl | |
+| Ruby | alpha | TruffleRuby | MRI | Passes ~97% of ruby/spec. See here. |
+| LLVM | experimental | Sulong | LLVM Runtime | |
 
-Elide supports ES2024+ with the following features:
+## JavaScript & TypeScript
 
-- ✅ Classes and modules
-- ✅ Async/await
-- ✅ Destructuring
-- ✅ Template literals
-- ✅ Arrow functions
-- ✅ Promises
-- ✅ Generators
-- ✅ Proxies and Reflect
-- ✅ BigInt
-- ✅ Optional chaining (`?.`)
-- ✅ Nullish coalescing (`??`)
-- ✅ Top-level await
+### ECMAScript Support (ES2024+)
 
-### TypeScript
+Elide provides full support for modern ECMAScript features including classes, modules, async/await, destructuring, template literals, arrow functions, promises, generators, proxies, BigInt, optional chaining, nullish coalescing, and top-level await.
 
-- **Version**: 5.0+
-- **Features**: All TypeScript language features
-- **Compilation**: Native TypeScript support
+**TypeScript**: Version 5.0+ with native compilation support and all language features.
 
-### Node.js APIs
+### API Compatibility
 
-| API | Status |
-|-----|--------|
-| `fs` | ✅ Supported |
-| `path` | ✅ Supported |
-| `http` | ✅ Supported |
-| `crypto` | ✅ Supported |
-| `buffer` | ✅ Supported |
-| `stream` | ✅ Supported |
-| `process` | ✅ Supported |
-| `console` | ✅ Supported |
-
-### Web APIs
-
-| API | Status |
-|-----|--------|
-| `fetch` | ✅ Supported |
-| `URL` | ✅ Supported |
-| `URLSearchParams` | ✅ Supported |
-| `TextEncoder/Decoder` | ✅ Supported |
-| `WebSocket` | ✅ Supported |
-| `FormData` | ✅ Supported |
-| `Headers` | ✅ Supported |
-| `Request/Response` | ✅ Supported |
+| API Category | Module | Support |
+|--------------|--------|---------|
+| **Node.js** | `fs`, `path`, `http`, `crypto`, `buffer`, `stream`, `process`, `console` | Full |
+| **Web** | `fetch`, `URL`, `URLSearchParams`, `TextEncoder/Decoder`, `WebSocket`, `FormData`, `Headers`, `Request/Response` | Full |
 
 ## Python
 
-### Version Support
-
-- **Python 3.11+**
-- **CPython-compatible**
+**Version**: 3.11+ (CPython-compatible)
 
 ### Standard Library
 
-Most of the Python standard library is supported:
+| Module Category | Modules | Support |
+|----------------|---------|---------|
+| **System** | `os`, `sys`, `pathlib` | Full |
+| **Data** | `json`, `csv`, `xml` | Full |
+| **Text & Time** | `re`, `datetime`, `time` | Full |
+| **Collections** | `collections`, `itertools` | Full |
+| **Math** | `math`, `random`, `statistics` | Full |
+| **Network** | `urllib`, `http.client` | Full |
+| **Concurrency** | `threading`, `multiprocessing` | Limited |
 
-- ✅ `os`, `sys`, `pathlib`
-- ✅ `json`, `csv`, `xml`
-- ✅ `re`, `datetime`, `time`
-- ✅ `collections`, `itertools`
-- ✅ `math`, `random`, `statistics`
-- ✅ `urllib`, `http.client`
-- ⚠️ Limited: `threading`, `multiprocessing`
+### Third-Party Packages
 
-### Popular Packages
-
-| Package | Status |
-|---------|--------|
-| NumPy | ✅ Supported |
-| Pandas | ✅ Supported |
-| Requests | ✅ Supported |
-| Flask | ⚠️ Partial |
-| Django | ❌ Not yet |
+| Package | Support |
+|---------|---------|
+| NumPy | Full |
+| Pandas | Full |
+| Requests | Full |
+| Flask | Partial |
+| Django | Not yet |
 
 ## Ruby
 
-### Version Support
+**Version**: 3.2+ (MRI-compatible)
 
-- **Ruby 3.2+**
-- **MRI-compatible**
-
-### Standard Library
-
-- ✅ Core classes (String, Array, Hash)
-- ✅ File I/O
-- ✅ JSON, YAML
-- ✅ Regular expressions
-- ⚠️ Limited C extensions
+Includes support for core classes (String, Array, Hash), file I/O, JSON/YAML parsing, regular expressions. C extensions have limited support.
 
 ## WebAssembly
 
-### WASI Support
+**WASI**: Preview 1 with memory management, file system access, and environment variables.
 
-- ✅ WASI preview 1
-- ✅ Memory management
-- ✅ File system access
-- ✅ Environment variables
-
-### Languages
-
-Any language that compiles to WASM:
-
-- ✅ Rust
-- ✅ C/C++
-- ✅ AssemblyScript
-- ✅ Go (TinyGo)
+**Supported Source Languages**: Rust, C/C++, AssemblyScript, Go (TinyGo)
 
 ## Pkl
 
-Full support for Pkl configuration language:
+Full support for the Pkl configuration language including all language features, native integration, type checking, and module imports.
 
-- ✅ All Pkl language features
-- ✅ Native integration
-- ✅ Type checking
-- ✅ Modules and imports
-
-## Compatibility Matrix
+## Feature Support Matrix
 
 | Feature | JavaScript | Python | Ruby | WASM |
 |---------|-----------|--------|------|------|
-| **File I/O** | ✅ | ✅ | ✅ | ✅ |
-| **HTTP Client** | ✅ | ✅ | ✅ | ⚠️ |
-| **HTTP Server** | ✅ | ✅ | ✅ | ❌ |
-| **Async/Await** | ✅ | ✅ | ⚠️ | ⚠️ |
-| **Polyglot Calls** | ✅ | ✅ | ✅ | ⚠️ |
-| **Native Extensions** | ⚠️ | ⚠️ | ⚠️ | N/A |
-
-Legend:
-- ✅ Fully supported
-- ⚠️ Partially supported
-- ❌ Not supported
-- N/A Not applicable
+| **File I/O** | Full | Full | Full | Full |
+| **HTTP Client** | Full | Full | Full | Partial |
+| **HTTP Server** | Full | Full | Full | No |
+| **Async/Await** | Full | Full | Partial | Partial |
+| **Polyglot Calls** | Full | Full | Full | Partial |
+| **Native Extensions** | Partial | Partial | Partial | N/A |
 
 ## Known Limitations
 
-### All Languages
+### Cross-Language
 
-- **Native extensions**: Limited support for C/C++ extensions
-- **Threading**: Some threading features may have limitations
-- **JNI**: Java Native Interface not available in native image
+- Native extensions for C/C++ have limited support
+- Threading features may have platform-specific limitations
+- Java Native Interface (JNI) unavailable in native image builds
 
 ### JavaScript
 
-- **npm packages**: Some packages with native dependencies may not work
-- **Specific modules**: `child_process`, `cluster` have limitations
+- Some npm packages with native dependencies may require workarounds
+- Modules `child_process` and `cluster` have functional limitations
 
 ### Python
 
-- **C extensions**: Pure Python preferred
-- **Threading**: GIL may affect multi-threaded code
-- **pip packages**: Some packages require additional configuration
+- Pure Python implementations preferred over C extensions
+- Global Interpreter Lock (GIL) may impact multi-threaded performance
+- Some pip packages require additional configuration
 
-## Testing Compatibility
+## Migration Guide
 
-Test your code for compatibility:
+### From Node.js
+
+Update CommonJS imports to ES modules:
 
 ```javascript
-// Check feature availability
+// Before
+const fs = require('fs')
+
+// After
+import fs from 'fs'
+```
+
+### From CPython
+
+Most Python code runs without modification:
+
+```python
+import json
+
+data = {'key': 'value'}
+print(json.dumps(data))
+```
+
+### Feature Detection
+
+```javascript
 if (typeof fetch === 'function') {
   // Fetch API available
 }
@@ -181,38 +144,7 @@ if (typeof Worker === 'function') {
 }
 ```
 
-## Migration Tips
-
-### From Node.js
-
-Most Node.js code works with minimal changes:
-
-```javascript
-// Node.js
-const fs = require('fs')
-
-// Elide (use ES modules)
-import fs from 'fs'
-```
-
-### From CPython
-
-Most Python code works as-is:
-
-```python
-# Same code works in Elide
-import json
-
-data = {'key': 'value'}
-print(json.dumps(data))
-```
-
 ## Reporting Issues
 
-Found a compatibility issue? Please report it:
-
-- [GitHub Issues](https://github.com/elide-dev/elide/issues)
-- Include runtime version
-- Provide minimal reproduction
-- Specify language and package versions
+Report compatibility issues on [GitHub](https://github.com/elide-dev/elide/issues). Include runtime version, minimal reproduction, and language/package versions.
 

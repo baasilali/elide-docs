@@ -8,19 +8,22 @@ import { Alert } from '@/components/ui/alert'
 
 # TypeScript in Elide
 
-Elide provides first-class TypeScript support with automatic compilation, type checking, and full IDE integration.
+Elide provides first-class TypeScript support with automatic compilation, type checking, and full IDE integration. The runtime compiles TypeScript on-demand without requiring separate build steps or configuration, enabling immediate execution of TypeScript code.
 
-## Features
+## Core Features
 
-- **Zero Configuration**: No build step required
-- **Automatic Compilation**: TypeScript compiles on the fly
-- **Type Checking**: Full TypeScript type system support
-- **Source Maps**: Debug TypeScript directly
-- **Declaration Files**: Generate `.d.ts` files
+| Feature | Description |
+|---------|-------------|
+| **Zero Configuration** | No build step or toolchain setup required |
+| **Automatic Compilation** | TypeScript compiles transparently at runtime |
+| **Type Checking** | Full TypeScript 5.0+ type system support |
+| **Source Maps** | Native debugging support for TypeScript files |
+| **Declaration Files** | Automatic `.d.ts` generation for type definitions |
+| **Module Resolution** | ESNext module system with bundler resolution |
 
-## Getting Started
+## Quick Start
 
-Simply write TypeScript—Elide handles the rest:
+Write TypeScript and execute it directly with Elide:
 
 ```typescript
 // app.ts
@@ -41,7 +44,6 @@ async function createUser(data: Omit<User, 'id' | 'createdAt'>): Promise<User> {
   return user
 }
 
-// Run directly
 const newUser = await createUser({
   name: 'Alice',
   email: 'alice@example.com'
@@ -50,17 +52,43 @@ const newUser = await createUser({
 console.log(newUser)
 ```
 
-Run it:
+Execute the TypeScript file directly:
 
 ```bash
 elide run app.ts
 ```
 
-No build step needed!
+Elide compiles and executes the TypeScript code in a single step, with full type safety and automatic dependency resolution.
 
-## Type Safety
+## Performance
 
-### Interface Definitions
+TypeScript execution in Elide achieves near-parity with JavaScript performance. The type-stripping compilation step adds minimal overhead, typically measured in milliseconds, and is amortized across all runs for a given TypeScript source.
+
+<img src="/assets/bench-js-vs-ts.png" alt="JavaScript vs TypeScript Performance Benchmark" class="rounded-lg border border-border my-6 w-full" />
+
+<Alert>
+  Executing a non-trivial JavaScript sample vs. an identical TypeScript sample.
+</Alert>
+
+### How it works
+
+Elide parses TypeScript directly with OXC's high-performance native parser, implemented in Rust, and then interprets the code as normal on top of the JavaScript engine. Bindings that need to be present for features like JSX are injected into the JavaScript context transparently.
+
+This type-stripping pre-compilation step takes very little time, on the order of milliseconds, and is amortized over all runs for a given TypeScript source root, since Elide aggressively caches ASTs at the bytecode stage.
+
+As a result, TypeScript execution is often nearly cost-free compared to regular JavaScript.
+
+<img src="/assets/oxc-parsing.svg" alt="OXC Parser Performance Benchmark" class="rounded-lg border border-border my-6 w-full" />
+
+<Alert>
+  Parsing speed comparison from OXC's own benchmarks.
+</Alert>
+
+## Type System Features
+
+### Generic Types and Interfaces
+
+TypeScript's generic type system provides compile-time safety for complex data structures. Generic interfaces enable type-safe API responses with flexible data payloads:
 
 ```typescript
 interface ApiResponse<T> {
@@ -83,11 +111,13 @@ async function fetchUser(id: number): Promise<ApiResponse<User>> {
 
 const result = await fetchUser(123)
 if (result.success && result.data) {
-  console.log(result.data.name) // Type-safe!
+  console.log(result.data.name) // Type-safe property access
 }
 ```
 
-### Type Guards
+### Type Guards and Narrowing
+
+Type guards enable runtime type checking with compile-time type narrowing, allowing TypeScript to refine types based on conditional logic:
 
 ```typescript
 function isString(value: unknown): value is string {
@@ -96,37 +126,43 @@ function isString(value: unknown): value is string {
 
 function processValue(value: unknown) {
   if (isString(value)) {
-    // TypeScript knows value is string here
-    console.log(value.toUpperCase())
+    console.log(value.toUpperCase()) // TypeScript infers string type
   }
 }
+```
 
-// Discriminated unions
+Discriminated unions provide exhaustive type checking for result types:
+
+```typescript
 type Result<T> = 
   | { success: true; value: T }
   | { success: false; error: string }
 
 function handleResult<T>(result: Result<T>): T {
   if (result.success) {
-    return result.value // Type-safe access
+    return result.value
   } else {
     throw new Error(result.error)
   }
 }
 ```
 
-### Generics
+### Generic Classes and Functions
+
+Generic functions provide type inference across parameters and return types:
 
 ```typescript
-// Generic function
 function first<T>(arr: T[]): T | undefined {
   return arr[0]
 }
 
 const nums = [1, 2, 3]
-const firstNum = first(nums) // type: number | undefined
+const firstNum = first(nums) // Inferred as: number | undefined
+```
 
-// Generic class
+Generic classes enable type-safe container implementations:
+
+```typescript
 class Cache<T> {
   private data = new Map<string, T>()
   
@@ -143,9 +179,11 @@ const userCache = new Cache<User>()
 userCache.set('123', { id: 123, name: 'Alice', email: 'alice@example.com' })
 ```
 
-## Elide API Types
+## Elide Runtime Types
 
-### HTTP Server Types
+### HTTP Server API
+
+The Elide server module provides fully typed HTTP server primitives. Route handlers receive strongly-typed request and response objects with automatic type inference for parameters:
 
 ```typescript
 import type { Request, Response, RouteHandler } from '@elide/server'
@@ -160,7 +198,9 @@ const handler: RouteHandler = (req: Request, res: Response) => {
 }
 ```
 
-### File System Types
+### File System API
+
+File system operations are fully typed with interfaces for file statistics, handles, and descriptors:
 
 ```typescript
 import type { FileStats, FileHandle } from '@elide/fs'
@@ -173,11 +213,11 @@ const stats = await getFileInfo('./file.txt')
 console.log(stats.size, stats.mtime)
 ```
 
-## Configuration
+## Compiler Configuration
 
-### tsconfig.json
+### TypeScript Configuration
 
-Create a `tsconfig.json` for IDE support:
+While Elide does not require a `tsconfig.json` for execution, creating one improves IDE integration and enables fine-grained control over type checking and compilation behavior:
 
 ```json
 {
@@ -197,9 +237,21 @@ Create a `tsconfig.json` for IDE support:
 }
 ```
 
-## Decorators
+### Compiler Options Reference
 
-Experimental decorator support:
+| Option | Value | Purpose |
+|--------|-------|---------|
+| target | ES2024 | Output ECMAScript version |
+| module | ESNext | Module system (ESM) |
+| moduleResolution | bundler | Module resolution strategy |
+| strict | true | Enable all strict type checking |
+| types | @elide/types | Include Elide runtime types |
+
+## Advanced Features
+
+### Decorators
+
+Elide supports experimental decorators for metadata-driven programming patterns. Decorators enable declarative class and method annotations:
 
 ```typescript
 // Enable decorators in tsconfig.json
@@ -209,8 +261,11 @@ Experimental decorator support:
     "emitDecoratorMetadata": true
   }
 }
+```
 
-// Use decorators
+Decorator implementation example for route registration:
+
+```typescript
 function Route(path: string) {
   return function (target: any, key: string) {
     target.routes = target.routes || []
@@ -231,23 +286,33 @@ class API {
 }
 ```
 
-## Type Imports
+### Type-Only Imports
+
+Type-only imports are erased during compilation, eliminating runtime overhead for type definitions:
 
 ```typescript
-// Import only types (erased at runtime)
 import type { User } from './types'
 import type { Request, Response } from '@elide/server'
+```
 
-// Mixed imports
+Mixed imports combine runtime values and compile-time types in a single statement:
+
+```typescript
 import { createUser, type User } from './user'
 ```
 
-## Next Steps
+This syntax imports `createUser` as a runtime value while treating `User` as a type-only import.
 
-- **[JavaScript Guide](/docs/javascript)** - JavaScript features
-- **[Server API](/docs/api-server)** - Build HTTP servers
-- **[Configuration](/docs/configuration)** - Configure TypeScript
+## Additional Resources
+
+For more information on related topics:
+
+**[JavaScript Guide](/docs/javascript)** - Learn about JavaScript runtime features and ECMAScript support
+
+**[Server API](/docs/api-server)** - Build HTTP servers with typed request handlers
+
+**[Configuration](/docs/configuration)** - Advanced compiler and runtime configuration options
 
 <Alert>
-  <strong>Pro Tip:</strong> Elide compiles TypeScript automatically—no build step required. Just write TypeScript and run it!
+  <strong>Note:</strong> Elide compiles TypeScript automatically without requiring separate build tooling. TypeScript files execute directly with full type safety and source map support.
 </Alert>

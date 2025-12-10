@@ -1,0 +1,78 @@
+# Elide Documentation
+
+> Comprehensive documentation for Elide - a high-performance polyglot runtime powered by GraalVM
+
+## Getting Started
+/docs/readme: Welcome to Elide and overview of the runtime
+/docs/installation: Install Elide on your system
+/docs/getting-started: Run your first code samples with Elide
+/docs/quick-start: Build your first Elide application in minutes
+/docs/runtime: Learn about the Elide polyglot runtime
+
+## Documentation
+/docs/cli-references: Complete CLI command reference
+/docs/contributors: Contributing guidelines and contributor information
+/docs/acknowledgements: Acknowledgements and credits
+/docs/releases: Release notes and version history
+
+## Core Concepts
+/docs/architecture: System architecture and design principles
+/docs/components: Core components of the Elide runtime
+/docs/configuration: Configuration options and settings
+/docs/security: Security features and best practices
+/docs/performance: Performance optimization and benchmarks
+/docs/compatibility: Language and feature compatibility matrix
+
+## Fundamentals
+/docs/env-variables: Environment variable configuration
+/docs/file-system: File system access and operations
+/docs/debugging: Debugging applications with Elide
+
+## Advanced Topics
+/docs/interop: Language interoperability features
+/docs/servers: Building HTTP servers with Elide
+/docs/deployment: Deploying Elide applications
+/docs/connect-ide: IDE integration and development tools
+
+## Language Support
+
+### JavaScript & TypeScript
+/docs/javascript: JavaScript support and features overview
+/docs/typescript: TypeScript support and configuration
+/docs/javascript-tools: JavaScript development tools
+
+### Node.js API
+/docs/javascript-node-api: Node.js API compatibility overview
+/docs/javascript-node-assertions: Node.js assertions module
+/docs/javascript-node-buffer: Node.js buffer module
+/docs/javascript-node-child-process: Node.js child_process module
+/docs/javascript-node-events: Node.js events module
+/docs/javascript-node-filesystem: Node.js fs module
+/docs/javascript-node-os: Node.js os module
+/docs/javascript-node-path: Node.js path module
+/docs/javascript-node-url: Node.js url module
+/docs/javascript-node-zlib: Node.js zlib module
+
+### Web APIs
+/docs/javascript-web-apis: Web API compatibility overview
+/docs/javascript-web-encoding: Web Encoding API (TextEncoder/TextDecoder)
+/docs/javascript-web-url: Web URL API
+
+### JavaScript Libraries
+/docs/javascript-sqlite: SQLite database integration
+/docs/javascript-wintertc: WinterTC library support
+
+### Other Languages
+/docs/python: Python language support
+/docs/ruby: Ruby language support
+/docs/pkl: Pkl configuration language support
+/docs/webassembly: WebAssembly support
+
+## API Reference
+/docs/api-overview: API documentation overview
+/docs/api-core: Core API reference
+/docs/api-server: Server API reference
+/docs/api-database: Database API reference
+
+## Advanced Features
+/docs/experimental-engines: Experimental language engines and features

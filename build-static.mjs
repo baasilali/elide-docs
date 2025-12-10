@@ -410,6 +410,30 @@ async function copyAssets() {
   } catch (err) {
     console.warn('  [WARN] Could not copy fonts:', err.message)
   }
+  
+  // Copy assets directory images
+  try {
+    const assetsSource = path.join(__dirname, 'assets')
+    const assetsDest = path.join(DIST_DIR, 'assets')
+    const entries = await fs.readdir(assetsSource)
+    
+    for (const entry of entries) {
+      // Skip fonts directory (already copied above) and empty files
+      if (entry === 'fonts') continue
+      
+      const src = path.join(assetsSource, entry)
+      const stat = await fs.stat(src)
+      
+      // Only copy files (not directories)
+      if (stat.isFile()) {
+        const dest = path.join(assetsDest, entry)
+        await fs.copyFile(src, dest)
+        console.log(`  [OK] Copied ${entry} from assets`)
+      }
+    }
+  } catch (err) {
+    console.warn('  [WARN] Could not copy assets directory:', err.message)
+  }
 }
 
 // Generate static navbar HTML with active state
