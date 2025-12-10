@@ -1,14 +1,53 @@
 ---
 title: "SQLite in JavaScript"
 description: "Using SQLite with JavaScript in Elide"
+date: "2025-11-20"
 ---
 
 # SQLite in JavaScript
 
-Learn how to use SQLite databases with JavaScript in Elide.
+**Module:** `elide:sqlite`  
+**Support:** Beta  
+**Docs:** <a href="https://bun.sh/docs/api/sqlite" style="color: rgb(168, 85, 247); text-decoration: underline; font-weight: 500;">Bun SQLite Docs</a>
 
-## Overview
+Elide embeds native support for <a href="https://sqlite.org" style="color: rgb(168, 85, 247); text-decoration: underline; font-weight: 500;">SQLite3</a>, with bindings into JavaScript. The API provided is identical to <a href="https://bun.sh/docs/api/sqlite" style="color: rgb(168, 85, 247); text-decoration: underline; font-weight: 500;">Bun's SQLite bindings</a>.
 
-Documentation coming soon.
+## Import
 
+```javascript
+// ESM
+import { Database } from "elide:sqlite"
+```
 
+```javascript
+// CJS
+const { Database } = require("elide:sqlite")
+```
+
+## Example
+
+```javascript
+import { Database } from "elide:sqlite"
+const db = new Database()
+db.exec("CREATE TABLE test (id INTEGER PRIMARY KEY, name TEXT);")
+db.exec("INSERT INTO test (name) VALUES ('foo');")
+db.query("SELECT * FROM test;").get()["name"]
+// 'foo'
+```
+
+<Alert type="note">
+Bindings are on the way for Python and Ruby.
+</Alert>
+
+## SQLite Examples
+
+Coming soon.
+
+## Classes
+
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; margin-top: 24px;">
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 Database</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Supported</div>
+  </div>
+</div>

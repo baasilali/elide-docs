@@ -1,14 +1,27 @@
 ---
 title: "WinterTC"
-description: "WinterTC support in Elide"
+description: "WinterTC conformance in Elide"
+date: "2025-11-20"
 ---
 
 # WinterTC
 
-WinterTC integration for JavaScript in Elide.
+<a href="https://wintertc.org/" style="color: rgb(168, 85, 247); text-decoration: underline; font-weight: 500;">WinterTC</a> (AKA ECMA International Technical Committee 55) is an open collaborative group committed to standardizing web-facing JavaScript runtimes; "web-interoperable" describes a package of new standards and definitions:
 
-## Overview
+- **<a href="https://min-common-api.proposal.wintertc.org/" style="color: rgb(168, 85, 247); text-decoration: underline; font-weight: 500;">Minimum Common API</a>**: Defines a standard set of "minimum common APIs" which all web-interoperable runtimes should support.
 
-Documentation coming soon.
+- **<a href="https://sockets-api.proposal.wintertc.org/" style="color: rgb(168, 85, 247); text-decoration: underline; font-weight: 500;">Sockets API</a>**: Defines APIs for communicating over custom TCP sockets from non-browser JavaScript applications.
 
+- **<a href="https://github.com/wintercg/proposal-cli-api" style="color: rgb(168, 85, 247); text-decoration: underline; font-weight: 500;">CLI API</a>**: Defines standards for accessing system environment, invocation arguments, and other CLI-related APIs.
 
+## Elide + WinterTC
+
+Elide aims to conform to most WITC standards:
+
+| Standard | Links | Standards Body | Description | Status |
+|----------|-------|----------------|-------------|--------|
+| Minimum Common API | <a href="https://min-common-api.proposal.wintertc.org/" style="color: rgb(168, 85, 247); text-decoration: underline; font-weight: 500;">Spec</a>, <a href="https://github.com/wintercg/proposal-minimum-common-api" style="color: rgb(168, 85, 247); text-decoration: underline; font-weight: 500;">Repo</a> | WinterTC (TC55) | Minimum APIs for web-interoperable runtimes | Supported |
+| CLI API | <a href="https://github.com/wintercg/proposal-cli-api" style="color: rgb(168, 85, 247); text-decoration: underline; font-weight: 500;">Repo</a> | WinterTC (TC55) | Uniform CLI-related APIs for non-browsers | In Progress |
+| Sockets API | <a href="https://sockets-api.proposal.wintertc.org/" style="color: rgb(168, 85, 247); text-decoration: underline; font-weight: 500;">Spec</a>, <a href="https://github.com/wintercg/proposal-sockets-api" style="color: rgb(168, 85, 247); text-decoration: underline; font-weight: 500;">Repo</a> | WinterTC (TC55) | Custom TCP sockets from non-browser contexts | Planned |
+| Fetch API | <a href="https://fetch.spec.whatwg.org/" style="color: rgb(168, 85, 247); text-decoration: underline; font-weight: 500;">Spec</a>, <a href="https://github.com/whatwg/fetch" style="color: rgb(168, 85, 247); text-decoration: underline; font-weight: 500;">Repo</a> | WHATWG | Standard WhatWG Fetch API, from non-browsers | Supported |
+| Web Crypto Streams | | WHATWG | Streaming options for Web Crypto APIs | Planned |

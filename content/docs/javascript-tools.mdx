@@ -1,14 +1,40 @@
 ---
 title: "JavaScript Tools"
 description: "JavaScript development tools in Elide"
+date: "2025-11-20"
 ---
 
 # JavaScript Tools
 
-JavaScript development tools and utilities available in Elide.
+Elide includes modern JavaScript tooling for enhanced development experience.
 
-## Overview
+## Package Management
 
-Documentation coming soon.
+Elide uses <a href="https://orogene.dev" style="color: rgb(168, 85, 247); text-decoration: underline; font-weight: 500;">Orogene</a> for fast, reliable package management with npm registry compatibility.
 
+## Code Transformation
 
+Elide integrates <a href="https://oxc.rs" style="color: rgb(168, 85, 247); text-decoration: underline; font-weight: 500;">OXC</a> (Oxidation Compiler) for:
+
+- **Fast parsing** - High-performance JavaScript and TypeScript parsing
+- **Transformation** - Code transformation and optimization
+- **Bundling** - Module bundling capabilities
+
+## TypeScript Support
+
+TypeScript files are automatically transpiled at runtime. No build step required.
+
+```javascript
+// Run TypeScript directly
+elide run script.ts
+```
+
+See the <a href="/docs/typescript.html" style="color: rgb(168, 85, 247); text-decoration: underline; font-weight: 500;">TypeScript</a> page for more details.
+
+## Performance
+
+Elide's tooling is designed for speed:
+
+- **Native performance** - Tools written in Rust for maximum efficiency
+- **Zero config** - Works out of the box with sensible defaults
+- **Minimal overhead** - Fast startup times and low memory footprint

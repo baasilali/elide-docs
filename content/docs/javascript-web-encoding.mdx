@@ -1,17 +1,119 @@
 ---
 title: "Encoding API"
-description: "Elide's compatibility with the Web Encoding API."
+description: "Elide's compatibility with the Web Encoding API"
+date: "2025-11-20"
 ---
 
 # Encoding API
 
-Elide provides compatibility with the Web Encoding API for text encoding and decoding operations.
+Elide supports the standard JavaScript types `TextEncoder` and `TextDecoder`. These classes can be used to obtain byte-arrays of strings in different encodings, or to obtain strings from byte arrays with different encodings.
+
+## Supported Encodings
+
+Elide supports several encodings via the `TextEncoder` and `TextDecoder` constructors:
+
+| Support | Charset | Encoding (Label) | Notes |
+|---------|---------|------------------|-------|
+| 🟢 Supported | `ISO_8859_1` | `iso-8859-1` | |
+| 🟢 Supported | `ASCII` | `ascii` | |
+| 🟢 Supported | `UTF_8` | `utf-8` | Default encoding |
+| 🔴 Not supported yet | `UTF_16` | `utf-16` | |
+| 🔴 Not supported yet | `UTF_32` | `utf-32` | |
+| 🔴 Not supported yet | (Other charsets) | | |
+
+## Classes
+
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; margin-top: 24px;">
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 TextDecoder</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Decode byte arrays into string representations</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 TextEncoder</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Encode strings into byte array representations</div>
+  </div>
+</div>
 
 ## TextEncoder
 
-The `TextEncoder` interface takes a stream of code points as input and produces a stream of UTF-8 bytes.
+```javascript
+// create an encoder; by default, it uses utf-8
+const encoder = new TextEncoder();
+encoder.encoding         // returns 'utf-8'
+encoder.encode("hello")  // returns `Uint8Array([...])`
+```
+
+The `TextEncoder` class behaves very similarly to how it behaves in a browser, or under Node.js; the only difference is that Elide supports additional encodings, on top of the default, which is `utf-8`.
+
+Read more about <a href="https://developer.mozilla.org/en-US/docs/Web/API/TextEncoder" style="color: rgb(168, 85, 247); text-decoration: underline; font-weight: 500;">TextEncoder on MDN</a>
+
+### TextEncoder Properties
+
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; margin-top: 24px;">
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 encoding</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Supported</div>
+  </div>
+</div>
+
+### TextEncoder Methods
+
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; margin-top: 24px;">
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 encode()</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Supported</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 encodeInto()</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Supported</div>
+  </div>
+</div>
 
 ## TextDecoder
 
-The `TextDecoder` interface takes a stream of bytes as input and produces a stream of code points.
+```javascript
+// create a decoder; by default, it uses utf-8
+const decoder = new TextDecoder();
+decoder.encoding         // returns 'utf-8'
+const input = new Uint8Array([104, 101, 108, 108, 111]);
+decoder.decode(input)  // returns 'hello'
+```
 
+The `TextDecoder` class behaves identically to how it behaves in a browser, or under Node.js.
+
+Read more about <a href="https://developer.mozilla.org/en-US/docs/Web/API/TextDecoder" style="color: rgb(168, 85, 247); text-decoration: underline; font-weight: 500;">TextDecoder on MDN</a>
+
+### TextDecoder Properties
+
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; margin-top: 24px;">
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 encoding</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Supported</div>
+  </div>
+</div>
+
+### TextDecoder Methods
+
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; margin-top: 24px;">
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 decode()</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Supported</div>
+  </div>
+</div>
+
+<div class="flex justify-between mt-12">
+  <a href="/docs/javascript-web-apis.html" class="group inline-flex items-center gap-2 text-lg font-medium text-foreground hover:text-primary transition-colors" style="text-decoration: none;">
+    <svg class="h-5 w-5 transition-transform duration-300 group-hover:-translate-x-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M11 17l-5-5m0 0l5-5m-5 5h12" />
+    </svg>
+    <span>Previous: Web & JavaScript APIs</span>
+  </a>
+  <a href="/docs/javascript-web-url.html" class="group inline-flex items-center gap-2 text-lg font-medium text-foreground hover:text-primary transition-colors" style="text-decoration: none;">
+    <span>Next: URL API</span>
+    <svg class="h-5 w-5 transition-transform duration-300 group-hover:translate-x-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+    </svg>
+  </a>
+</div>

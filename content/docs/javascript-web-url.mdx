@@ -1,17 +1,69 @@
 ---
 title: "URL API"
-description: "Elide's compatibility with the Web URL API."
+description: "Elide's compatibility with the Web URL API"
+date: "2025-11-20"
 ---
 
 # URL API
 
-Elide provides compatibility with the Web URL API for URL parsing and manipulation.
+Elide supports the <a href="https://whatwg.org" style="color: rgb(168, 85, 247); text-decoration: underline; font-weight: 500;">WhatWG</a> <a href="https://url.spec.whatwg.org/" style="color: rgb(168, 85, 247); text-decoration: underline; font-weight: 500;">URL API Specification</a>; this is the spec you use when you use the global `URL` class in JavaScript.
 
-## URL Constructor
+Elide's implementation of `URL` and `URLSearchParams` are based on JDK 22's <a href="https://docs.oracle.com/en%2Fjava%2Fjavase%2F22%2Fdocs%2Fapi%2F%2F/java.base/java/net/URI.html" style="color: rgb(168, 85, 247); text-decoration: underline; font-weight: 500;">URI</a>, <a href="https://docs.oracle.com/en%2Fjava%2Fjavase%2F22%2Fdocs%2Fapi%2F%2F/java.base/java/net/URL.html" style="color: rgb(168, 85, 247); text-decoration: underline; font-weight: 500;">URL</a>, and <a href="https://docs.oracle.com/en%2Fjava%2Fjavase%2F22%2Fdocs%2Fapi%2F%2F/java.base/java/net/URLDecoder.html" style="color: rgb(168, 85, 247); text-decoration: underline; font-weight: 500;">URLDecoder</a> classes.
 
-The `URL` interface represents an object providing static methods used for creating object URLs.
+## Classes
+
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; margin-top: 24px;">
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 URL</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Parse and manipulate URLs</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 URLSearchParams</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Parse and manipulate URL params</div>
+  </div>
+</div>
+
+## URL
+
+```javascript
+const url = new URL('https://google.com/search')
+url.pathname  // returns '/search'
+url.hostname  // returns 'google.com'
+```
+
+Read more about the standard JavaScript `URL` class <a href="https://developer.mozilla.org/en-US/docs/Web/API/URL" style="color: rgb(168, 85, 247); text-decoration: underline; font-weight: 500;">on MDN</a>
+
+The `URL` class is used as a <a href="https://en.wikipedia.org/wiki/Value_object" style="color: rgb(168, 85, 247); text-decoration: underline; font-weight: 500;">value class</a> which wraps a standard <a href="https://en.wikipedia.org/wiki/URL" style="color: rgb(168, 85, 247); text-decoration: underline; font-weight: 500;">Uniform Resource Locator</a>, also known as a "URL". URLs have a specific structure and suite of supported components, as opposed to their more general ancestor, <a href="https://en.wikipedia.org/wiki/Uniform_Resource_Identifier" style="color: rgb(168, 85, 247); text-decoration: underline; font-weight: 500;">URIs</a>.
+
+URLs are strictly validated: when you construct one from a string, it is parsed eagerly, and you will get an error if the provided string is not a valid URL.
+
+URLs, by spec, support the following components:
+
+| URL Property | Sample Value | Description |
+|--------------|--------------|-------------|
+| `protocol` | `'https:'` | The transport technology in use, including the trailing `:`; usually `http:` or `https:` |
+| `origin` | `'https://google.com:443'` | The web origin value of the URL; consists of the scheme, domain, and port |
+| `host` | `'google.com:443'` | The full host string, like `https://google.com:443` from the example above |
+| `hostname` | `'google.com'` | Just the hostname, like `google.com` from the sample above |
+| `port` | `443` | Just the port, like `443` from the sample above (HTTPS) |
+| `pathname` | `/search` | The path portion of the url `/like-this/here`, or `/` at a minimum |
+| `hash` | `#hello` | The portion of the URL after `#`, if present |
+| `href` | `'https://google.com/search'` | Formatted string version of the whole URL |
+| `username` | `'user'` | If there is auth information in the URL (like `user:pass@...`), this is `user` |
+| `password` | `'pass'` | If there is auth information in the URL (like `user:pass@...`), this is `pass` |
+| `search` | `'?hello=hi'` | The portion of the URL after `?` but before `#`, if present, including the initial `?` |
+| `searchParams` | `URLSearchParams` object | Parsed `search` value into a multimap of key-value pairs |
 
 ## URLSearchParams
 
-The `URLSearchParams` interface defines utility methods to work with the query string of a URL.
+Coming soon.
 
+<div class="flex justify-start mt-12">
+  <a href="/docs/javascript-web-encoding.html" class="group inline-flex items-center gap-2 text-lg font-medium text-foreground hover:text-primary transition-colors" style="text-decoration: none;">
+    <svg class="h-5 w-5 transition-transform duration-300 group-hover:-translate-x-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M11 17l-5-5m0 0l5-5m-5 5h12" />
+    </svg>
+    <span>Previous: Encoding API</span>
+  </a>
+</div>

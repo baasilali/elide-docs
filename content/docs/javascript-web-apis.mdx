@@ -1,6 +1,7 @@
 ---
 title: "Web & JavaScript APIs"
 description: "Web and JavaScript API support in Elide"
+date: "2025-11-20"
 ---
 
 # Web & JavaScript APIs
@@ -9,6 +10,111 @@ Elide supports standard Web and JavaScript APIs for modern application developme
 
 ## Available APIs
 
-Documentation coming soon. You'll provide the specific Web API content.
+Elide provides support for several Web APIs as global objects and dedicated modules:
 
+### Encoding
 
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; margin-top: 24px;">
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 TextDecoder</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Decode byte arrays into strings</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 TextEncoder</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Encode strings into byte arrays</div>
+  </div>
+</div>
+
+See <a href="/docs/javascript-web-encoding.html" style="color: rgb(168, 85, 247); text-decoration: underline; font-weight: 500;">Encoding API</a> for details.
+
+### URL Parsing
+
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; margin-top: 24px;">
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 URL</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Parse and manipulate URLs</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 URLSearchParams</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Parse and manipulate URL parameters</div>
+  </div>
+</div>
+
+See <a href="/docs/javascript-web-url.html" style="color: rgb(168, 85, 247); text-decoration: underline; font-weight: 500;">URL API</a> for details.
+
+### Global Objects
+
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; margin-top: 24px;">
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 atob()</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Base64 decoding</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 btoa()</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Base64 encoding</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 console</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Logging and debugging</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 fetch()</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Experimental - HTTP requests</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 globalThis</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Global object reference</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 setInterval()</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Repeat execution with delay</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟢 setTimeout()</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Delayed execution</div>
+  </div>
+</div>
+
+## Coming Soon
+
+Additional Web APIs are planned for future releases:
+
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; margin-top: 24px;">
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟡 WebSocket</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Bidirectional communication</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟡 WebCrypto</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Cryptographic operations</div>
+  </div>
+
+  <div style="padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);">
+    <div style="font-family: monospace; font-weight: 600; margin-bottom: 4px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🟡 Streams</div>
+    <div style="font-size: 14px; color: var(--muted-foreground);">Web Streams API</div>
+  </div>
+</div>
+
+<div class="flex justify-between mt-12">
+  <a href="/docs/javascript-node-api.html" class="group inline-flex items-center gap-2 text-lg font-medium text-foreground hover:text-primary transition-colors" style="text-decoration: none;">
+    <svg class="h-5 w-5 transition-transform duration-300 group-hover:-translate-x-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M11 17l-5-5m0 0l5-5m-5 5h12" />
+    </svg>
+    <span>Previous: Node API</span>
+  </a>
+  <a href="/docs/javascript-web-encoding.html" class="group inline-flex items-center gap-2 text-lg font-medium text-foreground hover:text-primary transition-colors" style="text-decoration: none;">
+    <span>Next: Encoding API</span>
+    <svg class="h-5 w-5 transition-transform duration-300 group-hover:translate-x-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+    </svg>
+  </a>
+</div>
