@@ -1,24 +1,38 @@
 ---
 title: "HTTP Servers"
-description: "Building HTTP servers with Elide"
+description: "Building web servers with Elide"
 date: "2025-11-20"
 ---
 
 # HTTP Servers
 
-Build high-performance HTTP servers with Elide's built-in server API.
+Build fast HTTP servers with Elide
 
-## Quick Start
+This exercise is part of the Polyglot 101 intro guide.
+
+Elide includes a built-in high-performance HTTP server that makes it easy to build web applications and APIs.
+
+## Before you start
+
+Before running the code below, you'll need to make sure the following is true:
+
+- Elide is installed
+- The `elide` binary is executable
+- The `elide` binary is on your `PATH`, or otherwise referenced in absolute form
+
+## Your First Server
+
+Create a file named `server.js`:
 
 ```javascript
 // server.js
-const app = Elide.http
+const server = Elide.http
 
-app.router.handle("GET", "/", (request, response) => {
+server.handle("GET", "/", (request, response) => {
   response.send(200, "Hello, World!")
 })
 
-console.log("Server running on http://localhost:8080")
+console.log("Server running at http://localhost:8080")
 ```
 
 Run it:
@@ -27,269 +41,164 @@ Run it:
 elide run server.js
 ```
 
-## Routing
+Visit `http://localhost:8080` in your browser to see "Hello, World!"
 
-### Basic Routes
+## Handling Routes
 
-```javascript
-// GET route
-app.router.handle("GET", "/users", (req, res) => {
-  res.json({ users: ['Alice', 'Bob'] })
-})
-
-// POST route
-app.router.handle("POST", "/users", (req, res) => {
-  const body = await req.json()
-  // Process user creation
-  res.json({ id: 123, ...body })
-})
-
-// PUT route
-app.router.handle("PUT", "/users/:id", (req, res) => {
-  const id = req.params.id
-  res.json({ id, updated: true })
-})
-
-// DELETE route
-app.router.handle("DELETE", "/users/:id", (req, res) => {
-  res.send(204)
-})
-```
-
-### Path Parameters
+Add more routes to handle different paths:
 
 ```javascript
-app.router.handle("GET", "/users/:userId/posts/:postId", (req, res) => {
-  const { userId, postId } = req.params
-  res.json({ userId, postId })
-})
-```
-
-### Query Parameters
-
-```javascript
-app.router.handle("GET", "/search", (req, res) => {
-  const { q, limit = 10 } = req.query
-  res.json({ query: q, limit })
-})
-```
-
-## Request Handling
-
-### Reading Request Body
-
-```javascript
-// JSON body
-app.router.handle("POST", "/api/data", async (req, res) => {
-  const data = await req.json()
-  res.json({ received: data })
+// GET request
+server.handle("GET", "/hello", (req, res) => {
+  res.send(200, "Hello!")
 })
 
-// Text body
-app.router.handle("POST", "/api/text", async (req, res) => {
-  const text = await req.text()
-  res.send(200, `Received: ${text}`)
-})
-
-// Form data
-app.router.handle("POST", "/api/form", async (req, res) => {
-  const form = await req.formData()
-  const name = form.get('name')
-  res.json({ name })
-})
-```
-
-### Request Headers
-
-```javascript
-app.router.handle("GET", "/headers", (req, res) => {
-  const authHeader = req.headers.get('Authorization')
-  const userAgent = req.headers.get('User-Agent')
-  
+// JSON response
+server.handle("GET", "/api/users", (req, res) => {
   res.json({
-    auth: authHeader,
-    userAgent
+    users: [
+      { id: 1, name: 'Alice' },
+      { id: 2, name: 'Bob' }
+    ]
+  })
+})
+
+// Route with parameter
+server.handle("GET", "/users/:id", (req, res) => {
+  const userId = req.params.id
+  res.json({ userId, name: 'User ' + userId })
+})
+```
+
+## Handling POST Requests
+
+Receive and process data from clients:
+
+```javascript
+server.handle("POST", "/api/users", async (req, res) => {
+  // Parse JSON body
+  const body = await req.json()
+  
+  // Process the data
+  console.log('Received:', body)
+  
+  // Send response
+  res.json({
+    success: true,
+    user: body
   })
 })
 ```
 
-## Response Types
+Test it with curl:
 
-### JSON Response
-
-```javascript
-res.json({ message: "Success", data: [1, 2, 3] })
+```bash
+curl -X POST http://localhost:8080/api/users \
+  -H "Content-Type: application/json" \
+  -d '{"name":"Charlie","email":"charlie@example.com"}'
 ```
 
-### Text Response
+## Query Parameters
+
+Access query parameters from the URL:
 
 ```javascript
-res.send(200, "Hello, World!")
-```
-
-### HTML Response
-
-```javascript
-res.html(`
-  <!DOCTYPE html>
-  <html>
-    <body>
-      <h1>Hello from Elide!</h1>
-    </body>
-  </html>
-`)
-```
-
-### File Response
-
-```javascript
-res.file('/path/to/file.pdf')
-```
-
-### Stream Response
-
-```javascript
-const stream = createReadStream('/large/file.dat')
-res.stream(stream)
-```
-
-## Middleware
-
-```javascript
-// Logging middleware
-app.use((req, res, next) => {
-  console.log(`${req.method} ${req.url}`)
-  next()
+server.handle("GET", "/search", (req, res) => {
+  const query = req.query.q
+  const limit = req.query.limit || 10
+  
+  res.json({
+    query: query,
+    limit: limit,
+    results: []
+  })
 })
+```
 
-// Authentication middleware
-app.use((req, res, next) => {
-  const token = req.headers.get('Authorization')
-  if (!token) {
-    return res.send(401, 'Unauthorized')
-  }
-  next()
-})
+Visit: `http://localhost:8080/search?q=elide&limit=5`
 
-// CORS middleware
-app.use((req, res, next) => {
-  res.headers.set('Access-Control-Allow-Origin', '*')
-  next()
+## Serving HTML
+
+Return HTML content:
+
+```javascript
+server.handle("GET", "/page", (req, res) => {
+  res.html("<p>Welcome to Elide</p>")
 })
 ```
 
 ## Error Handling
 
+Handle errors gracefully:
+
 ```javascript
-app.router.handle("GET", "/error", (req, res) => {
+server.handle("GET", "/error", (req, res) => {
   try {
     // Some operation that might fail
     throw new Error('Something went wrong')
   } catch (error) {
-    res.status(500).json({
+    res.json({
       error: error.message
-    })
-  }
-})
-
-// Global error handler
-app.onError((error, req, res) => {
-  console.error(error)
-  res.status(500).json({
-    error: 'Internal Server Error'
-  })
-})
-```
-
-## Static Files
-
-```javascript
-// Serve static files from directory
-app.static('/public', './static')
-
-// Now accessible at:
-// http://localhost:8080/public/style.css
-// http://localhost:8080/public/app.js
-```
-
-## WebSocket Support
-
-```javascript
-app.ws('/chat', {
-  open(ws) {
-    console.log('Client connected')
-  },
-  
-  message(ws, message) {
-    // Echo message back
-    ws.send(`Echo: ${message}`)
-  },
-  
-  close(ws) {
-    console.log('Client disconnected')
+    }, 500)
   }
 })
 ```
 
-## Performance
+## Complete Example: Simple API
 
-| Feature | Benefit |
-|---------|---------|
-| **Async I/O** | Non-blocking operations |
-| **Native HTTP** | Powered by Netty |
-| **Zero-copy** | Efficient data transfer |
-| **Keep-alive** | Connection reuse |
-
-### Benchmarks
-
-| Runtime | Requests/sec |
-|---------|--------------|
-| **Elide** | 800K+ |
-| Express.js | 15K |
-| Fastify | 50K |
-
-## Configuration
+Here's a complete example of a basic REST API:
 
 ```javascript
-const app = Elide.http.createServer({
-  port: 3000,
-  host: '0.0.0.0',
-  backlog: 511,
-  keepAlive: true,
-  maxConnections: 10000
+// api-server.js
+const server = Elide.http
+
+// In-memory data store
+const users = [
+  { id: 1, name: 'Alice', email: 'alice@example.com' },
+  { id: 2, name: 'Bob', email: 'bob@example.com' }
+]
+
+// List all users
+server.handle("GET", "/api/users", (req, res) => {
+  res.json(users)
 })
+
+// Get user by ID
+server.handle("GET", "/api/users/:id", (req, res) => {
+  const id = parseInt(req.params.id)
+  const user = users.find(u => u.id === id)
+  
+  if (user) {
+    res.json(user)
+  } else {
+    res.json({ error: 'User not found' }, 404)
+  }
+})
+
+// Create new user
+server.handle("POST", "/api/users", async (req, res) => {
+  const body = await req.json()
+  const newUser = {
+    id: users.length + 1,
+    name: body.name,
+    email: body.email
+  }
+  users.push(newUser)
+  res.json(newUser, 201)
+})
+
+console.log("API server running at http://localhost:8080")
 ```
 
-## Production Tips
+## What you've learned
 
-1. **Enable compression**
-   ```javascript
-   app.use(Elide.http.compression())
-   ```
+In this tutorial, you learned how to create HTTP servers with Elide, handle different routes and methods, work with request data, and build a simple REST API.
 
-2. **Set timeouts**
-   ```javascript
-   app.timeout = 30000 // 30 seconds
-   ```
-
-3. **Rate limiting**
-   ```javascript
-   app.use(Elide.http.rateLimit({
-     windowMs: 60000,
-     max: 100
-   }))
-   ```
-
-4. **Health checks**
-   ```javascript
-   app.router.handle("GET", "/health", (req, res) => {
-     res.json({ status: 'ok' })
-   })
-   ```
-
-## Next Steps
-
-- [Polyglot Interop](/docs/interop) - Use Python for data processing
-- [Deployment](/docs/deployment) - Deploy to production
-- [Performance](/docs/performance) - Optimize your server
-
+<div class="flex justify-start mt-12">
+  <a href="/docs/interop.html" class="group inline-flex items-center gap-2 text-lg font-medium text-foreground hover:text-primary transition-colors" style="text-decoration: none;">
+    <svg class="h-5 w-5 transition-transform duration-300 group-hover:-translate-x-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M11 17l-5-5m0 0l5-5m-5 5h12" />
+    </svg>
+    <span>Previous: Interop</span>
+  </a>
+</div>

@@ -1,204 +1,151 @@
 ---
 title: "Debugging"
-description: "Debug your Elide applications effectively"
+description: "Debug your Elide applications"
 date: "2025-11-20"
 ---
 
 # Debugging
 
-Learn how to debug Elide applications using modern debugging tools.
+Learn how to debug applications in Elide
 
-## Inspector Protocol
+This exercise is part of the Polyglot 101 intro guide.
 
-Elide supports the Chrome DevTools Protocol for debugging.
+Elide provides multiple ways to debug your code, from simple console logging to full Chrome DevTools integration.
 
-### Starting the Debugger
+## Before you start
 
-```bash
-# Enable inspector
-elide run --inspect app.js
+Before running the code below, you'll need to make sure the following is true:
 
-# Specify port
-elide run --inspect=9229 app.js
+- Elide is installed
+- The `elide` binary is executable
+- The `elide` binary is on your `PATH`, or otherwise referenced in absolute form
 
-# Wait for debugger to attach
-elide run --inspect-brk app.js
-```
+## Console Logging
 
-### Connecting
-
-1. **Chrome DevTools**
-   - Open `chrome://inspect`
-   - Click "Configure" and add `localhost:9229`
-   - Click "inspect" on your Elide process
-
-2. **VS Code**
-   ```json
-   {
-     "type": "node",
-     "request": "attach",
-     "name": "Attach to Elide",
-     "port": 9229
-   }
-   ```
-
-3. **IntelliJ IDEA**
-   - Run → Attach to Process
-   - Select Elide process
-
-## Console Debugging
-
-### JavaScript
+The simplest way to debug is using console output:
 
 ```javascript
 // Basic logging
-console.log('Debug message')
-console.error('Error message')
-console.warn('Warning')
+console.log('Debug message:', someValue)
+console.error('Error:', error)
+console.warn('Warning:', warning)
 
-// Structured logging
-console.table([
-  { name: 'Alice', age: 30 },
-  { name: 'Bob', age: 25 }
-])
-
-// Timing
-console.time('operation')
-// ... code ...
-console.timeEnd('operation')
-
-// Stack traces
-console.trace('Trace point')
+// Inspect objects
+const user = { name: 'Alice', age: 30 }
+console.log('User:', user)
 ```
 
-### Python
+In Python:
 
 ```python
 # Basic logging
-print('Debug message')
+print('Debug message:', some_value)
 
-# With formatting
-print(f'Value: {value}')
-
-# Debug with locals
-import pdb
-pdb.set_trace()  # Breakpoint
+# Inspect objects
+user = {'name': 'Alice', 'age': 30}
+print('User:', user)
 ```
 
-## Breakpoints
+## Using the Debugger
 
-### JavaScript
+Elide supports the Chrome DevTools Protocol for interactive debugging.
+
+1. Start your app with the inspector enabled:
+
+```bash
+elide run --inspect app.js
+```
+
+2. Open Chrome and navigate to `chrome://inspect`
+
+3. Click "Configure" and add `localhost:9229` if not already present
+
+4. Click "inspect" on your Elide process
+
+You can now:
+- Set breakpoints
+- Step through code
+- Inspect variables
+- View the call stack
+
+## Debugger Statement
+
+Add breakpoints directly in your code:
 
 ```javascript
-// Programmatic breakpoint
-debugger
-
-// Conditional breakpoint
-if (someCondition) {
-  debugger
+function calculateTotal(items) {
+  debugger  // Execution will pause here
+  return items.reduce((sum, item) => sum + item.price, 0)
 }
 ```
 
-### Python
+The debugger statement only works when running with `--inspect`.
 
-```python
-# Using pdb
-import pdb
-pdb.set_trace()
+## REPL Debugging
 
-# Using breakpoint() (Python 3.7+)
-breakpoint()
-```
-
-## Performance Profiling
-
-### CPU Profiling
+Use the interactive REPL to test code snippets:
 
 ```bash
-# Profile your application
-elide run --cpuprofile app.js
+elide repl
+elide (js) > const data = [1, 2, 3, 4, 5]
+elide (js) > data.map(x => x * 2)
+[2, 4, 6, 8, 10]
 ```
 
-View the profile:
-1. Open Chrome DevTools
-2. Go to Performance tab
-3. Load the generated `.cpuprofile` file
+This is useful for:
+- Testing functions quickly
+- Exploring APIs
+- Validating assumptions
 
-### Memory Profiling
+## Common Debugging Tasks
 
-```bash
-# Track memory usage
-elide run --heapprofile app.js
-```
-
-## Logging Best Practices
-
-### Structured Logging
+### Check variable values
 
 ```javascript
-// Good: Structured logs
-console.log({
-  level: 'info',
-  message: 'User logged in',
-  userId: 123,
-  timestamp: Date.now()
-})
-
-// Avoid: Unstructured logs
-console.log('User 123 logged in')
+const result = someFunction()
+console.log('Result:', result)
 ```
 
-### Log Levels
+### Trace execution flow
 
 ```javascript
-const LOG_LEVEL = process.env.LOG_LEVEL || 'info'
-
-const log = {
-  error: (...args) => console.error('[ERROR]', ...args),
-  warn: (...args) => console.warn('[WARN]', ...args),
-  info: (...args) => console.log('[INFO]', ...args),
-  debug: (...args) => LOG_LEVEL === 'debug' && console.log('[DEBUG]', ...args)
-}
-
-log.info('Application started')
-log.debug('Debug information')
-```
-
-## Common Issues
-
-### Async Stack Traces
-
-Enable async stack traces:
-
-```bash
-elide run --async-stack-traces app.js
-```
-
-### Source Maps
-
-For TypeScript:
-
-```json
-{
-  "compilerOptions": {
-    "sourceMap": true
-  }
+function processData(data) {
+  console.log('Processing started')
+  const cleaned = cleanData(data)
+  console.log('Data cleaned:', cleaned)
+  const validated = validateData(cleaned)
+  console.log('Data validated:', validated)
+  return validated
 }
 ```
 
-## Debugging Tools
+### Catch errors
 
-| Tool | Use Case |
-|------|----------|
-| **Chrome DevTools** | Interactive debugging |
-| **VS Code** | IDE integration |
-| **Console** | Quick debugging |
-| **Profiler** | Performance analysis |
+```javascript
+try {
+  const result = riskyOperation()
+  console.log('Success:', result)
+} catch (error) {
+  console.error('Error occurred:', error.message)
+  console.error('Stack:', error.stack)
+}
+```
 
-## Tips
+## What you've learned
 
-1. **Use debugger statement** for quick breakpoints
-2. **Enable source maps** for TypeScript
-3. **Log at boundaries** - Function entry/exit, API calls
-4. **Profile before optimizing** - Measure, don't guess
+In this tutorial, you learned how to debug Elide applications using console logging, the Chrome DevTools inspector, and the REPL.
 
+<div class="flex justify-between mt-12">
+  <a href="/docs/file-system.html" class="group inline-flex items-center gap-2 text-lg font-medium text-foreground hover:text-primary transition-colors" style="text-decoration: none;">
+    <svg class="h-5 w-5 transition-transform duration-300 group-hover:-translate-x-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M11 17l-5-5m0 0l5-5m-5 5h12" />
+    </svg>
+    <span>Previous: File System</span>
+  </a>
+  <a href="/docs/interop.html" class="group inline-flex items-center gap-2 text-lg font-medium text-foreground hover:text-primary transition-colors" style="text-decoration: none;">
+    <span>Next: Interop</span>
+    <svg class="h-5 w-5 transition-transform duration-300 group-hover:translate-x-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+    </svg>
+  </a>
+</div>
