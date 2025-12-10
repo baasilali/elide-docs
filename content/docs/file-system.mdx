@@ -1,139 +1,71 @@
 ---
 title: "File System"
-description: "Working with files and directories in Elide"
+description: "Filesystem access with Elide"
 date: "2025-11-20"
 ---
 
 # File System
 
-Learn how to read, write, and manage files in Elide across different languages.
+Filesystem access with Elide
 
-## JavaScript/TypeScript
+This exercise is part of the Polyglot 101 intro guide.
 
-### Reading Files
+Coming soon.
 
-```javascript
-// Read file as string
-const content = await Elide.readFile('data.txt')
+<Alert>
+  <strong>Note:</strong> Like <a href="/docs/env-variables.html">env variables</a>, Elide <strong>isolates filesystem I/O by default</strong>; unless you grant permission, code running under Elide (in any language) cannot see your disk.
+</Alert>
 
-// Read as JSON
-const data = JSON.parse(await Elide.readFile('config.json'))
+## Before you start
 
-// Read binary
-const buffer = await Elide.readFile('image.png', { encoding: null })
+Before running the code below, you'll need to make sure the following is true:
+
+- Elide is installed
+- The `elide` binary is executable
+- The `elide` binary is on your `PATH`, or otherwise referenced in absolute form
+
+## Reading files from disk
+
+We're going to try out Elide's isolation with regard to **disk I/O**
+
+1. Start an interactive session. Elide starts you with JavaScript. Let's also create a file which we will read:
+
+```bash
+echo "testing" > hello.txt
+elide repl
+elide (js) >
 ```
 
-### Writing Files
+Use `Ctrl+C` twice or `Ctrl+D` to exit the interactive session.
 
-```javascript
-// Write string
-await Elide.writeFile('output.txt', 'Hello, World!')
+2. Now, let's import the [`node:fs`](https://nodejs.org/api/fs.html) module:
 
-// Write JSON
-await Elide.writeFile('data.json', JSON.stringify(data, null, 2))
-
-// Append to file
-await Elide.appendFile('log.txt', 'New log entry\n')
+```bash
+elide (js) > const fs = require('node:fs');
 ```
 
-### Directory Operations
+Elide aims for full Node API support, but we aren't there yet. See the Node API reference.
 
-```javascript
-// List directory
-const files = await Elide.readDir('/path/to/dir')
+3. Let's read the file we just wrote:
 
-// Create directory
-await Elide.mkdir('/path/to/new/dir', { recursive: true })
-
-// Check if exists
-const exists = await Elide.exists('/path/to/file')
-
-// Get file info
-const stats = await Elide.stat('/path/to/file')
-console.log(stats.size, stats.mtime)
+```bash
+elide (js) > fs.readFileSync("hello.txt", {encoding: 'utf-8'})
+testing
 ```
 
-## Python
+Neat! We can read the file.
 
-### Reading Files
-
-```python
-# Read file
-with open('data.txt', 'r') as f:
-    content = f.read()
-
-# Read lines
-with open('data.txt', 'r') as f:
-    lines = f.readlines()
-
-# Read JSON
-import json
-with open('config.json', 'r') as f:
-    data = json.load(f)
-```
-
-### Writing Files
-
-```python
-# Write file
-with open('output.txt', 'w') as f:
-    f.write('Hello, World!')
-
-# Write JSON
-import json
-with open('data.json', 'w') as f:
-    json.dump(data, f, indent=2)
-```
-
-## Path Operations
-
-### JavaScript
-
-```javascript
-import { join, dirname, basename } from 'path'
-
-const fullPath = join('/home', 'user', 'file.txt')
-const dir = dirname(fullPath)
-const name = basename(fullPath)
-```
-
-### Python
-
-```python
-import os
-
-full_path = os.path.join('/home', 'user', 'file.txt')
-dir_path = os.path.dirname(full_path)
-file_name = os.path.basename(full_path)
-```
-
-## Temporary Files
-
-```javascript
-// Create temp file
-const tmpFile = await Elide.makeTempFile()
-await Elide.writeFile(tmpFile, 'temporary data')
-
-// Cleanup
-await Elide.remove(tmpFile)
-```
-
-## File Watching
-
-```javascript
-// Watch for changes
-const watcher = Elide.watch('/path/to/dir', (event, filename) => {
-  console.log(`${event}: ${filename}`)
-})
-
-// Stop watching
-watcher.close()
-```
-
-## Best Practices
-
-1. **Always close files** - Use `try/finally` or context managers
-2. **Handle errors** - Check if file exists before reading
-3. **Use absolute paths** - Or be explicit about working directory
-4. **Watch permissions** - Ensure proper file permissions
-
+<div class="flex justify-between mt-12">
+  <a href="/docs/env-variables.html" class="group inline-flex items-center gap-2 text-lg font-medium text-foreground hover:text-primary transition-colors" style="text-decoration: none;">
+    <svg class="h-5 w-5 transition-transform duration-300 group-hover:-translate-x-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M11 17l-5-5m0 0l5-5m-5 5h12" />
+    </svg>
+    <span>Previous: Env Variables</span>
+  </a>
+  <a href="/docs/debugging.html" class="group inline-flex items-center gap-2 text-lg font-medium text-foreground hover:text-primary transition-colors" style="text-decoration: none;">
+    <span>Next: Debugging</span>
+    <svg class="h-5 w-5 transition-transform duration-300 group-hover:translate-x-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+    </svg>
+  </a>
+</div>

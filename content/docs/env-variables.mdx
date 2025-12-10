@@ -1,124 +1,103 @@
 ---
 title: "Environment Variables"
-description: "Working with environment variables in Elide"
+description: "Reading environment variables from JavaScript and Python"
 date: "2025-11-20"
 ---
 
 # Environment Variables
 
-Learn how to use environment variables across different languages in Elide.
+Reading environment variables from JavaScript and Python
 
-## Accessing Environment Variables
+This exercise is part of the Polyglot 101 intro guide.
 
-### JavaScript
+Many applications use [environment variables](https://en.wikipedia.org/wiki/Environment_variable) to pass small bits of data between invocations, or across process boundaries.
 
-```javascript
-// Read environment variable
-const apiKey = process.env.API_KEY
+As part of Elide's job in unifying multiple languages for use in one program, environment variable access is made uniform across all languages:
 
-// Check if variable exists
-if (process.env.NODE_ENV === 'production') {
-  console.log('Running in production')
-}
+- **Environment is subject to policy.** By default, code **cannot see system environment variables** in Elide; this is a big difference with other runtimes, so it bears repeating below.
 
-// Default values
-const port = process.env.PORT || 3000
+- **Environment is loaded uniformly.** Support for features like [dotenv files](https://stackoverflow.com/questions/68267862/what-is-an-env-or-dotenv-file-exactly) is cross-language in Elide. If you see a variable in JavaScript, you will see it as well in Python, Ruby, and so on.
+
+<Alert>
+  <strong>Note:</strong> With Elide, system environment variables are <strong>invisible by default</strong> to running code. You can allow access to environment using command line flags.
+</Alert>
+
+## Before you start
+
+Before running the code below, you'll need to make sure the following is true:
+
+- Elide is installed
+- The `elide` binary is executable
+- The `elide` binary is on your `PATH`, or otherwise referenced in absolute form
+
+## Reading environment variables
+
+We're going to try out Elide's policies with regard to **reading host environment variables.**
+
+1. Start an interactive session; Elide defaults to JavaScript, so you should get a JavaScript prompt:
+
+```bash
+export ELIDE_TESTING="hello"
+elide repl
+elide (js) >
 ```
 
-### Python
+Use `Ctrl+C` twice or `Ctrl+D` to exit the interactive session.
+
+2. Elide provides the [`process`](https://nodejs.org/api/process.html#process) object, just like Node:
+
+```bash
+elide (js) > process.env.ELIDE_TESTING
+undefined
+```
+
+Our `ELIDE_TESTING` environment variable isn't showing up! That's because Elide forbids access to environment variables by default.
+
+3. Now, let's run the REPL session again, but with access to host environment:
+
+```bash
+elide repl --allow:host-env
+elide (js) > process.env.ELIDE_TESTING
+hello
+```
+
+Neat! We can see the environment variable.
+
+4. Now let's try Python:
 
 ```python
-import os
-
-# Read environment variable
-api_key = os.getenv('API_KEY')
-
-# With default value
-port = os.getenv('PORT', '3000')
-
-# Check if exists
-if os.getenv('NODE_ENV') == 'production':
-    print('Running in production')
+elide repl --python
+elide (python) > import os; os.environ
+Environ(ELIDE_INTERNAL, ELIDE_ROOT, NODE_ENV)
 ```
 
-### TypeScript
+Elide provides the `NODE_ENV` variable to all languages, set to either `'development'` or `'production'`.
 
-```typescript
-// With type safety
-const apiKey: string | undefined = process.env.API_KEY
-
-// With validation
-const port = Number(process.env.PORT) || 3000
-```
-
-## Setting Environment Variables
-
-### Command Line
-
-```bash
-# Inline
-API_KEY=secret elide run app.js
-
-# Export
-export API_KEY=secret
-elide run app.js
-```
-
-### .env Files
-
-Create a `.env` file:
-
-```bash
-API_KEY=your-secret-key
-PORT=3000
-NODE_ENV=development
-DATABASE_URL=postgresql://localhost/mydb
-```
-
-Load it:
-
-```bash
-elide run --env .env app.js
-```
-
-## Best Practices
-
-1. **Never commit secrets** - Use `.gitignore` for `.env`
-2. **Use defaults** - Provide fallback values
-3. **Validate early** - Check required variables at startup
-4. **Document variables** - List all required env vars
-
-## Example: Configuration Module
-
-```javascript
-// config.js
-const config = {
-  apiKey: process.env.API_KEY,
-  port: parseInt(process.env.PORT || '3000'),
-  env: process.env.NODE_ENV || 'development',
-  database: process.env.DATABASE_URL,
-}
-
-// Validate required variables
-if (!config.apiKey) {
-  throw new Error('API_KEY environment variable is required')
-}
-
-export default config
-```
-
-## Cross-Language Access
-
-Environment variables are accessible from all languages:
-
-```javascript
-// JavaScript sets variable
-process.env.SHARED_VALUE = '42'
-```
+5. And with environment access enabled:
 
 ```python
-# Python can read it
-import os
-value = os.getenv('SHARED_VALUE')  # '42'
+elide repl --python --allow:host-env
+elide (python) > import os; os.environ
+Environ(ANDROID_HOME, AWS_ACCESS_KEY_ID, ... ELIDE_TESTING, ...)
 ```
 
+Of course, the accessing variable returns the expected value:
+
+```python
+elide repl --python --allow:host-env
+elide (python) > import os; os.environ["ELIDE_TESTING"]
+'hello'
+```
+
+## What you've learned
+
+In this tutorial, you learned about Elide's policy enforcement around env variable access, and how it interoperates with JavaScript and Python.
+
+<div class="flex justify-end mt-12">
+  <a href="/docs/file-system.html" class="group inline-flex items-center gap-2 text-lg font-medium text-foreground hover:text-primary transition-colors" style="text-decoration: none;">
+    <span>Next: Filesystem access</span>
+    <svg class="h-5 w-5 transition-transform duration-300 group-hover:translate-x-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+    </svg>
+  </a>
+</div>
